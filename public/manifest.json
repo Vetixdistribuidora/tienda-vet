@@ -1,0 +1,26 @@
+{
+  "name": "VETIX Distribuidora Veterinaria",
+  "short_name": "VETIX",
+  "description": "Distribuidora veterinaria al por mayor. Pedidos online las 24 hs.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#e8197d",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["shopping", "medical"],
+  "lang": "es-AR"
+}
