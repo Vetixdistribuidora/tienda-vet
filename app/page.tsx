@@ -287,7 +287,7 @@ function FilaListaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFa
           Ver precio
         </button>
       ) : tipoCliente === "pendiente" ? (
-        <span style={{ fontSize: 11, fontWeight: 700, color: "#92400e", flexShrink: 0, whiteSpace: "nowrap" }}>A consultar</span>
+        <span style={{ fontSize: 11, fontWeight: 700, color: "#64748b", flexShrink: 0, whiteSpace: "nowrap" }}>Precio a confirmar</span>
       ) : (
         <span style={{ fontSize: 15, fontWeight: 900, color: "#e8197d", flexShrink: 0, minWidth: 88, textAlign: "right" }}>
           {fmt(precioConTipo(p.precio_venta, tipoCliente)!)}
@@ -394,7 +394,7 @@ function TarjetaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFav,
               Ver precio
             </button>
           ) : tipoCliente === "pendiente" ? (
-            <span style={{ fontSize: 12, fontWeight: 700, color: "#92400e" }}>A consultar</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: "#64748b" }}>Precio a confirmar</span>
           ) : (
             <span style={{ fontSize: 17, fontWeight: 900, color: "#e8197d", letterSpacing: -0.3 }}>{fmt(precioConTipo(p.precio_venta, tipoCliente)!)}</span>
           )}
@@ -1300,7 +1300,6 @@ export default function Tienda() {
 
   function imprimirCarrito() {
     const fecha = new Date().toLocaleDateString("es-AR", { day: "2-digit", month: "long", year: "numeric" })
-    const tipoLabel = tipoCliente === "veterinario" ? "Veterinario" : tipoCliente === "productor" ? "Productor" : ""
     const lineas = carrito.map(i => {
       const pu = precioConTipo(i.producto.precio_venta, tipoCliente) ?? i.producto.precio_venta
       return `
@@ -1325,7 +1324,7 @@ export default function Tienda() {
   @media print{body{padding:16px}.no-print{display:none}}
 </style></head><body>
 <div class="top">
-  <div><h1>VETIX Distribuidora</h1><p class="sub">Lista de pedido${tipoLabel ? ` — Precio ${tipoLabel}` : " — precios de referencia"}</p>${perfil ? `<p class="sub" style="margin-top:2px;color:#1a2035;font-weight:700">${perfil.nombre} ${perfil.apellido}</p>` : ""}</div>
+  <div><h1>VETIX Distribuidora</h1><p class="sub">Lista de pedido — precios de referencia</p>${perfil ? `<p class="sub" style="margin-top:2px;color:#1a2035;font-weight:700">${perfil.nombre} ${perfil.apellido}</p>` : ""}</div>
   <div class="date">${fecha}</div>
 </div>
 <table>
@@ -1452,11 +1451,6 @@ export default function Tienda() {
                 {(perfil ? perfil.nombre : usuario.email)[0].toUpperCase()}
               </span>
               <span className="wa-text">{perfil ? perfil.nombre : usuario.email.split("@")[0]}</span>
-              {tipoCliente && tipoCliente !== "pendiente" && (
-                <span style={{ fontSize: 9, fontWeight: 800, background: tipoCliente === "veterinario" ? "#eff6ff" : "#fff7ed", color: tipoCliente === "veterinario" ? "#1e40af" : "#9a3412", border: `1px solid ${tipoCliente === "veterinario" ? "#bfdbfe" : "#fed7aa"}`, borderRadius: 20, padding: "1px 6px", textTransform: "uppercase", letterSpacing: 0.5 }}>
-                  {tipoCliente === "veterinario" ? "Vet" : "Prod"}
-                </span>
-              )}
             </button>
           ) : (
             <button onClick={() => { setLoginModo("login"); setLoginError(""); setAuthModalOpen(true) }}
@@ -2613,13 +2607,13 @@ export default function Tienda() {
                       ) : tipoCliente === "pendiente" ? (
                         <>
                           <p style={{ margin: "0 0 4px", fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.5 }}>Precio</p>
-                          <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#92400e" }}>A consultar</p>
-                          <p style={{ margin: "5px 0 0", fontSize: 11, color: "#94a3b8" }}>Tu precio será asignado pronto</p>
+                          <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#64748b" }}>Precio a confirmar</p>
+                          <p style={{ margin: "5px 0 0", fontSize: 11, color: "#94a3b8" }}>El equipo VETIX asignará tu precio</p>
                         </>
                       ) : (
                         <>
                           <p style={{ margin: "0 0 4px", fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.5 }}>
-                            Precio {tipoCliente === "veterinario" ? "veterinario" : "productor"}
+                            Precio
                           </p>
                           <p style={{ margin: 0, fontSize: 30, fontWeight: 900, color: "#e8197d", lineHeight: 1 }}>
                             {fmt(precioConTipo(p.precio_venta, tipoCliente)!)}
@@ -2788,13 +2782,6 @@ export default function Tienda() {
                       <p style={{ margin: "3px 0 0", fontSize: 10, color: "#4ade80", fontWeight: 600 }}>● Sesión activa</p>
                     </div>
                   </div>
-                  {tipoCliente && (
-                    <div style={{ marginBottom: 10, padding: "7px 10px", background: tipoCliente === "veterinario" ? "#1e3a5f" : tipoCliente === "productor" ? "#3b2a0a" : "#1a1a2e", borderRadius: 8, display: "flex", alignItems: "center", gap: 7 }}>
-                      <span style={{ fontSize: 10, fontWeight: 800, color: tipoCliente === "veterinario" ? "#93c5fd" : tipoCliente === "productor" ? "#fcd34d" : "#94a3b8", textTransform: "uppercase", letterSpacing: 0.5 }}>
-                        {tipoCliente === "veterinario" ? "🐾 Veterinario" : tipoCliente === "productor" ? "🌾 Productor" : "⏳ Pendiente de asignación"}
-                      </span>
-                    </div>
-                  )}
                   <div style={{ display: "flex", gap: 7 }}>
                     <button onClick={abrirEditarPerfil}
                       style={{ flex: 1, padding: "9px", borderRadius: 9, background: "#1e293b", border: "1px solid #2d3a55", color: "#94a3b8", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
