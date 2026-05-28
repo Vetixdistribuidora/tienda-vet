@@ -3153,7 +3153,7 @@ export default function Tienda() {
                     </p>
                   )}
                   <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 9, padding: "10px 13px", fontSize: 11, color: "#166534", lineHeight: 1.5 }}>
-                    <b>Nota:</b> Tu tipo de precio (veterinario / productor) lo asigna el equipo de VETIX según tus datos. Una vez aprobado, verás tus precios al iniciar sesión.
+                    Los precios los asigna el equipo VETIX, verás los precios al iniciar sesión.
                   </div>
                   <button onClick={registrar} disabled={loginCargando}
                     style={{ width: "100%", padding: "13px", background: loginCargando ? "#f9a8d4" : "#e8197d", color: "white", border: "none", borderRadius: 11, fontSize: 14, fontWeight: 900, cursor: loginCargando ? "not-allowed" : "pointer", boxShadow: loginCargando ? "none" : "0 4px 16px rgba(232,25,125,0.4)" }}>
