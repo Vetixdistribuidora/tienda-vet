@@ -287,7 +287,7 @@ function FilaListaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFa
           Ver precio
         </button>
       ) : tipoCliente === "pendiente" ? (
-        <span style={{ fontSize: 11, fontWeight: 700, color: "#64748b", flexShrink: 0, whiteSpace: "nowrap" }}>Precio a confirmar</span>
+        <span style={{ fontSize: 11, fontWeight: 700, color: "#92400e", flexShrink: 0, whiteSpace: "nowrap" }}>A consultar</span>
       ) : (
         <span style={{ fontSize: 15, fontWeight: 900, color: "#e8197d", flexShrink: 0, minWidth: 88, textAlign: "right" }}>
           {fmt(precioConTipo(p.precio_venta, tipoCliente)!)}
@@ -394,7 +394,7 @@ function TarjetaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFav,
               Ver precio
             </button>
           ) : tipoCliente === "pendiente" ? (
-            <span style={{ fontSize: 12, fontWeight: 700, color: "#64748b" }}>Precio a confirmar</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: "#92400e" }}>A consultar</span>
           ) : (
             <span style={{ fontSize: 17, fontWeight: 900, color: "#e8197d", letterSpacing: -0.3 }}>{fmt(precioConTipo(p.precio_venta, tipoCliente)!)}</span>
           )}
@@ -2607,8 +2607,8 @@ export default function Tienda() {
                       ) : tipoCliente === "pendiente" ? (
                         <>
                           <p style={{ margin: "0 0 4px", fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.5 }}>Precio</p>
-                          <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#64748b" }}>Precio a confirmar</p>
-                          <p style={{ margin: "5px 0 0", fontSize: 11, color: "#94a3b8" }}>El equipo VETIX asignará tu precio</p>
+                          <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#92400e" }}>A consultar</p>
+                          <p style={{ margin: "5px 0 0", fontSize: 11, color: "#94a3b8" }}>Consultá a VETIX para conocer tu precio</p>
                         </>
                       ) : (
                         <>
