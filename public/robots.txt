@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://vetix.com.ar/sitemap.xml
+Sitemap: https://vetix.com/sitemap.xml

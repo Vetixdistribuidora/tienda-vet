@@ -59,6 +59,19 @@ const CAT_ESTILO: Record<string, { bg: string; color: string; border: string; ic
 }
 const CAT_DEFAULT = { bg: "#f5f7fb", color: "#374151", border: "#e2e8f0", icon: "📦" }
 
+// ── Precios por rol ───────────────────────────────────────────────────────
+const FACTOR_VET  = 1.30
+const FACTOR_PROD = 1.58
+type TipoCliente = "veterinario" | "productor" | "pendiente"
+type PerfilUsuario = {
+  id: string; nombre: string; apellido: string; email: string
+  telefono: string; direccion: string; tipo_cliente: TipoCliente
+}
+function precioConTipo(precioVenta: number, tipo: TipoCliente | null): number | null {
+  if (tipo === "veterinario") return Math.round(precioVenta * FACTOR_VET * 100) / 100
+  if (tipo === "productor")   return Math.round(precioVenta * FACTOR_PROD * 100) / 100
+  return null
+}
 
 // ── Banner de anuncio ─────────────────────────────────────────────────────
 // Cambiá el texto para mostrar un anuncio en la parte superior.
@@ -223,9 +236,10 @@ function SkeletonCard() {
   )
 }
 
-function FilaListaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFav, onToggleFav, searchQuery }: {
+function FilaListaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFav, onToggleFav, searchQuery, tipoCliente, onVerPrecio }: {
   p: Producto; enCarrito: number; onAgregar: () => void; onCambiar: (d: number) => void
   onDetalle: () => void; esFav: boolean; onToggleFav: () => void; searchQuery?: string
+  tipoCliente?: TipoCliente | null; onVerPrecio?: () => void
 }) {
   const [hover, setHover] = useState(false)
   const badge = stockLabel(p.stock)
@@ -267,9 +281,18 @@ function FilaListaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFa
       )}
 
       {/* Precio */}
-      <span style={{ fontSize: 15, fontWeight: 900, color: "#e8197d", flexShrink: 0, minWidth: 88, textAlign: "right" }}>
-        {fmt(p.precio_venta)}
-      </span>
+      {tipoCliente === undefined || tipoCliente === null ? (
+        <button onClick={e => { e.stopPropagation(); onVerPrecio?.() }}
+          style={{ fontSize: 11, fontWeight: 700, color: "#e8197d", background: "#fff0f7", border: "1px solid #fbcfe8", borderRadius: 7, padding: "5px 10px", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0 }}>
+          Ver precio
+        </button>
+      ) : tipoCliente === "pendiente" ? (
+        <span style={{ fontSize: 11, fontWeight: 700, color: "#92400e", flexShrink: 0, whiteSpace: "nowrap" }}>A consultar</span>
+      ) : (
+        <span style={{ fontSize: 15, fontWeight: 900, color: "#e8197d", flexShrink: 0, minWidth: 88, textAlign: "right" }}>
+          {fmt(precioConTipo(p.precio_venta, tipoCliente)!)}
+        </span>
+      )}
 
       {/* Favorito */}
       <button onClick={e => { e.stopPropagation(); onToggleFav() }}
@@ -296,9 +319,10 @@ function FilaListaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFa
   )
 }
 
-function TarjetaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFav, onToggleFav }: {
+function TarjetaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFav, onToggleFav, tipoCliente, onVerPrecio }: {
   p: Producto; enCarrito: number; onAgregar: () => void; onCambiar: (d: number) => void
   onDetalle: () => void; esFav: boolean; onToggleFav: () => void
+  tipoCliente?: TipoCliente | null; onVerPrecio?: () => void
 }) {
   const [hover, setHover] = useState(false)
   const badge = stockLabel(p.stock)
@@ -364,7 +388,16 @@ function TarjetaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFav,
           {p.nombre}
         </p>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
-          <span style={{ fontSize: 17, fontWeight: 900, color: "#e8197d", letterSpacing: -0.3 }}>{fmt(p.precio_venta)}</span>
+          {tipoCliente === undefined || tipoCliente === null ? (
+            <button onClick={e => { e.stopPropagation(); onVerPrecio?.() }}
+              style={{ fontSize: 11, fontWeight: 700, color: "#e8197d", background: "#fff0f7", border: "1px solid #fbcfe8", borderRadius: 7, padding: "5px 10px", cursor: "pointer", whiteSpace: "nowrap" }}>
+              Ver precio
+            </button>
+          ) : tipoCliente === "pendiente" ? (
+            <span style={{ fontSize: 12, fontWeight: 700, color: "#92400e" }}>A consultar</span>
+          ) : (
+            <span style={{ fontSize: 17, fontWeight: 900, color: "#e8197d", letterSpacing: -0.3 }}>{fmt(precioConTipo(p.precio_venta, tipoCliente)!)}</span>
+          )}
           {enCarrito > 0 ? (
             <div style={{ display: "flex", alignItems: "center", gap: 2, background: "#fff0f7", border: "2px solid #e8197d", borderRadius: 10, padding: "2px 4px" }}>
               <button onClick={e => { e.stopPropagation(); onCambiar(-1) }} style={{ width: 26, height: 26, border: "none", borderRadius: 7, background: "#fce7f3", color: "#be185d", fontWeight: 900, cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1 }}>−</button>
@@ -534,6 +567,23 @@ export default function Tienda() {
   const [loginCargando, setLoginCargando] = useState(false)
   const [loginError, setLoginError] = useState("")
   const [loginModo, setLoginModo] = useState<"login" | "registro">("login")
+  // Auth modal + perfil
+  const [authModalOpen, setAuthModalOpen] = useState(false)
+  const [perfil, setPerfil] = useState<PerfilUsuario | null>(null)
+  const [tipoCliente, setTipoCliente] = useState<TipoCliente | null>(null)
+  // Campos de registro
+  const [regNombre, setRegNombre] = useState("")
+  const [regApellido, setRegApellido] = useState("")
+  const [regTelefono, setRegTelefono] = useState("")
+  const [regDireccion, setRegDireccion] = useState("")
+  // Editar perfil
+  const [editPerfilOpen, setEditPerfilOpen] = useState(false)
+  const [editNombre, setEditNombre] = useState("")
+  const [editApellido, setEditApellido] = useState("")
+  const [editTelefono, setEditTelefono] = useState("")
+  const [editDireccion, setEditDireccion] = useState("")
+  const [editGuardando, setEditGuardando] = useState(false)
+  const [editError, setEditError] = useState("")
 
   // Cargar productos
   useEffect(() => {
@@ -691,7 +741,10 @@ export default function Tienda() {
 
   const totalFiltrados = secciones.reduce((s, g) => s + g.items.length, 0)
   const totalItems = carrito.reduce((s, i) => s + i.cantidad, 0)
-  const totalPrecio = carrito.reduce((s, i) => s + i.producto.precio_venta * i.cantidad, 0)
+  const totalPrecio = carrito.reduce((s, i) => {
+    const precio = precioConTipo(i.producto.precio_venta, tipoCliente) ?? i.producto.precio_venta
+    return s + precio * i.cantidad
+  }, 0)
 
   // Sincronizar carrito con localStorage
   useEffect(() => {
@@ -727,6 +780,8 @@ export default function Tienda() {
       if (productoDetalle) { setProductoDetalle(null); return }
       if (pedidosOpen) { setPedidosOpen(false); return }
       if (catModalOpen) { setCatModalOpen(false); return }
+      if (authModalOpen) { setAuthModalOpen(false); return }
+      if (editPerfilOpen) { setEditPerfilOpen(false); return }
       if (sidebarOpen) { setSidebarOpen(false); return }
       if (carritoOpen) { setCarritoOpen(false); return }
       if (checkoutOpen) { setCheckoutOpen(false); return }
@@ -735,7 +790,7 @@ export default function Tienda() {
     }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
-  }, [imagenZoom, productoDetalle, pedidosOpen, catModalOpen, sidebarOpen, carritoOpen, checkoutOpen, labDropdownOpen, catDropdownOpen])
+  }, [imagenZoom, productoDetalle, pedidosOpen, catModalOpen, authModalOpen, editPerfilOpen, sidebarOpen, carritoOpen, checkoutOpen, labDropdownOpen, catDropdownOpen])
 
   // Reset paginación cuando cambian los filtros
   useEffect(() => { setVisibles(48) }, [busquedaDelay, categoriaActiva, precioMin, precioMax, laboratoriosFiltro, orden])
@@ -755,13 +810,23 @@ export default function Tienda() {
   // Auth session
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) setUsuario({ email: session.user.email!, id: session.user.id })
+      if (session?.user) {
+        setUsuario({ email: session.user.email!, id: session.user.id })
+        loadPerfil(session.user.id)
+      }
     })
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) setUsuario({ email: session.user.email!, id: session.user.id })
-      else setUsuario(null)
+      if (session?.user) {
+        setUsuario({ email: session.user.email!, id: session.user.id })
+        loadPerfil(session.user.id)
+      } else {
+        setUsuario(null)
+        setPerfil(null)
+        setTipoCliente(null)
+      }
     })
     return () => subscription.unsubscribe()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Debounce: aplicar filtro 300 ms después de la última tecla
@@ -937,38 +1002,169 @@ export default function Tienda() {
   async function cargarMisPedidos() {
     if (!usuario) return
     setCargandoPedidos(true)
+    // Busca por usuario_id (pedidos nuevos) O por email (pedidos anteriores al login)
     const { data } = await supabase
       .from("pedidos")
       .select("id, created_at, estado, total, pedido_items(producto_id, nombre_producto, cantidad, precio_unitario)")
-      .eq("cliente_email", usuario.email)
+      .or(`usuario_id.eq.${usuario.id},cliente_email.eq.${usuario.email}`)
       .order("created_at", { ascending: false })
       .limit(20)
     setCargandoPedidos(false)
     setMisPedidos((data as PedidoHistorial[]) ?? [])
   }
 
+  async function recuperarContrasena() {
+    if (!loginEmail.trim()) { setLoginError("Ingresá tu email para recuperar la contraseña"); return }
+    setLoginCargando(true); setLoginError("")
+    const { error } = await supabase.auth.resetPasswordForEmail(loginEmail.trim(), {
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin}/reset-password`,
+    })
+    setLoginCargando(false)
+    if (error) setLoginError("No se pudo enviar el email. Verificá que sea correcto.")
+    else { mostrarToast("📧 Email de recuperación enviado — revisá tu casilla"); setAuthModalOpen(false) }
+  }
+
+  async function loadPerfil(userId: string) {
+    const { data } = await supabase
+      .from("tienda_perfiles")
+      .select("*")
+      .eq("id", userId)
+      .maybeSingle()
+    if (!data) return
+    const p = data as PerfilUsuario
+
+    // Re-verificar tipo_cliente contra clientes (el admin puede haberlo asignado
+    // después del registro, o cambiado). Siempre gana el valor de clientes.
+    const { data: clienteRow } = await supabase
+      .from("clientes")
+      .select("tipo_cliente")
+      .eq("email_tienda", p.email.toLowerCase())
+      .maybeSingle()
+
+    const TIPOS_VALIDOS: TipoCliente[] = ["veterinario", "productor", "pendiente"]
+    const tipoDeClientes: TipoCliente | null = clienteRow?.tipo_cliente && TIPOS_VALIDOS.includes(clienteRow.tipo_cliente)
+      ? clienteRow.tipo_cliente as TipoCliente
+      : null
+    const tipoFinal: TipoCliente = tipoDeClientes ?? (TIPOS_VALIDOS.includes(p.tipo_cliente) ? p.tipo_cliente : "pendiente")
+
+    // Si cambió, actualizar tienda_perfiles para la próxima vez
+    if (tipoFinal !== p.tipo_cliente) {
+      await supabase.from("tienda_perfiles").update({ tipo_cliente: tipoFinal }).eq("id", userId)
+      p.tipo_cliente = tipoFinal
+    }
+
+    setPerfil(p)
+    setTipoCliente(tipoFinal)
+    // Pre-rellenar checkout con datos del perfil
+    setForm(f => ({
+      ...f,
+      nombre: `${p.nombre} ${p.apellido}`.trim() || f.nombre,
+      telefono: p.telefono || f.telefono,
+      email: p.email || f.email,
+      direccion: p.direccion || f.direccion,
+    }))
+  }
+
   async function iniciarSesion() {
     if (!loginEmail.trim() || !loginPass.trim()) { setLoginError("Completá todos los campos"); return }
     setLoginCargando(true); setLoginError("")
-    const { error } = await supabase.auth.signInWithPassword({ email: loginEmail.trim(), password: loginPass })
+    const { data, error } = await supabase.auth.signInWithPassword({ email: loginEmail.trim(), password: loginPass })
     setLoginCargando(false)
-    if (error) setLoginError("Email o contraseña incorrectos")
-    else { setLoginEmail(""); setLoginPass(""); mostrarToast("¡Sesión iniciada!") }
+    if (error) { setLoginError("Email o contraseña incorrectos"); return }
+    if (data.user) await loadPerfil(data.user.id)
+    setLoginEmail(""); setLoginPass("")
+    setAuthModalOpen(false)
+    mostrarToast("¡Sesión iniciada!")
   }
 
   async function registrar() {
-    if (!loginEmail.trim() || !loginPass.trim()) { setLoginError("Completá todos los campos"); return }
+    if (!loginEmail.trim() || !loginPass.trim() || !regNombre.trim() || !regApellido.trim() || !regTelefono.trim()) {
+      setLoginError("Completá los campos obligatorios (*)"); return
+    }
     setLoginCargando(true); setLoginError("")
-    const { error } = await supabase.auth.signUp({ email: loginEmail.trim(), password: loginPass })
+
+    // 1. Crear usuario en Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: loginEmail.trim(),
+      password: loginPass,
+    })
+    if (authError || !authData.user) {
+      setLoginCargando(false)
+      setLoginError(authError?.message ?? "Error al registrarse")
+      return
+    }
+
+    // 2. Buscar tipo_cliente en la tabla clientes (controlado por el admin)
+    const { data: clienteData } = await supabase
+      .from("clientes")
+      .select("tipo_cliente")
+      .eq("email_tienda", loginEmail.trim().toLowerCase())
+      .maybeSingle()
+    const tipoRaw = clienteData?.tipo_cliente ?? "pendiente"
+    const tipo: TipoCliente = (["veterinario", "productor", "pendiente"] as TipoCliente[]).includes(tipoRaw)
+      ? tipoRaw as TipoCliente : "pendiente"
+
+    // 3. Insertar perfil
+    await supabase.from("tienda_perfiles").upsert({
+      id: authData.user.id,
+      nombre: regNombre.trim(),
+      apellido: regApellido.trim(),
+      email: loginEmail.trim(),
+      telefono: regTelefono.trim(),
+      direccion: regDireccion.trim() || null,
+      tipo_cliente: tipo,
+    })
+
     setLoginCargando(false)
-    if (error) setLoginError(error.message)
-    else { setLoginEmail(""); setLoginPass(""); mostrarToast("¡Registro exitoso! Revisá tu email.") }
+    // Limpiar campos
+    setRegNombre(""); setRegApellido(""); setRegTelefono(""); setRegDireccion("")
+    setLoginEmail(""); setLoginPass("")
+    setAuthModalOpen(false)
+    mostrarToast("¡Cuenta creada! Si pedimos confirmar tu email, revisá tu casilla.")
   }
 
   async function cerrarSesion() {
     await supabase.auth.signOut()
     setUsuario(null)
+    setPerfil(null)
+    setTipoCliente(null)
     setSidebarOpen(false)
+  }
+
+  function abrirEditarPerfil() {
+    if (!perfil) return
+    setEditNombre(perfil.nombre)
+    setEditApellido(perfil.apellido)
+    setEditTelefono(perfil.telefono)
+    setEditDireccion(perfil.direccion ?? "")
+    setEditError("")
+    setEditPerfilOpen(true)
+  }
+
+  async function guardarPerfil() {
+    if (!usuario || !perfil) return
+    if (!editNombre.trim() || !editApellido.trim() || !editTelefono.trim()) {
+      setEditError("Nombre, apellido y teléfono son obligatorios"); return
+    }
+    setEditGuardando(true); setEditError("")
+    const { error } = await supabase.from("tienda_perfiles").update({
+      nombre: editNombre.trim(),
+      apellido: editApellido.trim(),
+      telefono: editTelefono.trim(),
+      direccion: editDireccion.trim() || null,
+    }).eq("id", usuario.id)
+    setEditGuardando(false)
+    if (error) { setEditError("Error al guardar. Intentá de nuevo."); return }
+    // Actualizar estado local
+    setPerfil(p => p ? { ...p, nombre: editNombre.trim(), apellido: editApellido.trim(), telefono: editTelefono.trim(), direccion: editDireccion.trim() } : p)
+    setForm(f => ({
+      ...f,
+      nombre: `${editNombre.trim()} ${editApellido.trim()}`.trim(),
+      telefono: editTelefono.trim(),
+      direccion: editDireccion.trim(),
+    }))
+    setEditPerfilOpen(false)
+    mostrarToast("Perfil actualizado correctamente")
   }
 
   function mostrarToast(msg: string) {
@@ -1022,22 +1218,27 @@ export default function Tienda() {
       .from("pedidos")
       .insert({
         cliente_nombre: form.nombre.trim(),
-        cliente_email: form.email.trim() || null,
+        cliente_email: form.email.trim() || usuario?.email || null,
         cliente_telefono: form.telefono.trim(),
         cliente_direccion: form.direccion.trim() || null,
         notas: notasFinal,
-        total: totalPrecio, estado: "pendiente",
+        total: totalPrecio,
+        estado: "pendiente",
+        usuario_id: usuario?.id ?? null,
       })
       .select().single()
 
     if (error || !pedido) { setEnviando(false); setErrPedido("Error al enviar el pedido. Intentá de nuevo."); return }
 
     await supabase.from("pedido_items").insert(
-      carrito.map(i => ({
-        pedido_id: pedido.id, producto_id: i.producto.id,
-        nombre_producto: i.producto.nombre, precio_unitario: i.producto.precio_venta,
-        cantidad: i.cantidad, subtotal: i.producto.precio_venta * i.cantidad,
-      }))
+      carrito.map(i => {
+        const pu = precioConTipo(i.producto.precio_venta, tipoCliente) ?? i.producto.precio_venta
+        return {
+          pedido_id: pedido.id, producto_id: i.producto.id,
+          nombre_producto: i.producto.nombre, precio_unitario: pu,
+          cantidad: i.cantidad, subtotal: pu * i.cantidad,
+        }
+      })
     )
 
     const total = totalPrecio
@@ -1068,7 +1269,8 @@ export default function Tienda() {
 
   function textoCarritoWA() {
     const lineas = carrito.map(i => {
-      let linea = `• ${i.producto.nombre} x${i.cantidad} — ${fmt(i.producto.precio_venta * i.cantidad)}`
+      const precio = precioConTipo(i.producto.precio_venta, tipoCliente) ?? i.producto.precio_venta
+      let linea = `• ${i.producto.nombre} x${i.cantidad} — ${fmt(precio * i.cantidad)}`
       if (i.nota) linea += ` _(${i.nota})_`
       return linea
     }).join("\n")
@@ -1098,13 +1300,17 @@ export default function Tienda() {
 
   function imprimirCarrito() {
     const fecha = new Date().toLocaleDateString("es-AR", { day: "2-digit", month: "long", year: "numeric" })
-    const lineas = carrito.map(i => `
+    const tipoLabel = tipoCliente === "veterinario" ? "Veterinario" : tipoCliente === "productor" ? "Productor" : ""
+    const lineas = carrito.map(i => {
+      const pu = precioConTipo(i.producto.precio_venta, tipoCliente) ?? i.producto.precio_venta
+      return `
       <tr>
         <td style="padding:9px 12px;border-bottom:1px solid #eee;font-size:13px">${i.producto.nombre}${i.producto.laboratorio ? `<br><span style="font-size:11px;color:#16a34a;font-weight:600">${i.producto.laboratorio}</span>` : ""}${i.nota ? `<br><span style="font-size:11px;color:#64748b;font-style:italic">${i.nota}</span>` : ""}</td>
         <td style="padding:9px 12px;border-bottom:1px solid #eee;text-align:center;font-size:13px">${i.cantidad}</td>
-        <td style="padding:9px 12px;border-bottom:1px solid #eee;text-align:right;font-size:13px">${fmt(i.producto.precio_venta)}</td>
-        <td style="padding:9px 12px;border-bottom:1px solid #eee;text-align:right;font-size:13px;font-weight:700;color:#e8197d">${fmt(i.producto.precio_venta * i.cantidad)}</td>
-      </tr>`).join("")
+        <td style="padding:9px 12px;border-bottom:1px solid #eee;text-align:right;font-size:13px">${fmt(pu)}</td>
+        <td style="padding:9px 12px;border-bottom:1px solid #eee;text-align:right;font-size:13px;font-weight:700;color:#e8197d">${fmt(pu * i.cantidad)}</td>
+      </tr>`
+    }).join("")
     const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Pedido VETIX — ${fecha}</title>
 <style>
   *{box-sizing:border-box}body{font-family:system-ui,sans-serif;margin:0;padding:32px;color:#111;max-width:800px;margin:0 auto;padding:32px}
@@ -1119,7 +1325,7 @@ export default function Tienda() {
   @media print{body{padding:16px}.no-print{display:none}}
 </style></head><body>
 <div class="top">
-  <div><h1>VETIX Distribuidora</h1><p class="sub">Lista de pedido — precios de referencia</p></div>
+  <div><h1>VETIX Distribuidora</h1><p class="sub">Lista de pedido${tipoLabel ? ` — Precio ${tipoLabel}` : " — precios de referencia"}</p>${perfil ? `<p class="sub" style="margin-top:2px;color:#1a2035;font-weight:700">${perfil.nombre} ${perfil.apellido}</p>` : ""}</div>
   <div class="date">${fecha}</div>
 </div>
 <table>
@@ -1234,6 +1440,32 @@ export default function Tienda() {
               <IcoWA size={15} />
               <span className="wa-text">Consultas</span>
             </a>
+          )}
+
+          {/* Login / Usuario */}
+          {usuario ? (
+            <button onClick={() => setSidebarOpen(true)}
+              style={{ display: "flex", alignItems: "center", gap: 7, padding: "7px 13px", borderRadius: 10, background: "#f8fafc", border: "1px solid #e2e8f0", color: "#1a2035", fontSize: 13, fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap", transition: "all 0.15s" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#f1f5f9"; e.currentTarget.style.borderColor = "#c7d2e0" }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#f8fafc"; e.currentTarget.style.borderColor = "#e2e8f0" }}>
+              <span style={{ width: 24, height: 24, borderRadius: "50%", background: "linear-gradient(135deg,#e8197d,#a80d40)", color: "white", fontWeight: 900, fontSize: 11, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                {(perfil ? perfil.nombre : usuario.email)[0].toUpperCase()}
+              </span>
+              <span className="wa-text">{perfil ? perfil.nombre : usuario.email.split("@")[0]}</span>
+              {tipoCliente && tipoCliente !== "pendiente" && (
+                <span style={{ fontSize: 9, fontWeight: 800, background: tipoCliente === "veterinario" ? "#eff6ff" : "#fff7ed", color: tipoCliente === "veterinario" ? "#1e40af" : "#9a3412", border: `1px solid ${tipoCliente === "veterinario" ? "#bfdbfe" : "#fed7aa"}`, borderRadius: 20, padding: "1px 6px", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                  {tipoCliente === "veterinario" ? "Vet" : "Prod"}
+                </span>
+              )}
+            </button>
+          ) : (
+            <button onClick={() => { setLoginModo("login"); setLoginError(""); setAuthModalOpen(true) }}
+              style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", borderRadius: 10, background: "#f8fafc", border: "1px solid #e2e8f0", color: "#1a2035", fontSize: 13, fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap", transition: "all 0.15s" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#f1f5f9"; e.currentTarget.style.borderColor = "#c7d2e0" }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#f8fafc"; e.currentTarget.style.borderColor = "#e2e8f0" }}>
+              <svg width="15" height="15" fill="none" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              <span className="wa-text">Iniciar sesión</span>
+            </button>
           )}
 
           {/* Cart */}
@@ -1371,6 +1603,8 @@ export default function Tienda() {
                         onDetalle={() => setProductoDetalle(p)}
                         esFav={favoritos.has(p.id)}
                         onToggleFav={() => toggleFavorito(p.id)}
+                        tipoCliente={tipoCliente}
+                        onVerPrecio={() => { setLoginModo("login"); setLoginError(""); setAuthModalOpen(true) }}
                       />
                     </div>
                   ))}
@@ -1413,6 +1647,8 @@ export default function Tienda() {
                         onDetalle={() => setProductoDetalle(p)}
                         esFav={true}
                         onToggleFav={() => toggleFavorito(p.id)}
+                        tipoCliente={tipoCliente}
+                        onVerPrecio={() => { setLoginModo("login"); setLoginError(""); setAuthModalOpen(true) }}
                       />
                     </div>
                   ))}
@@ -1448,6 +1684,8 @@ export default function Tienda() {
                         onDetalle={() => setProductoDetalle(p)}
                         esFav={favoritos.has(p.id)}
                         onToggleFav={() => toggleFavorito(p.id)}
+                        tipoCliente={tipoCliente}
+                        onVerPrecio={() => { setLoginModo("login"); setLoginError(""); setAuthModalOpen(true) }}
                       />
                     </div>
                   ))}
@@ -1540,6 +1778,8 @@ export default function Tienda() {
                     onCambiar={d => cambiar(p.id, d)}
                     onDetalle={() => setProductoDetalle(p)}
                     esFav={favoritos.has(p.id)} onToggleFav={() => toggleFavorito(p.id)}
+                    tipoCliente={tipoCliente}
+                    onVerPrecio={() => { setLoginModo("login"); setLoginError(""); setAuthModalOpen(true) }}
                   />
                 ))}
               </div>
@@ -1826,6 +2066,8 @@ export default function Tienda() {
                     esFav: favoritos.has(p.id),
                     searchQuery: busquedaDelay || undefined,
                     onToggleFav: () => toggleFavorito(p.id),
+                    tipoCliente,
+                    onVerPrecio: () => { setLoginModo("login"); setLoginError(""); setAuthModalOpen(true) },
                   })
 
                   // Sentinel para scroll infinito
@@ -2113,7 +2355,9 @@ export default function Tienda() {
                             </div>
                             <button onClick={() => quitar(item.producto.id)} style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: 11, fontWeight: 700, padding: "0 4px" }}>Quitar</button>
                           </div>
-                          <span style={{ fontWeight: 900, fontSize: 14, color: "#e8197d" }}>{fmt(item.producto.precio_venta * item.cantidad)}</span>
+                          <span style={{ fontWeight: 900, fontSize: 14, color: "#e8197d" }}>
+                            {fmt((precioConTipo(item.producto.precio_venta, tipoCliente) ?? item.producto.precio_venta) * item.cantidad)}
+                          </span>
                         </div>
                         {item.cantidad >= 10 && WHATSAPP && (
                           <a href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hola, consulto precio especial por ${item.cantidad} unidades de ${item.producto.nombre}`)}`}
@@ -2267,7 +2511,9 @@ export default function Tienda() {
                       <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {i.producto.nombre} <span style={{ color: "#9ca3af" }}>×{i.cantidad}</span>
                       </span>
-                      <span style={{ fontWeight: 700, flexShrink: 0 }}>{fmt(i.producto.precio_venta * i.cantidad)}</span>
+                      <span style={{ fontWeight: 700, flexShrink: 0 }}>
+                        {fmt((precioConTipo(i.producto.precio_venta, tipoCliente) ?? i.producto.precio_venta) * i.cantidad)}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -2356,9 +2602,31 @@ export default function Tienda() {
                     <h2 style={{ margin: 0, fontSize: 17, fontWeight: 900, color: "#1a2035", lineHeight: 1.4 }}>{p.nombre}</h2>
 
                     <div>
-                      <p style={{ margin: "0 0 4px", fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.5 }}>Precio de referencia</p>
-                      <p style={{ margin: 0, fontSize: 30, fontWeight: 900, color: "#e8197d", lineHeight: 1 }}>{fmt(p.precio_venta)}</p>
-                      <p style={{ margin: "5px 0 0", fontSize: 11, color: "#94a3b8" }}>Precio sujeto a confirmación</p>
+                      {tipoCliente === null ? (
+                        <>
+                          <p style={{ margin: "0 0 8px", fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.5 }}>Precio</p>
+                          <button onClick={() => { setProductoDetalle(null); setLoginModo("login"); setLoginError(""); setAuthModalOpen(true) }}
+                            style={{ padding: "10px 18px", background: "#e8197d", color: "white", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>
+                            Iniciá sesión para ver el precio
+                          </button>
+                        </>
+                      ) : tipoCliente === "pendiente" ? (
+                        <>
+                          <p style={{ margin: "0 0 4px", fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.5 }}>Precio</p>
+                          <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#92400e" }}>A consultar</p>
+                          <p style={{ margin: "5px 0 0", fontSize: 11, color: "#94a3b8" }}>Tu precio será asignado pronto</p>
+                        </>
+                      ) : (
+                        <>
+                          <p style={{ margin: "0 0 4px", fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                            Precio {tipoCliente === "veterinario" ? "veterinario" : "productor"}
+                          </p>
+                          <p style={{ margin: 0, fontSize: 30, fontWeight: 900, color: "#e8197d", lineHeight: 1 }}>
+                            {fmt(precioConTipo(p.precio_venta, tipoCliente)!)}
+                          </p>
+                          <p style={{ margin: "5px 0 0", fontSize: 11, color: "#94a3b8" }}>Precio sujeto a confirmación</p>
+                        </>
+                      )}
                     </div>
 
                     <div style={{ display: "flex", flexDirection: "column", gap: 7, background: "#f8fafc", borderRadius: 10, padding: "12px 14px", border: "1px solid #eaecf2" }}>
@@ -2430,7 +2698,9 @@ export default function Tienda() {
                             <span style={{ flex: 1, fontSize: 12, fontWeight: 600, color: "#1a2035", lineHeight: 1.35, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" } as React.CSSProperties}>
                               {r.nombre}
                             </span>
-                            <span style={{ fontSize: 13, fontWeight: 900, color: "#e8197d", flexShrink: 0 }}>{fmt(r.precio_venta)}</span>
+                            <span style={{ fontSize: 13, fontWeight: 900, color: "#e8197d", flexShrink: 0 }}>
+                              {tipoCliente && tipoCliente !== "pendiente" ? fmt(precioConTipo(r.precio_venta, tipoCliente)!) : "—"}
+                            </span>
                           </button>
                         ))}
                       </div>
@@ -2499,54 +2769,56 @@ export default function Tienda() {
             )}
 
             {/* Auth section */}
-            <div style={{ padding: "12px 14px", borderTop: "1px solid #1e293b", flex: 1 }}>
+            <div style={{ padding: "12px 14px 20px", borderTop: "1px solid #1e293b", marginTop: "auto" }}>
               <p style={{ fontSize: 9.5, fontWeight: 800, color: "#334155", letterSpacing: 1.5, textTransform: "uppercase", margin: "10px 0 14px", paddingLeft: 6 }}>Mi cuenta</p>
 
               {usuario ? (
                 <div style={{ padding: "14px 16px", background: "#0a1120", borderRadius: 13, border: "1px solid #1e293b" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-                    <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg, #e8197d, #a80d40)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 900, fontSize: 16, flexShrink: 0 }}>
-                      {usuario.email[0].toUpperCase()}
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+                    <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,#e8197d,#a80d40)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 900, fontSize: 16, flexShrink: 0 }}>
+                      {(perfil ? perfil.nombre : usuario.email)[0].toUpperCase()}
                     </div>
                     <div style={{ minWidth: 0 }}>
-                      <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: "white", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{usuario.email}</p>
-                      <p style={{ margin: "2px 0 0", fontSize: 10, color: "#4ade80", fontWeight: 600 }}>● Sesión activa</p>
+                      {perfil && (
+                        <p style={{ margin: 0, fontSize: 13, fontWeight: 800, color: "white", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {perfil.nombre} {perfil.apellido}
+                        </p>
+                      )}
+                      <p style={{ margin: perfil ? "1px 0 0" : 0, fontSize: 11, color: "#64748b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{usuario.email}</p>
+                      <p style={{ margin: "3px 0 0", fontSize: 10, color: "#4ade80", fontWeight: 600 }}>● Sesión activa</p>
                     </div>
                   </div>
-                  <button onClick={cerrarSesion}
-                    style={{ width: "100%", padding: "9px", borderRadius: 9, background: "#1e293b", border: "1px solid #2d3a55", color: "#94a3b8", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
-                    Cerrar sesión
-                  </button>
-                </div>
-              ) : (
-                <div style={{ background: "#0a1120", borderRadius: 13, padding: "16px", border: "1px solid #1e293b" }}>
-                  <div style={{ display: "flex", gap: 0, marginBottom: 14, background: "#1e293b", borderRadius: 9, padding: 3 }}>
-                    {(["login", "registro"] as const).map(modo => (
-                      <button key={modo} onClick={() => { setLoginModo(modo); setLoginError("") }}
-                        style={{ flex: 1, padding: "7px", borderRadius: 7, border: "none", background: loginModo === modo ? "#e8197d" : "transparent", color: loginModo === modo ? "white" : "#64748b", fontSize: 12, fontWeight: 700, cursor: "pointer", transition: "all 0.15s" }}>
-                        {modo === "login" ? "Ingresar" : "Registrarse"}
-                      </button>
-                    ))}
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
-                    <input type="email" placeholder="Email" value={loginEmail} onChange={e => { setLoginEmail(e.target.value); setLoginError("") }}
-                      style={{ width: "100%", padding: "9px 11px", borderRadius: 9, border: "1.5px solid #1e293b", background: "#0f172a", color: "#f1f5f9", fontSize: 13, outline: "none", boxSizing: "border-box" }}
-                      onFocus={e => (e.target.style.borderColor = "#e8197d")}
-                      onBlur={e => (e.target.style.borderColor = "#1e293b")}
-                      onKeyDown={e => e.key === "Enter" && (loginModo === "login" ? iniciarSesion() : registrar())}
-                    />
-                    <input type="password" placeholder="Contraseña" value={loginPass} onChange={e => { setLoginPass(e.target.value); setLoginError("") }}
-                      style={{ width: "100%", padding: "9px 11px", borderRadius: 9, border: "1.5px solid #1e293b", background: "#0f172a", color: "#f1f5f9", fontSize: 13, outline: "none", boxSizing: "border-box" }}
-                      onFocus={e => (e.target.style.borderColor = "#e8197d")}
-                      onBlur={e => (e.target.style.borderColor = "#1e293b")}
-                      onKeyDown={e => e.key === "Enter" && (loginModo === "login" ? iniciarSesion() : registrar())}
-                    />
-                    {loginError && <p style={{ margin: 0, fontSize: 11, color: "#f87171", fontWeight: 600 }}>{loginError}</p>}
-                    <button onClick={loginModo === "login" ? iniciarSesion : registrar} disabled={loginCargando}
-                      style={{ width: "100%", padding: "10px", borderRadius: 9, background: loginCargando ? "#4a1030" : "#e8197d", color: "white", border: "none", fontSize: 13, fontWeight: 800, cursor: loginCargando ? "not-allowed" : "pointer", transition: "background 0.15s" }}>
-                      {loginCargando ? "..." : loginModo === "login" ? "Ingresar" : "Crear cuenta"}
+                  {tipoCliente && (
+                    <div style={{ marginBottom: 10, padding: "7px 10px", background: tipoCliente === "veterinario" ? "#1e3a5f" : tipoCliente === "productor" ? "#3b2a0a" : "#1a1a2e", borderRadius: 8, display: "flex", alignItems: "center", gap: 7 }}>
+                      <span style={{ fontSize: 10, fontWeight: 800, color: tipoCliente === "veterinario" ? "#93c5fd" : tipoCliente === "productor" ? "#fcd34d" : "#94a3b8", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                        {tipoCliente === "veterinario" ? "🐾 Veterinario" : tipoCliente === "productor" ? "🌾 Productor" : "⏳ Pendiente de asignación"}
+                      </span>
+                    </div>
+                  )}
+                  <div style={{ display: "flex", gap: 7 }}>
+                    <button onClick={abrirEditarPerfil}
+                      style={{ flex: 1, padding: "9px", borderRadius: 9, background: "#1e293b", border: "1px solid #2d3a55", color: "#94a3b8", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                      Editar perfil
+                    </button>
+                    <button onClick={cerrarSesion}
+                      style={{ flex: 1, padding: "9px", borderRadius: 9, background: "#1e293b", border: "1px solid #2d3a55", color: "#94a3b8", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                      Cerrar sesión
                     </button>
                   </div>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  <button onClick={() => { setLoginModo("login"); setLoginError(""); setSidebarOpen(false); setAuthModalOpen(true) }}
+                    style={{ width: "100%", padding: "11px", borderRadius: 10, background: "#e8197d", color: "white", border: "none", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>
+                    Iniciar sesión
+                  </button>
+                  <button onClick={() => { setLoginModo("registro"); setLoginError(""); setSidebarOpen(false); setAuthModalOpen(true) }}
+                    style={{ width: "100%", padding: "11px", borderRadius: 10, background: "transparent", color: "#64748b", border: "1px solid #1e293b", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+                    Crear cuenta
+                  </button>
+                  <p style={{ margin: "6px 0 0", fontSize: 11, color: "#334155", textAlign: "center", lineHeight: 1.5 }}>
+                    Iniciá sesión para ver los precios según tu perfil
+                  </p>
                 </div>
               )}
             </div>
@@ -2666,6 +2938,236 @@ export default function Tienda() {
                   )
                 })}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL EDITAR PERFIL ────────────────────────────────────────────── */}
+      {editPerfilOpen && (
+        <div className="overlay-anim" style={{ position: "fixed", inset: 0, background: "rgba(10,15,28,0.72)", zIndex: 70, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, backdropFilter: "blur(4px)" }}
+          onClick={e => { if (e.target === e.currentTarget) setEditPerfilOpen(false) }}>
+          <div className="modal-scale-anim" style={{ background: "white", borderRadius: 22, width: "100%", maxWidth: 420, overflow: "hidden", boxShadow: "0 32px 80px rgba(0,0,0,0.45)" }}>
+
+            <div style={{ padding: "20px 24px 16px", background: "#0f172a", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div>
+                <h2 style={{ margin: "0 0 2px", fontSize: 17, fontWeight: 900, color: "white" }}>Editar perfil</h2>
+                <p style={{ margin: 0, fontSize: 12, color: "#64748b" }}>Actualizá tus datos de contacto</p>
+              </div>
+              <button onClick={() => setEditPerfilOpen(false)}
+                style={{ width: 34, height: 34, borderRadius: 9, border: "1px solid #1e293b", background: "#1e293b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8", flexShrink: 0 }}>
+                <IcoClose />
+              </button>
+            </div>
+
+            <div style={{ padding: "20px 24px 24px", display: "flex", flexDirection: "column", gap: 12 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <div>
+                  <label style={{ display: "block", fontSize: 10.5, fontWeight: 800, color: "#374151", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>Nombre *</label>
+                  <input type="text" value={editNombre} onChange={e => setEditNombre(e.target.value)}
+                    style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
+                    onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                    onBlur={e => (e.target.style.borderColor = "#e2e8f0")} />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: 10.5, fontWeight: 800, color: "#374151", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>Apellido *</label>
+                  <input type="text" value={editApellido} onChange={e => setEditApellido(e.target.value)}
+                    style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
+                    onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                    onBlur={e => (e.target.style.borderColor = "#e2e8f0")} />
+                </div>
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: 10.5, fontWeight: 800, color: "#374151", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>Teléfono / WA *</label>
+                <input type="tel" value={editTelefono} onChange={e => setEditTelefono(e.target.value)}
+                  style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
+                  onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                  onBlur={e => (e.target.style.borderColor = "#e2e8f0")} />
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: 10.5, fontWeight: 800, color: "#374151", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>
+                  Dirección <span style={{ fontWeight: 400, textTransform: "none", fontSize: 10, color: "#9ca3af" }}>(opcional)</span>
+                </label>
+                <input type="text" value={editDireccion} onChange={e => setEditDireccion(e.target.value)}
+                  style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
+                  onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                  onBlur={e => (e.target.style.borderColor = "#e2e8f0")} />
+              </div>
+              {editError && (
+                <p style={{ margin: 0, fontSize: 12, color: "#dc2626", fontWeight: 600, background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 8, padding: "8px 12px" }}>
+                  ⚠ {editError}
+                </p>
+              )}
+              <button onClick={guardarPerfil} disabled={editGuardando}
+                style={{ width: "100%", padding: "13px", background: editGuardando ? "#f9a8d4" : "#e8197d", color: "white", border: "none", borderRadius: 11, fontSize: 14, fontWeight: 900, cursor: editGuardando ? "not-allowed" : "pointer", boxShadow: editGuardando ? "none" : "0 4px 16px rgba(232,25,125,0.4)", marginTop: 4 }}>
+                {editGuardando ? "Guardando..." : "Guardar cambios"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL AUTH ─────────────────────────────────────────────────────── */}
+      {authModalOpen && (
+        <div className="overlay-anim" style={{ position: "fixed", inset: 0, background: "rgba(10,15,28,0.72)", zIndex: 70, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, backdropFilter: "blur(4px)" }}
+          onClick={e => { if (e.target === e.currentTarget) setAuthModalOpen(false) }}>
+          <div className="modal-scale-anim" style={{ background: "white", borderRadius: 22, width: "100%", maxWidth: 460, maxHeight: "92vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(0,0,0,0.45)" }}>
+
+            {/* Header */}
+            <div style={{ padding: "22px 24px 18px", background: "#0f172a", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div>
+                <h2 style={{ margin: "0 0 3px", fontSize: 18, fontWeight: 900, color: "white" }}>
+                  {loginModo === "login" ? "Iniciar sesión" : "Crear cuenta"}
+                </h2>
+                <p style={{ margin: 0, fontSize: 12, color: "#64748b" }}>
+                  {loginModo === "login" ? "Para ver tus precios personalizados" : "Registrate para acceder a precios"}
+                </p>
+              </div>
+              <button onClick={() => setAuthModalOpen(false)}
+                style={{ width: 34, height: 34, borderRadius: 9, border: "1px solid #1e293b", background: "#1e293b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8", flexShrink: 0 }}>
+                <IcoClose />
+              </button>
+            </div>
+
+            {/* Tabs */}
+            <div style={{ padding: "14px 24px 0", display: "flex", gap: 0, background: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
+              {(["login", "registro"] as const).map(modo => (
+                <button key={modo} onClick={() => { setLoginModo(modo); setLoginError("") }}
+                  style={{ padding: "10px 20px", border: "none", background: "transparent", borderBottom: `2.5px solid ${loginModo === modo ? "#e8197d" : "transparent"}`, color: loginModo === modo ? "#e8197d" : "#64748b", fontSize: 13, fontWeight: loginModo === modo ? 800 : 600, cursor: "pointer", transition: "all 0.15s", marginBottom: -1 }}>
+                  {modo === "login" ? "Ingresar" : "Registrarse"}
+                </button>
+              ))}
+            </div>
+
+            {/* Formulario */}
+            <div style={{ padding: "20px 24px 24px", overflowY: "auto", flex: 1 }}>
+
+              {loginModo === "login" ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: 10.5, fontWeight: 800, color: "#374151", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>Email</label>
+                    <input type="email" placeholder="tu@email.com" value={loginEmail}
+                      onChange={e => { setLoginEmail(e.target.value); setLoginError("") }}
+                      onKeyDown={e => e.key === "Enter" && iniciarSesion()}
+                      style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
+                      onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                      onBlur={e => (e.target.style.borderColor = "#e2e8f0")}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: 10.5, fontWeight: 800, color: "#374151", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>Contraseña</label>
+                    <input type="password" placeholder="••••••••" value={loginPass}
+                      onChange={e => { setLoginPass(e.target.value); setLoginError("") }}
+                      onKeyDown={e => e.key === "Enter" && iniciarSesion()}
+                      style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
+                      onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                      onBlur={e => (e.target.style.borderColor = "#e2e8f0")}
+                    />
+                  </div>
+                  {loginError && (
+                    <p style={{ margin: 0, fontSize: 12, color: "#dc2626", fontWeight: 600, background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 8, padding: "8px 12px" }}>
+                      ⚠ {loginError}
+                    </p>
+                  )}
+                  <button onClick={iniciarSesion} disabled={loginCargando}
+                    style={{ width: "100%", padding: "13px", background: loginCargando ? "#f9a8d4" : "#e8197d", color: "white", border: "none", borderRadius: 11, fontSize: 14, fontWeight: 900, cursor: loginCargando ? "not-allowed" : "pointer", boxShadow: loginCargando ? "none" : "0 4px 16px rgba(232,25,125,0.4)", marginTop: 4 }}>
+                    {loginCargando ? "Ingresando..." : "Ingresar"}
+                  </button>
+                  <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 4 }}>
+                    <p style={{ margin: 0, fontSize: 12, color: "#64748b" }}>
+                      ¿No tenés cuenta?{" "}
+                      <button onClick={() => { setLoginModo("registro"); setLoginError("") }}
+                        style={{ background: "none", border: "none", color: "#e8197d", fontWeight: 700, cursor: "pointer", fontSize: 12, padding: 0 }}>
+                        Registrate acá
+                      </button>
+                    </p>
+                    <button onClick={recuperarContrasena} disabled={loginCargando}
+                      style={{ background: "none", border: "none", color: "#94a3b8", fontWeight: 600, cursor: "pointer", fontSize: 12, padding: 0, textDecoration: "underline" }}>
+                      Olvidé mi contraseña
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 11 }}>
+                    <div>
+                      <label style={{ display: "block", fontSize: 10.5, fontWeight: 800, color: "#374151", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>Nombre *</label>
+                      <input type="text" placeholder="Juan" value={regNombre}
+                        onChange={e => { setRegNombre(e.target.value); setLoginError("") }}
+                        style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
+                        onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                        onBlur={e => (e.target.style.borderColor = "#e2e8f0")}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: "block", fontSize: 10.5, fontWeight: 800, color: "#374151", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>Apellido *</label>
+                      <input type="text" placeholder="Pérez" value={regApellido}
+                        onChange={e => { setRegApellido(e.target.value); setLoginError("") }}
+                        style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
+                        onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                        onBlur={e => (e.target.style.borderColor = "#e2e8f0")}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: 10.5, fontWeight: 800, color: "#374151", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>Email *</label>
+                    <input type="email" placeholder="tu@email.com" value={loginEmail}
+                      onChange={e => { setLoginEmail(e.target.value); setLoginError("") }}
+                      style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
+                      onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                      onBlur={e => (e.target.style.borderColor = "#e2e8f0")}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: 10.5, fontWeight: 800, color: "#374151", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>Contraseña *</label>
+                    <input type="password" placeholder="Mínimo 6 caracteres" value={loginPass}
+                      onChange={e => { setLoginPass(e.target.value); setLoginError("") }}
+                      style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
+                      onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                      onBlur={e => (e.target.style.borderColor = "#e2e8f0")}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: 10.5, fontWeight: 800, color: "#374151", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>Teléfono / WA *</label>
+                    <input type="tel" placeholder="11 1234-5678" value={regTelefono}
+                      onChange={e => { setRegTelefono(e.target.value); setLoginError("") }}
+                      style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
+                      onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                      onBlur={e => (e.target.style.borderColor = "#e2e8f0")}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: 10.5, fontWeight: 800, color: "#374151", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>
+                      Dirección <span style={{ fontWeight: 400, textTransform: "none", fontSize: 10, color: "#9ca3af" }}>(opcional)</span>
+                    </label>
+                    <input type="text" placeholder="Calle, número, localidad" value={regDireccion}
+                      onChange={e => setRegDireccion(e.target.value)}
+                      style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
+                      onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                      onBlur={e => (e.target.style.borderColor = "#e2e8f0")}
+                    />
+                  </div>
+                  {loginError && (
+                    <p style={{ margin: 0, fontSize: 12, color: "#dc2626", fontWeight: 600, background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 8, padding: "8px 12px" }}>
+                      ⚠ {loginError}
+                    </p>
+                  )}
+                  <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 9, padding: "10px 13px", fontSize: 11, color: "#166534", lineHeight: 1.5 }}>
+                    <b>Nota:</b> Tu tipo de precio (veterinario / productor) lo asigna el equipo de VETIX según tus datos. Una vez aprobado, verás tus precios al iniciar sesión.
+                  </div>
+                  <button onClick={registrar} disabled={loginCargando}
+                    style={{ width: "100%", padding: "13px", background: loginCargando ? "#f9a8d4" : "#e8197d", color: "white", border: "none", borderRadius: 11, fontSize: 14, fontWeight: 900, cursor: loginCargando ? "not-allowed" : "pointer", boxShadow: loginCargando ? "none" : "0 4px 16px rgba(232,25,125,0.4)" }}>
+                    {loginCargando ? "Creando cuenta..." : "Crear cuenta"}
+                  </button>
+                  <p style={{ margin: 0, fontSize: 12, color: "#64748b", textAlign: "center" }}>
+                    ¿Ya tenés cuenta?{" "}
+                    <button onClick={() => { setLoginModo("login"); setLoginError("") }}
+                      style={{ background: "none", border: "none", color: "#e8197d", fontWeight: 700, cursor: "pointer", fontSize: 12 }}>
+                      Iniciá sesión
+                    </button>
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
