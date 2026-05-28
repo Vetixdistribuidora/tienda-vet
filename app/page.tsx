@@ -1250,7 +1250,14 @@ export default function Tienda() {
       telefono: form.telefono.trim(),
       email: form.email.trim(),
     }))
-    setForm({ nombre: "", telefono: "", email: "", direccion: "", notas: "" })
+    // Resetear solo notas; mantener datos del perfil para la próxima compra
+    setForm({
+      nombre: perfil ? `${perfil.nombre} ${perfil.apellido}`.trim() : "",
+      telefono: perfil?.telefono ?? "",
+      email: perfil?.email ?? usuario?.email ?? "",
+      direccion: perfil?.direccion ?? "",
+      notas: "",
+    })
   }
 
   function waLink() {
@@ -2411,7 +2418,20 @@ export default function Tienda() {
                     <IcoWA size={15}/> Consultar precios por WhatsApp
                   </a>
                 )}
-                <button onClick={() => { if (usuario && !form.email) setField("email", usuario.email); setCarritoOpen(false); setCheckoutOpen(true) }}
+                <button onClick={() => {
+                  if (perfil) {
+                    setForm(f => ({
+                      notas: f.notas,
+                      nombre: `${perfil.nombre} ${perfil.apellido}`.trim() || f.nombre,
+                      telefono: perfil.telefono || f.telefono,
+                      email: perfil.email || usuario?.email || f.email,
+                      direccion: perfil.direccion || f.direccion,
+                    }))
+                  } else if (usuario?.email && !form.email) {
+                    setField("email", usuario.email)
+                  }
+                  setCarritoOpen(false); setCheckoutOpen(true)
+                }}
                   style={{ width: "100%", padding: "14px", background: "#e8197d", color: "white", border: "none", borderRadius: 12, fontSize: 15, fontWeight: 900, cursor: "pointer", boxShadow: "0 4px 18px rgba(232,25,125,0.45)", letterSpacing: 0.3 }}>
                   Confirmar pedido →
                 </button>
