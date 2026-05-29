@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   // Sin filtro de stock ni activo — muestra todos los productos existentes
   const { data, error } = await getSupabaseAdmin()
     .from("productos")
-    .select("id, nombre, precio_venta, stock, categoria, laboratorio, imagen_url, activo")
+    .select("id, nombre, precio_venta, stock, categoria, laboratorio, imagen_url")
     .order("nombre")
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
