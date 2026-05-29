@@ -1145,11 +1145,10 @@ export default function Tienda() {
   }
 
   function abrirEditarPerfil() {
-    if (!perfil) return
-    setEditNombre(perfil.nombre)
-    setEditApellido(perfil.apellido)
-    setEditTelefono(perfil.telefono)
-    setEditDireccion(perfil.direccion ?? "")
+    setEditNombre(perfil?.nombre ?? "")
+    setEditApellido(perfil?.apellido ?? "")
+    setEditTelefono(perfil?.telefono ?? "")
+    setEditDireccion(perfil?.direccion ?? "")
     setEditError("")
     setEditPerfilOpen(true)
   }
@@ -1160,12 +1159,15 @@ export default function Tienda() {
       setEditError("Nombre, apellido y teléfono son obligatorios"); return
     }
     setEditGuardando(true); setEditError("")
-    const { error } = await supabase.from("tienda_perfiles").update({
+    const { error } = await supabase.from("tienda_perfiles").upsert({
+      id: usuario.id,
+      email: usuario.email ?? "",
       nombre: editNombre.trim(),
       apellido: editApellido.trim(),
       telefono: editTelefono.trim(),
       direccion: editDireccion.trim() || null,
-    }).eq("id", usuario.id)
+      tipo_cliente: perfil?.tipo_cliente ?? "pendiente",
+    }, { onConflict: "id" })
     setEditGuardando(false)
     if (error) { setEditError("Error al guardar. Intentá de nuevo."); return }
     // Actualizar estado local
@@ -2834,7 +2836,7 @@ export default function Tienda() {
                     </div>
                   </div>
                   <div style={{ display: "flex", gap: 7 }}>
-                    <button onClick={abrirEditarPerfil}
+                    <button onClick={e => { e.stopPropagation(); abrirEditarPerfil() }}
                       style={{ flex: 1, padding: "9px", borderRadius: 9, background: "#1e293b", border: "1px solid #2d3a55", color: "#94a3b8", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
                       Editar perfil
                     </button>
