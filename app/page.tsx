@@ -2105,20 +2105,29 @@ export default function Tienda() {
                     onVerPrecio: () => { setLoginModo("login"); setLoginError(""); setAuthModalOpen(true) },
                   })
 
-                  // Sentinel para scroll infinito
+                  // Sentinel para scroll infinito + botón explícito
                   const Sentinel = ({ todos, pagina }: { todos: Producto[]; pagina: Producto[] }) =>
                     todos.length > pagina.length ? (
-                      <div ref={sentinelRef} style={{ padding: "32px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-                        <p style={{ margin: 0, fontSize: 13, color: "#94a3b8" }}>
-                          <b style={{ color: "#1a2035" }}>{pagina.length}</b> de <b style={{ color: "#1a2035" }}>{todos.length}</b> productos
+                      <div ref={sentinelRef} style={{ padding: "32px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+                        <p style={{ margin: 0, fontSize: 13, color: "#64748b" }}>
+                          Mostrando <b style={{ color: "#1a2035" }}>{pagina.length}</b> de <b style={{ color: "#1a2035" }}>{todos.length}</b> productos
                         </p>
-                        <div style={{ display: "flex", gap: 5 }}>
-                          {[0, 1, 2].map(i => (
-                            <div key={i} style={{ width: 7, height: 7, borderRadius: "50%", background: "#e8197d", opacity: 0.4 + i * 0.3 }} />
-                          ))}
-                        </div>
+                        <button
+                          onClick={() => setVisibles(v => v + 48)}
+                          style={{ padding: "11px 28px", background: "#1a2035", color: "white", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer", letterSpacing: 0.2 }}
+                          onMouseEnter={e => (e.currentTarget.style.background = "#e8197d")}
+                          onMouseLeave={e => (e.currentTarget.style.background = "#1a2035")}
+                        >
+                          Cargar más productos
+                        </button>
                       </div>
-                    ) : <div style={{ height: 32 }} />
+                    ) : (
+                      <div style={{ padding: "24px 0", textAlign: "center" }}>
+                        <p style={{ margin: 0, fontSize: 12, color: "#94a3b8" }}>
+                          Mostrando todos los <b style={{ color: "#1a2035" }}>{todos.length}</b> productos
+                        </p>
+                      </div>
+                    )
 
                   if (categoriaActiva === "" || esFiltroFavs) {
                     const todos = secciones.flatMap(({ items }) => items)
