@@ -95,6 +95,9 @@ export default function AdminPanel() {
   const [productos, setProductos] = useState<ProductoAdmin[]>([])
   const [cargandoProds, setCargandoProds] = useState(false)
 
+  // Error global de API
+  const [apiError, setApiError] = useState<string | null>(null)
+
   // Tab Categorías — bulk
   const [busqCat, setBusqCat] = useState("")
   const [filtroCatActual, setFiltroCatActual] = useState("todos")
@@ -151,23 +154,26 @@ export default function AdminPanel() {
 
   // ── Loaders ───────────────────────────────────────────────────────────────────
   async function cargarClientes() {
-    setCargandoClientes(true)
+    setCargandoClientes(true); setApiError(null)
     const res = await apiFetch("/api/admin/clientes")
-    if (res.ok) setClientes(await res.json())
+    if (res.ok) { setClientes(await res.json()) }
+    else { const body = await res.text(); setApiError(`Clientes: ${res.status} — ${body}`) }
     setCargandoClientes(false)
   }
 
   async function cargarPedidos() {
-    setCargandoPedidos(true)
+    setCargandoPedidos(true); setApiError(null)
     const res = await apiFetch("/api/admin/pedidos")
-    if (res.ok) setPedidos(await res.json())
+    if (res.ok) { setPedidos(await res.json()) }
+    else { const body = await res.text(); setApiError(`Pedidos: ${res.status} — ${body}`) }
     setCargandoPedidos(false)
   }
 
   async function cargarProductos() {
-    setCargandoProds(true)
+    setCargandoProds(true); setApiError(null)
     const res = await apiFetch("/api/admin/productos")
-    if (res.ok) setProductos(await res.json())
+    if (res.ok) { setProductos(await res.json()) }
+    else { const body = await res.text(); setApiError(`Productos: ${res.status} — ${body}`) }
     setCargandoProds(false)
   }
 
@@ -356,6 +362,16 @@ export default function AdminPanel() {
       </div>
 
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "24px 20px" }}>
+
+        {/* Error de API */}
+        {apiError && (
+          <div style={{ background: "#fef2f2", border: "1.5px solid #fecaca", borderRadius: 10, padding: "12px 16px", marginBottom: 16, fontSize: 13, color: "#dc2626", fontFamily: "monospace", wordBreak: "break-all" }}>
+            <strong>Error al cargar datos:</strong> {apiError}
+            <div style={{ marginTop: 8, fontSize: 12, color: "#64748b", fontFamily: "system-ui", fontStyle: "italic" }}>
+              Verificá: 1) SUPABASE_SERVICE_ROLE_KEY en Vercel Variables, 2) NEXT_PUBLIC_ADMIN_EMAIL coincide exactamente con tu email, 3) Hiciste redeploy después de agregar las variables.
+            </div>
+          </div>
+        )}
 
         {/* ════════ TAB CLIENTES ════════ */}
         {tab === "clientes" && (
