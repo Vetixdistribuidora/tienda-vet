@@ -26,6 +26,7 @@ type PedidoHistorial = {
 }
 
 const WHATSAPP = process.env.NEXT_PUBLIC_WHATSAPP ?? ""
+const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL ?? ""
 
 const CATEGORIAS_ORDEN = ["Accesorios", "Alimento Balanceado", "Ambiental", "Desinfectantes", "Instrumental y Descartables", "Medicamentos", "Pet Shop", "Antibióticos", "Antiparasitarios", "Suplementos Minerales", "Antiinflamatorios", "Analgésicos y Tranquilizantes", "Vacunas", "Piedras Sanitarias", "Cercos Eléctricos", "Identificación de Ganado", "Snacks", "Protectores Articulares", "Cremas", "Colirios", "Antidiarreicos", "Protectores Hepáticos", "Revulsivos", "Agroinsumos", "Sustituto Lácteo"]
 
@@ -2812,6 +2813,12 @@ export default function Tienda() {
                       Cerrar sesión
                     </button>
                   </div>
+                  {ADMIN_EMAIL && usuario?.email === ADMIN_EMAIL && (
+                    <a href="/admin"
+                      style={{ display: "block", textAlign: "center", padding: "9px", borderRadius: 9, background: "#e8197d", color: "white", fontSize: 12, fontWeight: 800, textDecoration: "none", marginTop: 2 }}>
+                      ⚙ Panel Admin
+                    </a>
+                  )}
                 </div>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
