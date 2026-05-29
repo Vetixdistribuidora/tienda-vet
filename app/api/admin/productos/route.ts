@@ -7,9 +7,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 })
   }
 
+  // Sin filtro de stock ni activo — muestra todos los productos existentes
   const { data, error } = await getSupabaseAdmin()
     .from("productos")
-    .select("id, nombre, precio_venta, stock, categoria, laboratorio, imagen_url")
+    .select("id, nombre, precio_venta, stock, categoria, laboratorio, imagen_url, activo")
     .order("nombre")
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
