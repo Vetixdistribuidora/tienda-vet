@@ -127,6 +127,8 @@ export default function AdminPanel() {
   const [editProducto, setEditProducto] = useState<ProductoAdmin | null>(null)
   const [editFields, setEditFields] = useState<Partial<ProductoAdmin & { categoria: string; laboratorio: string }>>({})
   const [guardandoProd, setGuardandoProd] = useState(false)
+  const [subiendoImagen, setSubiendoImagen] = useState(false)
+  const [imagenError, setImagenError] = useState("")
 
   // ── Auth ──────────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -296,6 +298,26 @@ export default function AdminPanel() {
     ))
     setGuardandoProd(false)
     setEditProducto(null)
+  }
+
+  async function subirImagen(file: File) {
+    if (!editProducto) return
+    setSubiendoImagen(true); setImagenError("")
+    const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg"
+    const path = `${editProducto.id}.${ext}`
+    const { error: upErr } = await supabase.storage
+      .from("productos")
+      .upload(path, file, { upsert: true, contentType: file.type })
+    if (upErr) { setImagenError("Error al subir: " + upErr.message); setSubiendoImagen(false); return }
+    const { data: urlData } = supabase.storage.from("productos").getPublicUrl(path)
+    const url = urlData.publicUrl + "?t=" + Date.now()
+    await apiFetch(`/api/admin/productos/${editProducto.id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ imagen_url: url }),
+    })
+    setEditProducto(p => p ? { ...p, imagen_url: url } : p)
+    setProductos(ps => ps.map(p => p.id === editProducto.id ? { ...p, imagen_url: url } : p))
+    setSubiendoImagen(false)
   }
 
   // ── Derived ───────────────────────────────────────────────────────────────────
@@ -730,7 +752,7 @@ export default function AdminPanel() {
                 <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 700 }}>
                   <thead>
                     <tr style={{ background: "#f8fafc", borderBottom: "2px solid #e2e8f0" }}>
-                      {["Producto", "Laboratorio", "Categoría", "Precio", "Stock", ""].map((h, i) => (
+                      {["", "Producto", "Laboratorio", "Categoría", "Precio", "Stock", ""].map((h, i) => (
                         <th key={i} style={{ padding: "11px 16px", textAlign: "left", fontSize: 10.5, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.6, whiteSpace: "nowrap" }}>{h}</th>
                       ))}
                     </tr>
@@ -738,6 +760,11 @@ export default function AdminPanel() {
                   <tbody>
                     {productosFiltrados.map((p, i) => (
                       <tr key={p.id} style={{ borderBottom: "1px solid #f1f5f9", background: i % 2 === 0 ? "white" : "#fafbfc" }}>
+                        <td style={{ padding: "8px 8px 8px 16px", width: 48 }}>
+                          {p.imagen_url
+                            ? <img src={p.imagen_url} alt="" style={{ width: 36, height: 36, objectFit: "contain", borderRadius: 6, border: "1px solid #e2e8f0", background: "#f8fafc" }} />
+                            : <div style={{ width: 36, height: 36, borderRadius: 6, border: "1.5px dashed #e2e8f0", background: "#f8fafc", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>📷</div>}
+                        </td>
                         <td style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "#1a2035", maxWidth: 260 }}>{p.nombre}</td>
                         <td style={{ padding: "10px 16px" }}>
                           {p.laboratorio
@@ -825,6 +852,27 @@ export default function AdminPanel() {
                 </div>
               </div>
             </div>
+              {/* Imagen */}
+              <div>
+                <label style={{ display: "block", fontSize: 10.5, fontWeight: 800, color: "#374151", marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.6 }}>Imagen del producto</label>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  {editProducto.imagen_url ? (
+                    <img src={editProducto.imagen_url} alt="" style={{ width: 64, height: 64, objectFit: "contain", borderRadius: 10, border: "1px solid #e2e8f0", background: "#f8fafc" }} />
+                  ) : (
+                    <div style={{ width: 64, height: 64, borderRadius: 10, border: "2px dashed #e2e8f0", background: "#f8fafc", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>📷</div>
+                  )}
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: "inline-block", padding: "8px 14px", background: subiendoImagen ? "#f1f5f9" : "#1a2035", color: subiendoImagen ? "#94a3b8" : "white", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: subiendoImagen ? "not-allowed" : "pointer" }}>
+                      {subiendoImagen ? "Subiendo..." : editProducto.imagen_url ? "Cambiar imagen" : "Subir imagen"}
+                      <input type="file" accept="image/*" style={{ display: "none" }} disabled={subiendoImagen}
+                        onChange={e => { const f = e.target.files?.[0]; if (f) subirImagen(f); e.target.value = "" }} />
+                    </label>
+                    <p style={{ margin: "5px 0 0", fontSize: 11, color: "#94a3b8" }}>JPG, PNG o WEBP · máx 5 MB</p>
+                    {imagenError && <p style={{ margin: "4px 0 0", fontSize: 11, color: "#dc2626", fontWeight: 600 }}>{imagenError}</p>}
+                  </div>
+                </div>
+              </div>
+
             <div style={{ display: "flex", gap: 10, marginTop: 22 }}>
               <button onClick={() => setEditProducto(null)} style={{ flex: 1, padding: "11px", background: "#f1f5f9", color: "#475569", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Cancelar</button>
               <button onClick={guardarProducto} disabled={guardandoProd} style={{ flex: 2, padding: "11px", background: guardandoProd ? "#f9a8d4" : "#e8197d", color: "white", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 900, cursor: guardandoProd ? "not-allowed" : "pointer" }}>
