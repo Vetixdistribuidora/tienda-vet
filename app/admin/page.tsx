@@ -49,9 +49,9 @@ type ProductoAdmin = {
   precio_venta: number
   stock: number
   categoria: string | null
+  subcategoria: string | null
   laboratorio: string | null
   imagen_url: string | null
-  activo?: boolean
 }
 
 // ── Constantes ────────────────────────────────────────────────────────────────
@@ -110,11 +110,16 @@ export default function AdminPanel() {
   const [filtroCatActual, setFiltroCatActual] = useState("todos")
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
   const [bulkCat, setBulkCat] = useState("")
+  const [bulkSubcat, setBulkSubcat] = useState("")
   const [guardandoBulk, setGuardandoBulk] = useState(false)
-  // inline edit
+  // inline edit categoría
   const [editCatId, setEditCatId] = useState<number | null>(null)
   const [editCatVal, setEditCatVal] = useState("")
   const [guardandoCat, setGuardandoCat] = useState<number | null>(null)
+  // inline edit subcategoría
+  const [editSubcatId, setEditSubcatId] = useState<number | null>(null)
+  const [editSubcatVal, setEditSubcatVal] = useState("")
+  const [guardandoSubcat, setGuardandoSubcat] = useState<number | null>(null)
 
   // Tab Productos
   const [busqProd, setBusqProd] = useState("")
@@ -225,20 +230,36 @@ export default function AdminPanel() {
 
   async function asignarBulk() {
     if (selectedIds.size === 0) return
+    if (!bulkCat.trim() && !bulkSubcat.trim()) return
     setGuardandoBulk(true)
-    const cat = bulkCat.trim() || null
+    const updates: Record<string, string | null> = {}
+    if (bulkCat.trim())    updates.categoria    = bulkCat.trim()
+    if (bulkSubcat.trim()) updates.subcategoria = bulkSubcat.trim()
     await Promise.all(
       Array.from(selectedIds).map(id =>
         apiFetch(`/api/admin/productos/${id}`, {
           method: "PATCH",
-          body: JSON.stringify({ categoria: cat }),
+          body: JSON.stringify(updates),
         })
       )
     )
-    setProductos(ps => ps.map(p => selectedIds.has(p.id) ? { ...p, categoria: cat } : p))
+    setProductos(ps => ps.map(p => selectedIds.has(p.id) ? { ...p, ...updates } : p))
     setSelectedIds(new Set())
     setBulkCat("")
+    setBulkSubcat("")
     setGuardandoBulk(false)
+  }
+
+  async function guardarSubcategoria(id: number, subcat: string) {
+    setGuardandoSubcat(id)
+    const subcatFinal = subcat.trim() || null
+    setProductos(ps => ps.map(p => p.id === id ? { ...p, subcategoria: subcatFinal } : p))
+    await apiFetch(`/api/admin/productos/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ subcategoria: subcatFinal }),
+    })
+    setGuardandoSubcat(null)
+    setEditSubcatId(null)
   }
 
   async function guardarCategoria(id: number, cat: string) {
@@ -261,6 +282,7 @@ export default function AdminPanel() {
     if (editFields.nombre !== undefined) updates.nombre = editFields.nombre
     if (editFields.precio_venta !== undefined) updates.precio_venta = editFields.precio_venta
     if (editFields.categoria !== undefined) updates.categoria = (editFields.categoria as string).trim() || null
+    if (editFields.subcategoria !== undefined) updates.subcategoria = (editFields.subcategoria as string).trim() || null
     if (editFields.laboratorio !== undefined) updates.laboratorio = (editFields.laboratorio as string).trim() || null
     if (editFields.stock !== undefined) updates.stock = editFields.stock
     await apiFetch(`/api/admin/productos/${editProducto.id}`, {
@@ -279,6 +301,10 @@ export default function AdminPanel() {
   // ── Derived ───────────────────────────────────────────────────────────────────
   const categoriasExistentes = Array.from(
     new Set(productos.filter(p => p.categoria).map(p => p.categoria!))
+  ).sort()
+
+  const subcategoriasExistentes = Array.from(
+    new Set(productos.filter(p => p.subcategoria).map(p => p.subcategoria!))
   ).sort()
 
   const clientesFiltrados = clientes
@@ -551,28 +577,32 @@ export default function AdminPanel() {
             {/* Barra de acción masiva */}
             {algunoSeleccionado && (
               <div style={{ background: "#0f172a", borderRadius: 11, padding: "12px 16px", marginBottom: 12, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: "white", marginRight: 4 }}>
-                  {selectedIds.size} producto{selectedIds.size !== 1 ? "s" : ""} seleccionado{selectedIds.size !== 1 ? "s" : ""}
+                <span style={{ fontSize: 13, fontWeight: 700, color: "white", flexShrink: 0 }}>
+                  {selectedIds.size} producto{selectedIds.size !== 1 ? "s" : ""}
                 </span>
-                <span style={{ fontSize: 12, color: "#64748b" }}>→ Asignar categoría:</span>
-                <input
-                  list="bulk-cats"
-                  value={bulkCat}
-                  onChange={e => setBulkCat(e.target.value)}
-                  onKeyDown={e => e.key === "Enter" && asignarBulk()}
-                  placeholder="Escribí o elegí una categoría..."
-                  style={{ flex: 1, minWidth: 180, padding: "7px 12px", borderRadius: 8, border: "1.5px solid #2d3a55", background: "#1e293b", color: "white", fontSize: 13, outline: "none" }}
-                />
-                <datalist id="bulk-cats">
-                  {categoriasExistentes.map(c => <option key={c} value={c} />)}
-                </datalist>
-                <button onClick={asignarBulk} disabled={guardandoBulk || !bulkCat.trim()}
-                  style={{ padding: "7px 16px", background: guardandoBulk ? "#64748b" : "#e8197d", color: "white", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: guardandoBulk || !bulkCat.trim() ? "not-allowed" : "pointer", whiteSpace: "nowrap" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, flex: 1, minWidth: 240 }}>
+                  <span style={{ fontSize: 11, color: "#64748b", whiteSpace: "nowrap" }}>Categoría:</span>
+                  <input list="bulk-cats" value={bulkCat} onChange={e => setBulkCat(e.target.value)}
+                    onKeyDown={e => e.key === "Enter" && asignarBulk()}
+                    placeholder="Categoría..."
+                    style={{ flex: 1, minWidth: 120, padding: "6px 10px", borderRadius: 7, border: "1.5px solid #2d3a55", background: "#1e293b", color: "white", fontSize: 12, outline: "none" }} />
+                  <datalist id="bulk-cats">{categoriasExistentes.map(c => <option key={c} value={c} />)}</datalist>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, flex: 1, minWidth: 200 }}>
+                  <span style={{ fontSize: 11, color: "#64748b", whiteSpace: "nowrap" }}>Subcategoría:</span>
+                  <input list="bulk-subcats" value={bulkSubcat} onChange={e => setBulkSubcat(e.target.value)}
+                    onKeyDown={e => e.key === "Enter" && asignarBulk()}
+                    placeholder="Subcategoría (opcional)..."
+                    style={{ flex: 1, minWidth: 120, padding: "6px 10px", borderRadius: 7, border: "1.5px solid #2d3a55", background: "#1e293b", color: "white", fontSize: 12, outline: "none" }} />
+                  <datalist id="bulk-subcats">{subcategoriasExistentes.map(c => <option key={c} value={c} />)}</datalist>
+                </div>
+                <button onClick={asignarBulk} disabled={guardandoBulk || (!bulkCat.trim() && !bulkSubcat.trim())}
+                  style={{ padding: "7px 16px", background: guardandoBulk ? "#64748b" : "#e8197d", color: "white", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 800, cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0 }}>
                   {guardandoBulk ? "Guardando..." : "✓ Aplicar"}
                 </button>
-                <button onClick={() => { setSelectedIds(new Set()); setBulkCat("") }}
-                  style={{ padding: "7px 10px", background: "#1e293b", border: "1px solid #2d3a55", color: "#94a3b8", borderRadius: 8, fontSize: 12, cursor: "pointer" }}>
-                  ✕ Cancelar
+                <button onClick={() => { setSelectedIds(new Set()); setBulkCat(""); setBulkSubcat("") }}
+                  style={{ padding: "7px 10px", background: "#1e293b", border: "1px solid #2d3a55", color: "#94a3b8", borderRadius: 8, fontSize: 12, cursor: "pointer", flexShrink: 0 }}>
+                  ✕
                 </button>
               </div>
             )}
@@ -592,7 +622,7 @@ export default function AdminPanel() {
                           title={todosSeleccionados ? "Deseleccionar todo" : "Seleccionar todo"}
                         />
                       </th>
-                      {["Producto", "Laboratorio", "Categoría actual", "Editar"].map(h => (
+                      {["Producto", "Laboratorio", "Categoría", "Subcategoría", ""].map(h => (
                         <th key={h} style={{ padding: "11px 16px", textAlign: "left", fontSize: 10.5, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.6 }}>{h}</th>
                       ))}
                     </tr>
@@ -641,6 +671,31 @@ export default function AdminPanel() {
                               <button onClick={() => { setEditCatId(p.id); setEditCatVal(p.categoria ?? "") }}
                                 style={{ padding: "5px 12px", background: "#f1f5f9", color: "#475569", border: "1px solid #e2e8f0", borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
                                 {p.categoria ? "Cambiar" : "Asignar"}
+                              </button>
+                            )}
+                          </td>
+                          {/* Subcategoría inline edit */}
+                          <td style={{ padding: "10px 16px" }}>
+                            {editSubcatId === p.id ? (
+                              <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                                <input list={`subcats-${p.id}`} value={editSubcatVal} onChange={e => setEditSubcatVal(e.target.value)} autoFocus
+                                  onKeyDown={e => { if (e.key === "Enter") guardarSubcategoria(p.id, editSubcatVal); if (e.key === "Escape") setEditSubcatId(null) }}
+                                  placeholder="Subcategoría..."
+                                  style={{ padding: "5px 10px", border: "1.5px solid #7c3aed", borderRadius: 7, fontSize: 12, outline: "none", width: 140 }} />
+                                <datalist id={`subcats-${p.id}`}>
+                                  {subcategoriasExistentes.map(c => <option key={c} value={c} />)}
+                                </datalist>
+                                <button onClick={() => guardarSubcategoria(p.id, editSubcatVal)} disabled={guardandoSubcat === p.id}
+                                  style={{ padding: "5px 10px", background: "#7c3aed", color: "white", border: "none", borderRadius: 7, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                                  {guardandoSubcat === p.id ? "..." : "✓"}
+                                </button>
+                                <button onClick={() => setEditSubcatId(null)}
+                                  style={{ padding: "5px 8px", background: "#f1f5f9", color: "#64748b", border: "none", borderRadius: 7, fontSize: 12, cursor: "pointer" }}>✕</button>
+                              </div>
+                            ) : (
+                              <button onClick={() => { setEditSubcatId(p.id); setEditSubcatVal(p.subcategoria ?? "") }}
+                                style={{ padding: "5px 12px", background: p.subcategoria ? "#faf5ff" : "#f1f5f9", color: p.subcategoria ? "#7c3aed" : "#475569", border: `1px solid ${p.subcategoria ? "#ddd6fe" : "#e2e8f0"}`, borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+                                {p.subcategoria || "Asignar"}
                               </button>
                             )}
                           </td>
@@ -699,7 +754,7 @@ export default function AdminPanel() {
                           <span style={{ fontSize: 12, fontWeight: 700, color: p.stock > 0 ? "#16a34a" : "#94a3b8" }}>{p.stock}</span>
                         </td>
                         <td style={{ padding: "10px 16px" }}>
-                          <button onClick={() => { setEditProducto(p); setEditFields({ nombre: p.nombre, precio_venta: p.precio_venta, categoria: p.categoria ?? "", laboratorio: p.laboratorio ?? "", stock: p.stock }) }}
+                          <button onClick={() => { setEditProducto(p); setEditFields({ nombre: p.nombre, precio_venta: p.precio_venta, categoria: p.categoria ?? "", subcategoria: p.subcategoria ?? "", laboratorio: p.laboratorio ?? "", stock: p.stock }) }}
                             style={{ padding: "5px 12px", background: "#f1f5f9", color: "#475569", border: "1px solid #e2e8f0", borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
                             ✏ Editar
                           </button>
@@ -727,10 +782,10 @@ export default function AdminPanel() {
               <button onClick={() => setEditProducto(null)} style={{ width: 32, height: 32, border: "1px solid #e2e8f0", borderRadius: 8, background: "#f8fafc", cursor: "pointer", fontSize: 15, color: "#64748b" }}>✕</button>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              {(["nombre", "categoria", "laboratorio"] as const).map(key => (
+              {(["nombre", "categoria", "subcategoria", "laboratorio"] as const).map(key => (
                 <div key={key}>
                   <label style={{ display: "block", fontSize: 10.5, fontWeight: 800, color: "#374151", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>
-                    {key === "nombre" ? "Nombre" : key === "categoria" ? "Categoría" : "Laboratorio"}
+                    {key === "nombre" ? "Nombre" : key === "categoria" ? "Categoría" : key === "subcategoria" ? "Subcategoría" : "Laboratorio"}
                   </label>
                   {key === "categoria" ? (
                     <>
@@ -739,6 +794,14 @@ export default function AdminPanel() {
                         style={{ width: "100%", padding: "9px 12px", border: "1.5px solid #e2e8f0", borderRadius: 8, fontSize: 13, outline: "none", boxSizing: "border-box" }}
                         onFocus={e => (e.target.style.borderColor = "#e8197d")} onBlur={e => (e.target.style.borderColor = "#e2e8f0")} />
                       <datalist id="edit-cats">{categoriasExistentes.map(c => <option key={c} value={c} />)}</datalist>
+                    </>
+                  ) : key === "subcategoria" ? (
+                    <>
+                      <input list="edit-subcats" value={(editFields.subcategoria as string) ?? ""} onChange={e => setEditFields(f => ({ ...f, subcategoria: e.target.value }))}
+                        placeholder="Ej: Externos (opcional)"
+                        style={{ width: "100%", padding: "9px 12px", border: "1.5px solid #e2e8f0", borderRadius: 8, fontSize: 13, outline: "none", boxSizing: "border-box" }}
+                        onFocus={e => (e.target.style.borderColor = "#7c3aed")} onBlur={e => (e.target.style.borderColor = "#e2e8f0")} />
+                      <datalist id="edit-subcats">{subcategoriasExistentes.map(c => <option key={c} value={c} />)}</datalist>
                     </>
                   ) : (
                     <input type="text" value={(editFields[key] as string) ?? ""} onChange={e => setEditFields(f => ({ ...f, [key]: e.target.value }))}

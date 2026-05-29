@@ -12,6 +12,7 @@ type Producto = {
   precio_venta: number
   stock: number
   categoria: string | null
+  subcategoria: string | null
   laboratorio: string | null
   imagen_url: string | null
 }
@@ -455,6 +456,7 @@ export default function Tienda() {
   const [cargando, setCargando] = useState(true)
   const [busqueda, setBusqueda] = useState("")
   const [categoriaActiva, setCategoriaActiva] = useState("")
+  const [subcategoriaActiva, setSubcategoriaActiva] = useState("")
   const [orden, setOrden] = useState<Orden>("az")
 
   const [carrito, setCarrito] = useState<ItemCarrito[]>(() => {
@@ -597,7 +599,7 @@ export default function Tienda() {
         while (true) {
           const { data, error } = await supabase
             .from("productos")
-            .select("id, nombre, precio_venta, stock, categoria, laboratorio, imagen_url")
+            .select("id, nombre, precio_venta, stock, categoria, subcategoria, laboratorio, imagen_url")
             .gt("stock", 0)
             .order("nombre")
             .range(desde, desde + 999)
@@ -684,6 +686,11 @@ export default function Tienda() {
   const vistaHome = !cargando && !errorCarga && !busqueda.trim() && !categoriaActiva && !precioMin && !precioMax && laboratoriosFiltro.size === 0 && !modoCatalogo
   const esFiltroFavs = categoriaActiva === "__favs__"
 
+  // Subcategorías disponibles para la categoría activa
+  const subcategoriasDeCat = categoriaActiva && !esFiltroFavs
+    ? [...new Set(productos.filter(p => p.categoria === categoriaActiva && p.subcategoria).map(p => p.subcategoria!))].sort()
+    : []
+
   // Sugerencias de búsqueda (top 7 coincidencias por nombre)
   const sugerencias = useMemo(() => {
     const q = busqueda.trim().toLowerCase()
@@ -730,7 +737,9 @@ export default function Tienda() {
     const grupos: { cat: string; items: Producto[] }[] = []
     const catsAMostrar = categoriaActiva ? [categoriaActiva] : categorias
     for (const cat of catsAMostrar) {
-      const items = ordenar(filtrarProductos(productos.filter(p => p.categoria === cat)))
+      let base = productos.filter(p => p.categoria === cat)
+      if (subcategoriaActiva) base = base.filter(p => p.subcategoria === subcategoriaActiva)
+      const items = ordenar(filtrarProductos(base))
       if (items.length > 0) grupos.push({ cat, items })
     }
     if (!categoriaActiva) {
@@ -738,7 +747,7 @@ export default function Tienda() {
       if (sinCat.length > 0) grupos.push({ cat: "Otros", items: sinCat })
     }
     return grupos
-  }, [productos, categorias, categoriaActiva, busquedaDelay, precioMin, precioMax, laboratoriosFiltro, orden, favoritos])
+  }, [productos, categorias, categoriaActiva, subcategoriaActiva, busquedaDelay, precioMin, precioMax, laboratoriosFiltro, orden, favoritos])
 
   const totalFiltrados = secciones.reduce((s, g) => s + g.items.length, 0)
   const totalItems = carrito.reduce((s, i) => s + i.cantidad, 0)
@@ -793,8 +802,11 @@ export default function Tienda() {
     return () => window.removeEventListener("keydown", onKey)
   }, [imagenZoom, productoDetalle, pedidosOpen, catModalOpen, authModalOpen, editPerfilOpen, sidebarOpen, carritoOpen, checkoutOpen, labDropdownOpen, catDropdownOpen])
 
+  // Reset subcategoría cuando cambia la categoría principal
+  useEffect(() => { setSubcategoriaActiva("") }, [categoriaActiva])
+
   // Reset paginación cuando cambian los filtros
-  useEffect(() => { setVisibles(48) }, [busquedaDelay, categoriaActiva, precioMin, precioMax, laboratoriosFiltro, orden])
+  useEffect(() => { setVisibles(48) }, [busquedaDelay, categoriaActiva, subcategoriaActiva, precioMin, precioMax, laboratoriosFiltro, orden])
 
   // Scroll infinito — cuando el sentinel entra en pantalla cargamos más
   useEffect(() => {
@@ -2055,6 +2067,24 @@ export default function Tienda() {
                         <button onClick={() => setCategoriaActiva("")} style={{ background: "none", border: "none", cursor: "pointer", color: "#e8197d", fontSize: 14, lineHeight: 1, padding: 0, display: "flex" }}>×</button>
                       </div>
                     )}
+                  </div>
+                )}
+
+                {/* Chips de subcategoría — aparecen cuando hay subcategorías para la categoría activa */}
+                {subcategoriasDeCat.length > 0 && (
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12, alignItems: "center" }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.5, marginRight: 2 }}>Subcategoría:</span>
+                    <button
+                      onClick={() => setSubcategoriaActiva("")}
+                      style={{ padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: subcategoriaActiva === "" ? 800 : 600, border: `1.5px solid ${subcategoriaActiva === "" ? "#e8197d" : "#e2e8f0"}`, background: subcategoriaActiva === "" ? "#fff0f7" : "white", color: subcategoriaActiva === "" ? "#e8197d" : "#64748b", cursor: "pointer" }}>
+                      Todas
+                    </button>
+                    {subcategoriasDeCat.map(sub => (
+                      <button key={sub} onClick={() => setSubcategoriaActiva(sub === subcategoriaActiva ? "" : sub)}
+                        style={{ padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: sub === subcategoriaActiva ? 800 : 600, border: `1.5px solid ${sub === subcategoriaActiva ? "#e8197d" : "#e2e8f0"}`, background: sub === subcategoriaActiva ? "#fff0f7" : "white", color: sub === subcategoriaActiva ? "#e8197d" : "#64748b", cursor: "pointer" }}>
+                        {sub}
+                      </button>
+                    ))}
                   </div>
                 )}
 

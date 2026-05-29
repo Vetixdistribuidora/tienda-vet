@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   }
 
   const db = getSupabaseAdmin()
-  const SELECT = "id, nombre, precio_venta, stock, categoria, laboratorio, imagen_url"
+  const SELECT = "id, nombre, precio_venta, stock, categoria, subcategoria, laboratorio, imagen_url"
 
   // ── 1. Traer todos los productos con stock > 0 (paginando de a 1000) ────────
   const conStock: ProdRow[] = []
