@@ -7,9 +7,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 })
   }
 
+  // select("*") para no asumir nombres de columnas — la tabla pedidos puede
+  // tener cliente_nombre o nombre según cómo fue creada en distribuidora-vet
   const { data, error } = await getSupabaseAdmin()
     .from("pedidos")
-    .select("id, created_at, cliente_nombre, cliente_email, cliente_telefono, estado, total, notas, usuario_id, pedido_items(nombre_producto, cantidad, precio_unitario)")
+    .select("*, pedido_items(nombre_producto, cantidad, precio_unitario)")
     .order("created_at", { ascending: false })
     .limit(500)
 

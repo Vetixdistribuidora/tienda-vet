@@ -27,13 +27,20 @@ type PedidoItemAdmin = {
 type PedidoAdmin = {
   id: number
   created_at: string
-  cliente_nombre: string
-  cliente_email: string | null
-  cliente_telefono: string | null
   estado: string
   total: number
   notas: string | null
+  usuario_id?: string | null
+  // columnas de cliente — nombre puede variar según el esquema de la DB
+  cliente_nombre?: string | null
+  nombre?: string | null
+  cliente_email?: string | null
+  email?: string | null
+  cliente_telefono?: string | null
+  telefono?: string | null
   pedido_items: PedidoItemAdmin[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any
 }
 
 type ProductoAdmin = {
@@ -300,6 +307,11 @@ export default function AdminPanel() {
   const todosSeleccionados = productosCatFiltrados.length > 0 && selectedIds.size === productosCatFiltrados.length
   const algunoSeleccionado = selectedIds.size > 0
 
+  // Helpers para columnas de pedido con nombre variable
+  const pNombre   = (p: PedidoAdmin) => p.cliente_nombre ?? p.nombre ?? "—"
+  const pEmail    = (p: PedidoAdmin) => p.cliente_email   ?? p.email   ?? null
+  const pTelefono = (p: PedidoAdmin) => p.cliente_telefono ?? p.telefono ?? null
+
   // ── Loading / not admin ───────────────────────────────────────────────────────
   if (verificando) {
     return (
@@ -469,8 +481,8 @@ export default function AdminPanel() {
                         <span style={{ fontSize: 11.5, color: "#64748b", minWidth: 105, whiteSpace: "nowrap" }}>
                           {new Date(p.created_at).toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" })}
                         </span>
-                        <span style={{ fontSize: 13, fontWeight: 700, color: "#1a2035", flex: 1, minWidth: 120 }}>{p.cliente_nombre}</span>
-                        <span style={{ fontSize: 12, color: "#64748b", minWidth: 160 }}>{p.cliente_email ?? "—"}</span>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "#1a2035", flex: 1, minWidth: 120 }}>{pNombre(p)}</span>
+                        <span style={{ fontSize: 12, color: "#64748b", minWidth: 160 }}>{pEmail(p) ?? "—"}</span>
                         <span style={{ fontSize: 13, fontWeight: 800, color: "#e8197d", minWidth: 90, textAlign: "right" }}>{fmt(p.total ?? 0)}</span>
                         <div onClick={e => e.stopPropagation()}>
                           <select value={p.estado} onChange={e => cambiarEstado(p.id, e.target.value)} disabled={guardandoEstado === p.id}
@@ -482,7 +494,7 @@ export default function AdminPanel() {
                       </div>
                       {expanded && (
                         <div style={{ padding: "0 18px 16px", borderTop: "1px solid #f1f5f9" }}>
-                          {p.cliente_telefono && <p style={{ margin: "10px 0 6px", fontSize: 12, color: "#64748b" }}>📞 {p.cliente_telefono}</p>}
+                          {pTelefono(p) && <p style={{ margin: "10px 0 6px", fontSize: 12, color: "#64748b" }}>📞 {pTelefono(p)}</p>}
                           {p.notas && <p style={{ margin: "6px 0 10px", fontSize: 12, color: "#475569", background: "#f8fafc", padding: "8px 12px", borderRadius: 8, whiteSpace: "pre-wrap" }}>📝 {p.notas}</p>}
                           <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 8 }}>
                             <thead>
