@@ -470,6 +470,7 @@ export default function Tienda() {
   const [pedidoOk, setPedidoOk] = useState(false)
   const [numeroPedido, setNumeroPedido] = useState<number | null>(null)
   const [precioFinal, setPrecioFinal] = useState(0)
+  const [pedidoCarrito, setPedidoCarrito] = useState<ItemCarrito[]>([])
   const [enviando, setEnviando] = useState(false)
   const [errPedido, setErrPedido] = useState("")
 
@@ -1154,7 +1155,7 @@ export default function Tienda() {
   }
 
   async function guardarPerfil() {
-    if (!usuario || !perfil) return
+    if (!usuario) return
     if (!editNombre.trim() || !editApellido.trim() || !editTelefono.trim()) {
       setEditError("Nombre, apellido y teléfono son obligatorios"); return
     }
@@ -1258,7 +1259,7 @@ export default function Tienda() {
 
     const total = totalPrecio
     setEnviando(false); setNumeroPedido(pedido.id); setPrecioFinal(total)
-    setPedidoOk(true); setCarrito([])
+    setPedidoCarrito(carrito); setPedidoOk(true); setCarrito([])
     // Guardar datos del cliente para pre-rellenar la próxima vez
     localStorage.setItem("vetix_cliente", JSON.stringify({
       nombre: form.nombre.trim(),
@@ -1277,8 +1278,8 @@ export default function Tienda() {
 
   function waLink() {
     if (!WHATSAPP || !numeroPedido) return "#"
-    const lineas = carrito.length > 0
-      ? carrito.map(i => `• ${i.producto.nombre} x${i.cantidad} — ${fmt(i.producto.precio_venta * i.cantidad)}`).join("\n")
+    const lineas = pedidoCarrito.length > 0
+      ? pedidoCarrito.map(i => `• ${i.producto.nombre} x${i.cantidad} — ${fmt(i.producto.precio_venta * i.cantidad)}`).join("\n")
       : ""
     const msg = [
       `Hola! Acabo de hacer el pedido N°${String(numeroPedido).padStart(4, "0")} en la tienda online.`,
