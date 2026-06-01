@@ -61,7 +61,7 @@ export default function ResetPassword() {
         {/* Header */}
         <div style={{ padding: "28px 32px 22px", background: "#0f172a", textAlign: "center" }}>
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
-            <Image src="/logo vetix.jpeg" alt="VETIX" height={44} width={176} style={{ height: 44, width: "auto" }} priority />
+            <Image src="/logo-vetix.jpeg" alt="VETIX" height={44} width={176} style={{ height: 44, width: "auto" }} priority />
           </div>
           <h1 style={{ margin: 0, fontSize: 18, fontWeight: 900, color: "white" }}>
             {done ? "¡Contraseña actualizada!" : "Nueva contraseña"}

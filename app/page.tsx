@@ -105,7 +105,7 @@ function LogoMarca({ height = 46 }: { height?: number }) {
       lineHeight: 0,
     }}>
       <Image
-        src="/logo vetix.jpeg"
+        src="/logo-vetix.jpeg"
         alt="VETIX Distribuidora"
         height={height}
         width={height * 4}
@@ -228,7 +228,7 @@ function Toast({ mensaje }: { mensaje: string }) {
 
 function SkeletonCard() {
   return (
-    <div style={{ background: "#f2f2f2", borderRadius: 14, border: "1px solid #e6e2de", overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.07)" }}>
+    <div style={{ background: "#e8e8e8", borderRadius: 14, border: "1px solid #e6e2de", overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.07)" }}>
       <div className="skeleton" style={{ height: 166 }} />
       <div style={{ padding: "14px 14px 16px" }}>
         <div className="skeleton" style={{ height: 10, borderRadius: 6, marginBottom: 10, width: "45%" }} />
@@ -252,7 +252,7 @@ function FilaListaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFa
   const badge = stockLabel(p.stock)
   return (
     <div onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
-      style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 14px", background: "#f2f2f2", borderRadius: 10, border: `1.5px solid ${hover ? "#f4b8d4" : "#e6e2de"}`, transition: "border-color 0.15s", minWidth: 0, boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+      style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 14px", background: "#e8e8e8", borderRadius: 10, border: `1.5px solid ${hover ? "#f4b8d4" : "#e6e2de"}`, transition: "border-color 0.15s", minWidth: 0, boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
 
       {/* Imagen mini */}
       <div onClick={onDetalle} style={{ width: 48, height: 48, background: "#f7f8fb", borderRadius: 8, flexShrink: 0, cursor: "pointer", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
@@ -303,7 +303,7 @@ function FilaListaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFa
 
       {/* Favorito */}
       <button onClick={e => { e.stopPropagation(); onToggleFav() }}
-        style={{ width: 28, height: 28, borderRadius: "50%", background: esFav ? "#d4688e" : "#efefef", border: esFav ? "none" : "1px solid #e2e8f0", cursor: "pointer", fontSize: 13, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: esFav ? "white" : "#94a3b8", transition: "all 0.15s" }}>
+        style={{ width: 28, height: 28, borderRadius: "50%", background: esFav ? "#d4688e" : "#e2e2e2", border: esFav ? "none" : "1px solid #e2e8f0", cursor: "pointer", fontSize: 13, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: esFav ? "white" : "#94a3b8", transition: "all 0.15s" }}>
         {esFav ? "♥" : "♡"}
       </button>
 
@@ -338,7 +338,7 @@ function TarjetaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFav,
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       style={{
-        background: "#f2f2f2",
+        background: "#e8e8e8",
         borderRadius: 14,
         border: `1.5px solid ${hover ? "#f4b8d4" : "#e6e2de"}`,
         overflow: "hidden",
@@ -1384,7 +1384,7 @@ export default function Tienda() {
   // ── RENDER ────────────────────────────────────────────────────────────────
 
   return (
-    <div style={{ minHeight: "100vh", background: "#e4e4e4" }}>
+    <div style={{ minHeight: "100vh", background: "#c8c8c8" }}>
 
       {/* ── BANNER DE ANUNCIO ──────────────────────────────────────────────── */}
       {BANNER_TEXTO && !bannerCerrado && (
@@ -1412,7 +1412,7 @@ export default function Tienda() {
 
       {/* ── HEADER ─────────────────────────────────────────────────────────── */}
       <header style={{
-        background: "#f2f2f2",
+        background: "#e8e8e8",
         position: "sticky", top: 0, zIndex: 40,
         borderBottom: "1px solid #e8edf5",
         boxShadow: "0 2px 12px rgba(15,23,42,0.07)",
@@ -1450,7 +1450,7 @@ export default function Tienda() {
             )}
             {/* Dropdown búsquedas recientes */}
             {searchFocus && !busqueda && busquedasRecientes.length > 0 && (
-              <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, background: "#f2f2f2", border: "1.5px solid #e2e8f0", borderRadius: 11, boxShadow: "0 8px 32px rgba(0,0,0,0.12)", zIndex: 100, overflow: "hidden" }}>
+              <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, background: "#e8e8e8", border: "1.5px solid #e2e8f0", borderRadius: 11, boxShadow: "0 8px 32px rgba(0,0,0,0.12)", zIndex: 100, overflow: "hidden" }}>
                 <div style={{ padding: "8px 12px 4px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <span style={{ fontSize: 10, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1 }}>Búsquedas recientes</span>
                   <button onClick={() => { setBusquedasRecientes([]); localStorage.removeItem("vetix_recent") }}
@@ -1459,7 +1459,7 @@ export default function Tienda() {
                 {busquedasRecientes.map(rec => (
                   <button key={rec} onClick={() => { setBusqueda(rec); guardarBusquedaReciente(rec); setSearchFocus(false) }}
                     style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "8px 12px", background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "#374151", textAlign: "left", transition: "background 0.1s" }}
-                    onMouseEnter={e => (e.currentTarget.style.background = "#efefef")}
+                    onMouseEnter={e => (e.currentTarget.style.background = "#e2e2e2")}
                     onMouseLeave={e => (e.currentTarget.style.background = "none")}>
                     <span style={{ fontSize: 12, color: "#94a3b8" }}>↩</span>
                     {rec}
@@ -1483,9 +1483,9 @@ export default function Tienda() {
           {/* Login / Usuario */}
           {usuario ? (
             <button onClick={() => setSidebarOpen(true)}
-              style={{ display: "flex", alignItems: "center", gap: 7, padding: "7px 13px", borderRadius: 10, background: "#efefef", border: "1px solid #e2e8f0", color: "#1a2035", fontSize: 13, fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap", transition: "all 0.15s" }}
+              style={{ display: "flex", alignItems: "center", gap: 7, padding: "7px 13px", borderRadius: 10, background: "#e2e2e2", border: "1px solid #e2e8f0", color: "#1a2035", fontSize: 13, fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap", transition: "all 0.15s" }}
               onMouseEnter={e => { e.currentTarget.style.background = "#f1f5f9"; e.currentTarget.style.borderColor = "#c7d2e0" }}
-              onMouseLeave={e => { e.currentTarget.style.background = "#efefef"; e.currentTarget.style.borderColor = "#e2e8f0" }}>
+              onMouseLeave={e => { e.currentTarget.style.background = "#e2e2e2"; e.currentTarget.style.borderColor = "#e2e8f0" }}>
               <span style={{ width: 24, height: 24, borderRadius: "50%", background: "linear-gradient(135deg,#d4688e,#b05070)", color: "white", fontWeight: 900, fontSize: 11, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 {(perfil ? perfil.nombre : usuario.email)[0].toUpperCase()}
               </span>
@@ -1493,9 +1493,9 @@ export default function Tienda() {
             </button>
           ) : (
             <button onClick={() => { setLoginModo("login"); setLoginError(""); setAuthModalOpen(true) }}
-              style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", borderRadius: 10, background: "#efefef", border: "1px solid #e2e8f0", color: "#1a2035", fontSize: 13, fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap", transition: "all 0.15s" }}
+              style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", borderRadius: 10, background: "#e2e2e2", border: "1px solid #e2e8f0", color: "#1a2035", fontSize: 13, fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap", transition: "all 0.15s" }}
               onMouseEnter={e => { e.currentTarget.style.background = "#f1f5f9"; e.currentTarget.style.borderColor = "#c7d2e0" }}
-              onMouseLeave={e => { e.currentTarget.style.background = "#efefef"; e.currentTarget.style.borderColor = "#e2e8f0" }}>
+              onMouseLeave={e => { e.currentTarget.style.background = "#e2e2e2"; e.currentTarget.style.borderColor = "#e2e8f0" }}>
               <svg width="15" height="15" fill="none" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
               <span className="wa-text">Iniciar sesión</span>
             </button>
@@ -1573,7 +1573,7 @@ export default function Tienda() {
           </div>
 
           {/* ── VENTAJAS ───────────────────────────────────────────────────── */}
-          <div style={{ background: "#efefef", borderBottom: "1px solid #e8edf5", padding: "14px 20px" }}>
+          <div style={{ background: "#e2e2e2", borderBottom: "1px solid #e8edf5", padding: "14px 20px" }}>
             <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "center", gap: 0, flexWrap: "wrap" }}>
               {[
                 { texto: "Precios al por mayor" },
@@ -1591,7 +1591,7 @@ export default function Tienda() {
 
           {/* ── LABORATORIOS ───────────────────────────────────────────────── */}
           {laboratorios.length > 0 && (
-            <div style={{ background: "#f2f2f2", borderTop: "1px solid #eaecf2", borderBottom: "1px solid #eaecf2", padding: "16px 0" }}>
+            <div style={{ background: "#e8e8e8", borderTop: "1px solid #eaecf2", borderBottom: "1px solid #eaecf2", padding: "16px 0" }}>
               <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px 10px", display: "flex", alignItems: "center", gap: 10 }}>
                 <span style={{ fontSize: 10, fontWeight: 800, color: "#94a3b8", letterSpacing: 2, textTransform: "uppercase", whiteSpace: "nowrap", flexShrink: 0 }}>Laboratorios</span>
                 <div style={{ flex: 1, height: 1, background: "#e8ecf2" }}/>
@@ -1613,7 +1613,7 @@ export default function Tienda() {
 
           {/* ── RECIENTEMENTE VISTOS ──────────────────────────────────────── */}
           {recientesProductos.length > 0 && (
-            <div style={{ background: "#f2f2f2", padding: "28px 0 32px", borderBottom: "1px solid #eaecf2" }}>
+            <div style={{ background: "#e8e8e8", padding: "28px 0 32px", borderBottom: "1px solid #eaecf2" }}>
               <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div>
                   <h2 style={{ margin: "0 0 3px", fontSize: 18, fontWeight: 900, color: "#1a2035" }}>Vistos recientemente</h2>
@@ -1664,7 +1664,7 @@ export default function Tienda() {
                     + Agregar todos al carrito
                   </button>
                   <button onClick={() => { setModoCatalogo(true); setBusqueda(""); setBusquedaDelay(""); setCategoriaActiva("__favs__") }}
-                    style={{ padding: "8px 14px", borderRadius: 9, background: "#f2f2f2", border: "1.5px solid #f0c8d8", color: "#d4688e", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                    style={{ padding: "8px 14px", borderRadius: 9, background: "#e8e8e8", border: "1.5px solid #f0c8d8", color: "#d4688e", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
                     Ver todos →
                   </button>
                 </div>
@@ -1701,7 +1701,7 @@ export default function Tienda() {
                   <p style={{ margin: 0, fontSize: 13, color: "#92400e" }}>Stock limitado — aprovechá antes de que se agoten</p>
                 </div>
                 <button onClick={() => { setOrden("stock_asc"); verCatalogo("") }}
-                  style={{ padding: "8px 16px", borderRadius: 9, background: "#f2f2f2", border: "1.5px solid #fde68a", color: "#92400e", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                  style={{ padding: "8px 16px", borderRadius: 9, background: "#e8e8e8", border: "1.5px solid #fde68a", color: "#92400e", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
                   Ver todos con stock limitado →
                 </button>
               </div>
@@ -1776,7 +1776,7 @@ export default function Tienda() {
                     const est = CAT_ESTILO[cat] ?? CAT_DEFAULT
                     return (
                       <button key={cat} onClick={() => verCatalogo(cat)}
-                        style={{ background: "#f2f2f2", border: "1.5px solid #e2e8f0", borderRadius: 11, padding: "14px 16px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 12, transition: "border-color 0.15s, background 0.15s" }}
+                        style={{ background: "#e8e8e8", border: "1.5px solid #e2e8f0", borderRadius: 11, padding: "14px 16px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 12, transition: "border-color 0.15s, background 0.15s" }}
                         onMouseEnter={e => { e.currentTarget.style.borderColor = "#d4688e"; e.currentTarget.style.background = "#fff8fb" }}
                         onMouseLeave={e => { e.currentTarget.style.borderColor = "#e2e8f0"; e.currentTarget.style.background = "white" }}>
                           <div style={{ minWidth: 0 }}>
@@ -1791,7 +1791,7 @@ export default function Tienda() {
           )}
 
           {/* ── PRODUCTOS DESTACADOS ───────────────────────────────────────── */}
-          <div style={{ background: "#f2f2f2", padding: "32px 20px 40px" }}>
+          <div style={{ background: "#e8e8e8", padding: "32px 20px 40px" }}>
             <div style={{ maxWidth: 1280, margin: "0 auto" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 10 }}>
                 <div>
@@ -1799,7 +1799,7 @@ export default function Tienda() {
                   <p style={{ margin: "4px 0 0", fontSize: 13, color: "#64748b" }}>Una selección de nuestros productos</p>
                 </div>
                 <button onClick={() => verCatalogo("")}
-                  style={{ padding: "9px 20px", borderRadius: 10, background: "#f2f2f2", border: "1.5px solid #e2e8f0", fontSize: 13, fontWeight: 700, color: "#1a2035", cursor: "pointer" }}>
+                  style={{ padding: "9px 20px", borderRadius: 10, background: "#e8e8e8", border: "1.5px solid #e2e8f0", fontSize: 13, fontWeight: 700, color: "#1a2035", cursor: "pointer" }}>
                   Ver todos →
                 </button>
               </div>
@@ -1909,7 +1909,7 @@ export default function Tienda() {
                     </p>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       {busqueda && (
-                        <button onClick={() => { setBusqueda(""); setBusquedaDelay("") }} style={{ background: "#f2f2f2", border: "1px solid #e2e8f0", borderRadius: 8, padding: "6px 11px", fontSize: 12, fontWeight: 700, color: "#374151", cursor: "pointer" }}>✕ Limpiar</button>
+                        <button onClick={() => { setBusqueda(""); setBusquedaDelay("") }} style={{ background: "#e8e8e8", border: "1px solid #e2e8f0", borderRadius: 8, padding: "6px 11px", fontSize: 12, fontWeight: 700, color: "#374151", cursor: "pointer" }}>✕ Limpiar</button>
                       )}
                       <button
                         onClick={() => setFiltrosExpandidos(v => !v)}
@@ -1918,7 +1918,7 @@ export default function Tienda() {
                         {filtrosActivos > 0 && <span style={{ background: "#d4688e", color: "white", borderRadius: "50%", width: 16, height: 16, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 900 }}>{filtrosActivos}</span>}
                       </button>
                       <select value={orden} onChange={e => setOrden(e.target.value as Orden)}
-                        style={{ padding: "7px 11px", border: "1.5px solid #e2e8f0", borderRadius: 9, fontSize: 13, fontWeight: 600, outline: "none", background: "#f2f2f2", color: "#374151", cursor: "pointer" }}>
+                        style={{ padding: "7px 11px", border: "1.5px solid #e2e8f0", borderRadius: 9, fontSize: 13, fontWeight: 600, outline: "none", background: "#e8e8e8", color: "#374151", cursor: "pointer" }}>
                         <option value="az">Nombre A → Z</option>
                         <option value="za">Nombre Z → A</option>
                         <option value="precio_asc">Precio: menor primero</option>
@@ -1940,7 +1940,7 @@ export default function Tienda() {
                       {catDropdownOpen && (
                         <>
                           <div onClick={() => setCatDropdownOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 99 }} />
-                          <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, background: "#f2f2f2", border: "1.5px solid #e2e8f0", borderRadius: 11, boxShadow: "0 8px 32px rgba(0,0,0,0.12)", zIndex: 100, minWidth: 230, maxHeight: 320, overflowY: "auto", padding: "6px 0" }}>
+                          <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, background: "#e8e8e8", border: "1.5px solid #e2e8f0", borderRadius: 11, boxShadow: "0 8px 32px rgba(0,0,0,0.12)", zIndex: 100, minWidth: 230, maxHeight: 320, overflowY: "auto", padding: "6px 0" }}>
                             <div style={{ padding: "6px 12px 4px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                               <span style={{ fontSize: 10, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1 }}>Categorías</span>
                               {categoriaActiva && (
@@ -1950,7 +1950,7 @@ export default function Tienda() {
                             {/* Todas */}
                             <button onClick={() => { setCategoriaActiva(""); setCatDropdownOpen(false) }}
                               style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "7px 12px", background: categoriaActiva === "" ? "#fdf0f5" : "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: categoriaActiva === "" ? 700 : 500, color: categoriaActiva === "" ? "#d4688e" : "#374151", textAlign: "left" }}
-                              onMouseEnter={e => { if (categoriaActiva !== "") e.currentTarget.style.background = "#efefef" }}
+                              onMouseEnter={e => { if (categoriaActiva !== "") e.currentTarget.style.background = "#e2e2e2" }}
                               onMouseLeave={e => { if (categoriaActiva !== "") e.currentTarget.style.background = "none" }}>
                               <span style={{ width: 15, height: 15, borderRadius: 4, border: `2px solid ${categoriaActiva === "" ? "#d4688e" : "#d1d5db"}`, background: categoriaActiva === "" ? "#d4688e" : "white", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                 {categoriaActiva === "" && <svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="white" strokeWidth="2.5"><path d="M2 6l3 3 5-5"/></svg>}
@@ -1963,7 +1963,7 @@ export default function Tienda() {
                               return (
                                 <button key={cat} onClick={() => { setCategoriaActiva(cat); setCatDropdownOpen(false) }}
                                   style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "7px 12px", background: sel ? "#fdf0f5" : "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: sel ? 700 : 500, color: sel ? "#d4688e" : "#374151", textAlign: "left" }}
-                                  onMouseEnter={e => { if (!sel) e.currentTarget.style.background = "#efefef" }}
+                                  onMouseEnter={e => { if (!sel) e.currentTarget.style.background = "#e2e2e2" }}
                                   onMouseLeave={e => { if (!sel) e.currentTarget.style.background = "none" }}>
                                   <span style={{ width: 15, height: 15, borderRadius: 4, border: `2px solid ${sel ? "#d4688e" : "#d1d5db"}`, background: sel ? "#d4688e" : "white", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                     {sel && <svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="white" strokeWidth="2.5"><path d="M2 6l3 3 5-5"/></svg>}
@@ -1991,7 +1991,7 @@ export default function Tienda() {
                       {labDropdownOpen && (
                         <>
                           <div onClick={() => setLabDropdownOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 99 }} />
-                          <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, background: "#f2f2f2", border: "1.5px solid #e2e8f0", borderRadius: 11, boxShadow: "0 8px 32px rgba(0,0,0,0.12)", zIndex: 100, minWidth: 220, maxHeight: 260, overflowY: "auto", padding: "6px 0" }}>
+                          <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, background: "#e8e8e8", border: "1.5px solid #e2e8f0", borderRadius: 11, boxShadow: "0 8px 32px rgba(0,0,0,0.12)", zIndex: 100, minWidth: 220, maxHeight: 260, overflowY: "auto", padding: "6px 0" }}>
                             <div style={{ padding: "6px 12px 4px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                               <span style={{ fontSize: 10, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1 }}>Laboratorios</span>
                               {laboratoriosFiltro.size > 0 && (
@@ -2009,7 +2009,7 @@ export default function Tienda() {
                                   })
                                 }}
                                   style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "7px 12px", background: sel ? "#fdf0f5" : "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: sel ? 700 : 500, color: sel ? "#d4688e" : "#374151", textAlign: "left" }}
-                                  onMouseEnter={e => { if (!sel) e.currentTarget.style.background = "#efefef" }}
+                                  onMouseEnter={e => { if (!sel) e.currentTarget.style.background = "#e2e2e2" }}
                                   onMouseLeave={e => { if (!sel) e.currentTarget.style.background = "none" }}>
                                   <span style={{ width: 15, height: 15, borderRadius: 4, border: `2px solid ${sel ? "#d4688e" : "#d1d5db"}`, background: sel ? "#d4688e" : "white", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                     {sel && <svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="white" strokeWidth="2.5"><path d="M2 6l3 3 5-5"/></svg>}
@@ -2311,7 +2311,7 @@ export default function Tienda() {
         <>
           <div className="overlay-anim" onClick={() => setCarritoOpen(false)}
             style={{ position: "fixed", inset: 0, background: "rgba(10,15,28,0.6)", zIndex: 50, backdropFilter: "blur(3px)" }} />
-          <div className="cart-drawer-anim" style={{ position: "fixed", top: 0, right: 0, bottom: 0, width: "min(440px, 100vw)", background: "#f2f2f2", zIndex: 51, display: "flex", flexDirection: "column", boxShadow: "-8px 0 48px rgba(0,0,0,0.25)" }}>
+          <div className="cart-drawer-anim" style={{ position: "fixed", top: 0, right: 0, bottom: 0, width: "min(440px, 100vw)", background: "#e8e8e8", zIndex: 51, display: "flex", flexDirection: "column", boxShadow: "-8px 0 48px rgba(0,0,0,0.25)" }}>
 
             <div style={{ padding: "20px 22px 16px", borderBottom: "1px solid #f1f5f9", background: "#0f172a" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -2358,7 +2358,7 @@ export default function Tienda() {
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", marginTop: 8 }}>
                       {categorias.slice(0, 4).map(cat => (
                         <button key={cat} onClick={() => { setCarritoOpen(false); verCatalogo(cat) }}
-                          style={{ padding: "5px 12px", borderRadius: 20, background: "#f2f2f2", border: "1.5px solid #e2e8f0", fontSize: 12, fontWeight: 600, color: "#374151", cursor: "pointer" }}
+                          style={{ padding: "5px 12px", borderRadius: 20, background: "#e8e8e8", border: "1.5px solid #e2e8f0", fontSize: 12, fontWeight: 600, color: "#374151", cursor: "pointer" }}
                           onMouseEnter={e => { e.currentTarget.style.borderColor = "#d4688e"; e.currentTarget.style.color = "#d4688e" }}
                           onMouseLeave={e => { e.currentTarget.style.borderColor = "#e2e8f0"; e.currentTarget.style.color = "#374151" }}>
                           {cat}
@@ -2370,8 +2370,8 @@ export default function Tienda() {
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {carrito.map(item => (
-                    <div key={item.producto.id} style={{ display: "flex", gap: 12, padding: 12, background: "#efefef", borderRadius: 12, border: "1px solid #eaecf2" }}>
-                      <div style={{ width: 60, height: 60, background: "#f2f2f2", borderRadius: 9, border: "1px solid #eaecf2", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", position: "relative" }}>
+                    <div key={item.producto.id} style={{ display: "flex", gap: 12, padding: 12, background: "#e2e2e2", borderRadius: 12, border: "1px solid #eaecf2" }}>
+                      <div style={{ width: 60, height: 60, background: "#e8e8e8", borderRadius: 9, border: "1px solid #eaecf2", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", position: "relative" }}>
                         {item.producto.imagen_url
                           ? <Image src={item.producto.imagen_url} alt="" fill sizes="60px" style={{ objectFit: "contain", padding: 4 }} />
                           : <span style={{ fontSize: 22 }}>📦</span>}
@@ -2383,7 +2383,7 @@ export default function Tienda() {
                         {item.producto.laboratorio && <p style={{ margin: "0 0 7px", fontSize: 10, color: "#b05070", fontWeight: 700 }}>{item.producto.laboratorio}</p>}
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: 2, background: "#f2f2f2", border: "1.5px solid #eaecf2", borderRadius: 8, padding: "2px 3px" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 2, background: "#e8e8e8", border: "1.5px solid #eaecf2", borderRadius: 8, padding: "2px 3px" }}>
                               <button onClick={() => cambiar(item.producto.id, -1)} style={{ width: 24, height: 24, border: "none", background: "#f1f5f9", borderRadius: 5, cursor: "pointer", fontWeight: 900, color: "#374151", fontSize: 15, display: "flex", alignItems: "center", justifyContent: "center" }}>−</button>
                               {cantidadEditando?.id === item.producto.id ? (
                                 <input
@@ -2463,7 +2463,7 @@ export default function Tienda() {
 
             {carrito.length > 0 && (
               <div style={{ padding: "14px 20px 20px", borderTop: "1px solid #f1f5f9" }}>
-                <div style={{ background: "#efefef", borderRadius: 11, padding: "12px 14px", marginBottom: 12, border: "1px solid #eaecf2" }}>
+                <div style={{ background: "#e2e2e2", borderRadius: 11, padding: "12px 14px", marginBottom: 12, border: "1px solid #eaecf2" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "#6b7280" }}>
                     <span>Subtotal ({totalItems} ítems)</span>
                     <span style={{ fontWeight: 800, color: "#1a2035" }}>{fmt(totalPrecio)}</span>
@@ -2503,7 +2503,7 @@ export default function Tienda() {
       {/* ── CHECKOUT MODAL ─────────────────────────────────────────────────── */}
       {checkoutOpen && !pedidoOk && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(10,15,28,0.65)", zIndex: 60, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, backdropFilter: "blur(4px)" }}>
-          <div style={{ background: "#f2f2f2", borderRadius: 22, width: "100%", maxWidth: 520, maxHeight: "92vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(0,0,0,0.4)" }}>
+          <div style={{ background: "#e8e8e8", borderRadius: 22, width: "100%", maxWidth: 520, maxHeight: "92vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(0,0,0,0.4)" }}>
 
             <div style={{ padding: "22px 24px 16px", borderBottom: "1px solid #f1f5f9", background: "#0f172a" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -2576,7 +2576,7 @@ export default function Tienda() {
               </div>
 
               {/* Resumen */}
-              <div style={{ marginTop: 18, background: "#efefef", borderRadius: 13, padding: 15, border: "1px solid #eaecf2" }}>
+              <div style={{ marginTop: 18, background: "#e2e2e2", borderRadius: 13, padding: 15, border: "1px solid #eaecf2" }}>
                 <p style={{ margin: "0 0 10px", fontSize: 10.5, fontWeight: 800, color: "#374151", textTransform: "uppercase", letterSpacing: 0.8 }}>Resumen del pedido</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   {carrito.map(i => (
@@ -2625,7 +2625,7 @@ export default function Tienda() {
         return (
           <div className="overlay-anim" style={{ position: "fixed", inset: 0, background: "rgba(10,15,28,0.7)", zIndex: 60, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, backdropFilter: "blur(4px)" }}
             onClick={e => { if (e.target === e.currentTarget) setProductoDetalle(null) }}>
-            <div className="modal-scale-anim" style={{ background: "#f2f2f2", borderRadius: 22, width: "100%", maxWidth: 620, maxHeight: "92vh", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(0,0,0,0.4)", overflow: "hidden" }}>
+            <div className="modal-scale-anim" style={{ background: "#e8e8e8", borderRadius: 22, width: "100%", maxWidth: 620, maxHeight: "92vh", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(0,0,0,0.4)", overflow: "hidden" }}>
 
               {/* Header */}
               <div style={{ padding: "16px 20px", borderBottom: "1px solid #f1f5f9", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
@@ -2635,12 +2635,12 @@ export default function Tienda() {
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <button onClick={() => copiarLink(p.id)} title="Copiar link del producto"
-                    style={{ width: 34, height: 34, borderRadius: 9, border: "1px solid #e2e8f0", background: "#efefef", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", flexShrink: 0, transition: "all 0.15s" }}
+                    style={{ width: 34, height: 34, borderRadius: 9, border: "1px solid #e2e8f0", background: "#e2e2e2", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", flexShrink: 0, transition: "all 0.15s" }}
                     onMouseEnter={e => { e.currentTarget.style.borderColor = "#d4688e"; e.currentTarget.style.color = "#d4688e" }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor = "#e2e8f0"; e.currentTarget.style.color = "#64748b" }}>
                     <IcoShare size={14} />
                   </button>
-                  <button onClick={() => setProductoDetalle(null)} style={{ width: 34, height: 34, borderRadius: 9, border: "1px solid #e2e8f0", background: "#efefef", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", flexShrink: 0 }}>
+                  <button onClick={() => setProductoDetalle(null)} style={{ width: 34, height: 34, borderRadius: 9, border: "1px solid #e2e8f0", background: "#e2e2e2", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", flexShrink: 0 }}>
                     <IcoClose />
                   </button>
                 </div>
@@ -2702,7 +2702,7 @@ export default function Tienda() {
                       )}
                     </div>
 
-                    <div style={{ display: "flex", flexDirection: "column", gap: 7, background: "#efefef", borderRadius: 10, padding: "12px 14px", border: "1px solid #eaecf2" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 7, background: "#e2e2e2", borderRadius: 10, padding: "12px 14px", border: "1px solid #eaecf2" }}>
                       {p.laboratorio && (
                         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}>
                           <span style={{ color: "#64748b", fontWeight: 600 }}>Laboratorio</span>
@@ -2760,10 +2760,10 @@ export default function Tienda() {
                       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                         {relacionados.map(r => (
                           <button key={r.id} onClick={() => setProductoDetalle(r)}
-                            style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", borderRadius: 9, background: "#efefef", border: "1px solid #eaecf2", cursor: "pointer", textAlign: "left", transition: "background 0.15s" }}
+                            style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", borderRadius: 9, background: "#e2e2e2", border: "1px solid #eaecf2", cursor: "pointer", textAlign: "left", transition: "background 0.15s" }}
                             onMouseEnter={e => (e.currentTarget.style.background = "#fdf0f5")}
-                            onMouseLeave={e => (e.currentTarget.style.background = "#efefef")}>
-                            <div style={{ width: 38, height: 38, background: "#f2f2f2", borderRadius: 7, flexShrink: 0, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #eaecf2", position: "relative" }}>
+                            onMouseLeave={e => (e.currentTarget.style.background = "#e2e2e2")}>
+                            <div style={{ width: 38, height: 38, background: "#e8e8e8", borderRadius: 7, flexShrink: 0, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #eaecf2", position: "relative" }}>
                               {r.imagen_url
                                 ? <Image src={r.imagen_url} alt="" fill sizes="38px" style={{ objectFit: "contain", padding: 3 }} />
                                 : <span style={{ fontSize: 18, opacity: 0.3 }}>📦</span>}
@@ -2903,7 +2903,7 @@ export default function Tienda() {
       {pedidosOpen && (
         <div className="overlay-anim" style={{ position: "fixed", inset: 0, background: "rgba(10,15,28,0.7)", zIndex: 55, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, backdropFilter: "blur(4px)" }}
           onClick={e => { if (e.target === e.currentTarget) setPedidosOpen(false) }}>
-          <div className="modal-scale-anim" style={{ background: "#f2f2f2", borderRadius: 22, width: "100%", maxWidth: 580, maxHeight: "88vh", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(0,0,0,0.4)", overflow: "hidden" }}>
+          <div className="modal-scale-anim" style={{ background: "#e8e8e8", borderRadius: 22, width: "100%", maxWidth: 580, maxHeight: "88vh", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(0,0,0,0.4)", overflow: "hidden" }}>
 
             <div style={{ padding: "20px 24px 16px", borderBottom: "1px solid #f1f5f9", background: "#0f172a", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
               <div>
@@ -2933,7 +2933,7 @@ export default function Tienda() {
                     const estadoColor: Record<string, string> = { pendiente: "#f59e0b", confirmado: "#3b82f6", entregado: "#16a34a", cancelado: "#ef4444" }
                     const color = estadoColor[pedido.estado] ?? "#64748b"
                     return (
-                      <details key={pedido.id} style={{ background: "#efefef", border: "1px solid #eaecf2", borderRadius: 13, overflow: "hidden" }}>
+                      <details key={pedido.id} style={{ background: "#e2e2e2", border: "1px solid #eaecf2", borderRadius: 13, overflow: "hidden" }}>
                         <summary style={{ padding: "14px 16px", cursor: "pointer", listStyle: "none", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                           <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -2979,7 +2979,7 @@ export default function Tienda() {
       {catModalOpen && (
         <div className="overlay-anim" style={{ position: "fixed", inset: 0, background: "rgba(10,15,28,0.7)", zIndex: 55, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, backdropFilter: "blur(4px)" }}
           onClick={e => { if (e.target === e.currentTarget) setCatModalOpen(false) }}>
-          <div className="modal-scale-anim" style={{ background: "#f2f2f2", borderRadius: 22, width: "100%", maxWidth: 680, maxHeight: "88vh", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(0,0,0,0.4)", overflow: "hidden" }}>
+          <div className="modal-scale-anim" style={{ background: "#e8e8e8", borderRadius: 22, width: "100%", maxWidth: 680, maxHeight: "88vh", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(0,0,0,0.4)", overflow: "hidden" }}>
 
             {/* Header */}
             <div style={{ padding: "20px 24px 16px", borderBottom: "1px solid #f1f5f9", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#0f172a", flexShrink: 0 }}>
@@ -3000,7 +3000,7 @@ export default function Tienda() {
                   const est = CAT_ESTILO[cat] ?? CAT_DEFAULT
                   return (
                     <button key={cat} onClick={() => verCatalogo(cat)}
-                      style={{ background: "#f2f2f2", border: "1.5px solid #e8ecf2", borderRadius: 10, padding: "12px 14px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 11, transition: "border-color 0.15s, background 0.15s" }}
+                      style={{ background: "#e8e8e8", border: "1.5px solid #e8ecf2", borderRadius: 10, padding: "12px 14px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 11, transition: "border-color 0.15s, background 0.15s" }}
                       onMouseEnter={e => { e.currentTarget.style.borderColor = "#d4688e"; e.currentTarget.style.background = "#fff8fb" }}
                       onMouseLeave={e => { e.currentTarget.style.borderColor = "#e8ecf2"; e.currentTarget.style.background = "white" }}>
                       <div style={{ minWidth: 0 }}>
@@ -3019,7 +3019,7 @@ export default function Tienda() {
       {editPerfilOpen && (
         <div className="overlay-anim" style={{ position: "fixed", inset: 0, background: "rgba(10,15,28,0.72)", zIndex: 70, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, backdropFilter: "blur(4px)" }}
           onClick={e => { if (e.target === e.currentTarget) setEditPerfilOpen(false) }}>
-          <div className="modal-scale-anim" style={{ background: "#f2f2f2", borderRadius: 22, width: "100%", maxWidth: 420, overflow: "hidden", boxShadow: "0 32px 80px rgba(0,0,0,0.45)" }}>
+          <div className="modal-scale-anim" style={{ background: "#e8e8e8", borderRadius: 22, width: "100%", maxWidth: 420, overflow: "hidden", boxShadow: "0 32px 80px rgba(0,0,0,0.45)" }}>
 
             <div style={{ padding: "20px 24px 16px", background: "#0f172a", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div>
@@ -3083,7 +3083,7 @@ export default function Tienda() {
       {authModalOpen && (
         <div className="overlay-anim" style={{ position: "fixed", inset: 0, background: "rgba(10,15,28,0.72)", zIndex: 70, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, backdropFilter: "blur(4px)" }}
           onClick={e => { if (e.target === e.currentTarget) setAuthModalOpen(false) }}>
-          <div className="modal-scale-anim" style={{ background: "#f2f2f2", borderRadius: 22, width: "100%", maxWidth: 460, maxHeight: "92vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(0,0,0,0.45)" }}>
+          <div className="modal-scale-anim" style={{ background: "#e8e8e8", borderRadius: 22, width: "100%", maxWidth: 460, maxHeight: "92vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(0,0,0,0.45)" }}>
 
             {/* Header */}
             <div style={{ padding: "22px 24px 18px", background: "#0f172a", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -3102,7 +3102,7 @@ export default function Tienda() {
             </div>
 
             {/* Tabs */}
-            <div style={{ padding: "14px 24px 0", display: "flex", gap: 0, background: "#efefef", borderBottom: "1px solid #e2e8f0" }}>
+            <div style={{ padding: "14px 24px 0", display: "flex", gap: 0, background: "#e2e2e2", borderBottom: "1px solid #e2e8f0" }}>
               {(["login", "registro"] as const).map(modo => (
                 <button key={modo} onClick={() => { setLoginModo(modo); setLoginError("") }}
                   style={{ padding: "10px 20px", border: "none", background: "transparent", borderBottom: `2.5px solid ${loginModo === modo ? "#d4688e" : "transparent"}`, color: loginModo === modo ? "#d4688e" : "#64748b", fontSize: 13, fontWeight: loginModo === modo ? 800 : 600, cursor: "pointer", transition: "all 0.15s", marginBottom: -1 }}>
@@ -3276,7 +3276,7 @@ export default function Tienda() {
       {/* ── PEDIDO OK ──────────────────────────────────────────────────────── */}
       {pedidoOk && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(10,15,28,0.75)", zIndex: 60, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, backdropFilter: "blur(4px)" }}>
-          <div style={{ background: "#f2f2f2", borderRadius: 26, padding: "46px 34px 38px", maxWidth: 400, width: "100%", textAlign: "center", boxShadow: "0 32px 80px rgba(0,0,0,0.45)" }}>
+          <div style={{ background: "#e8e8e8", borderRadius: 26, padding: "46px 34px 38px", maxWidth: 400, width: "100%", textAlign: "center", boxShadow: "0 32px 80px rgba(0,0,0,0.45)" }}>
             <div style={{ width: 72, height: 72, background: "#f0fdf4", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", border: "2.5px solid #86efac" }}>
               <svg width="30" height="30" fill="none" strokeWidth="2.5" viewBox="0 0 24 24" stroke="#16a34a"><path d="M20 6 9 17l-5-5" /></svg>
             </div>

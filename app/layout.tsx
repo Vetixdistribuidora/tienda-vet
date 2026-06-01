@@ -72,7 +72,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           margin: 0,
           padding: 0,
           fontFamily: "system-ui, -apple-system, 'Segoe UI', sans-serif",
-          background: "#e4e4e4",
+          background: "#c8c8c8",
         }}
       >
         {children}
