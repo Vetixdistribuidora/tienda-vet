@@ -1251,7 +1251,7 @@ export default function Tienda() {
       return
     }
 
-    await supabase.from("pedido_items").insert(
+    const { error: errItems } = await supabase.from("pedido_items").insert(
       carrito.map(i => {
         const pu = precioConTipo(i.producto.precio_venta, tipoCliente) ?? i.producto.precio_venta
         return {
@@ -1261,6 +1261,12 @@ export default function Tienda() {
         }
       })
     )
+    if (errItems) {
+      console.error("Error al insertar pedido_items:", errItems)
+      setEnviando(false)
+      setErrPedido("Error al guardar los productos del pedido: " + errItems.message)
+      return
+    }
 
     const total = totalPrecio
     setEnviando(false); setNumeroPedido(pedido.id); setPrecioFinal(total)
