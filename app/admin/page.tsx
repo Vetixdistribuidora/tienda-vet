@@ -305,6 +305,8 @@ export default function AdminPanel() {
   async function subirImagen(file: File) {
     if (!editProducto) return
     setSubiendoImagen(true); setImagenError("")
+    // Refrescar sesión antes de subir para evitar RLS por token vencido
+    await supabase.auth.getSession()
     const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg"
     const path = `${editProducto.id}.${ext}`
     const { error: upErr } = await supabase.storage
