@@ -1412,7 +1412,7 @@ export default function Tienda() {
 
       {/* ── HEADER ─────────────────────────────────────────────────────────── */}
       <header style={{
-        background: "#e8e8e8",
+        background: "white",
         position: "sticky", top: 0, zIndex: 40,
         borderBottom: "1px solid #e8edf5",
         boxShadow: "0 2px 12px rgba(15,23,42,0.07)",
@@ -1471,16 +1471,7 @@ export default function Tienda() {
 
           <div style={{ flex: 1 }} />
 
-          {/* WA header link */}
-          {WHATSAPP && (
-            <a href={`https://wa.me/${WHATSAPP}`} target="_blank" rel="noopener noreferrer" className="wa-header-btn"
-              style={{ display: "flex", alignItems: "center", gap: 7, padding: "8px 14px", borderRadius: 10, background: "#f0fdf4", border: "1px solid #bbf7d0", color: "#16a34a", textDecoration: "none", fontSize: 13, fontWeight: 700, flexShrink: 0, whiteSpace: "nowrap" }}>
-              <IcoWA size={15} />
-              <span className="wa-text">Consultas</span>
-            </a>
-          )}
-
-          {/* Login / Usuario */}
+{/* Login / Usuario */}
           {usuario ? (
             <button onClick={() => setSidebarOpen(true)}
               style={{ display: "flex", alignItems: "center", gap: 7, padding: "7px 13px", borderRadius: 10, background: "#e2e2e2", border: "1px solid #e2e8f0", color: "#1a2035", fontSize: 13, fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap", transition: "all 0.15s" }}
@@ -1508,11 +1499,11 @@ export default function Tienda() {
             onAnimationEnd={() => setCartAnimando(false)}
             style={{
               display: "flex", alignItems: "center", gap: 7, flexShrink: 0,
-              background: totalItems > 0 ? "#d4688e" : "#1a2035",
+              background: "#d4688e",
               color: "white",
               border: "none", borderRadius: 10, padding: "9px 16px", cursor: "pointer",
               fontSize: 13, fontWeight: 800,
-              boxShadow: totalItems > 0 ? "0 4px 16px rgba(212,104,142,0.45)" : "none",
+              boxShadow: totalItems > 0 ? "0 4px 16px rgba(212,104,142,0.45)" : "0 2px 8px rgba(212,104,142,0.25)",
               transition: "background 0.2s, box-shadow 0.2s",
             }}>
             <IcoCart size={17} />
@@ -1563,10 +1554,6 @@ export default function Tienda() {
               <h1 style={{ margin: "0 0 10px", fontSize: "clamp(26px, 4vw, 44px)", fontWeight: 900, color: "white", lineHeight: 1.2 }}>
                 Tu distribuidora veterinaria <span style={{ color: "#f0c8d8" }}>online</span>
               </h1>
-              <p style={{ margin: "0 0 30px", fontSize: 14, color: "#94b8d8", lineHeight: 1.75 }}>
-                Medicamentos, vacunas, alimentos balanceados y más al por mayor.<br />
-                Pedís online y coordinamos la entrega.
-              </p>
               {/* Buscador hero */}
               <div style={{ position: "relative", maxWidth: 520, margin: "0 auto 26px" }}>
                 <input
@@ -1581,17 +1568,6 @@ export default function Tienda() {
                   style={{ position: "absolute", right: 6, top: 6, bottom: 6, background: "#d4688e", color: "white", border: "none", borderRadius: 9, padding: "0 20px", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>
                   Buscar
                 </button>
-              </div>
-              {/* Chips de categorías */}
-              <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
-                {(["Medicamentos", "Vacunas", "Alimento Balanceado", "Antibióticos", "Antiparasitarios", "Pet Shop"] as const).map(cat => (
-                  <button key={cat} onClick={() => verCatalogo(cat)}
-                    style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.7)", borderRadius: 20, padding: "5px 14px", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s" }}
-                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(212,104,142,0.25)"; e.currentTarget.style.borderColor = "#d4688e"; e.currentTarget.style.color = "white" }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; e.currentTarget.style.color = "rgba(255,255,255,0.7)" }}>
-                    {CAT_ESTILO[cat]?.icon} {cat}
-                  </button>
-                ))}
               </div>
             </div>
           </div>
@@ -1613,27 +1589,6 @@ export default function Tienda() {
             </div>
           </div>
 
-          {/* ── LABORATORIOS ───────────────────────────────────────────────── */}
-          {laboratorios.length > 0 && (
-            <div style={{ background: "#e8e8e8", borderTop: "1px solid #eaecf2", borderBottom: "1px solid #eaecf2", padding: "16px 0" }}>
-              <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px 10px", display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ fontSize: 10, fontWeight: 800, color: "#94a3b8", letterSpacing: 2, textTransform: "uppercase", whiteSpace: "nowrap", flexShrink: 0 }}>Laboratorios</span>
-                <div style={{ flex: 1, height: 1, background: "#e8ecf2" }}/>
-              </div>
-              <div style={{ overflow: "hidden", paddingLeft: 0 }}>
-                <div className="marquee-track" style={{ display: "flex", gap: 10, paddingLeft: 20 }}>
-                  {[...laboratorios, ...laboratorios].map((lab, i) => (
-                    <button key={i} onClick={() => { setModoCatalogo(true); setLaboratoriosFiltro(new Set([lab])); setBusqueda(""); setBusquedaDelay(""); setCategoriaActiva(""); window.scrollTo({ top: 0, behavior: "smooth" }) }}
-                      style={{ padding: "7px 18px", borderRadius: 20, background: "#fdf0f5", border: "1px solid #f0c8d8", fontSize: 12, fontWeight: 700, color: "#b05070", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, transition: "all 0.15s" }}
-                      onMouseEnter={e => { e.currentTarget.style.background = "#bbf7d0"; e.currentTarget.style.borderColor = "#6ee7b7"; e.currentTarget.style.color = "#064e3b" }}
-                      onMouseLeave={e => { e.currentTarget.style.background = "#ecfdf5"; e.currentTarget.style.borderColor = "#a7f3d0"; e.currentTarget.style.color = "#065f46" }}>
-                      {lab}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* ── RECIENTEMENTE VISTOS ──────────────────────────────────────── */}
           {recientesProductos.length > 0 && (
@@ -1714,42 +1669,6 @@ export default function Tienda() {
             </div>
           )}
 
-          {/* ── ÚLTIMAS UNIDADES ──────────────────────────────────────────── */}
-          {productosStockBajo.length > 0 && (
-            <div style={{ background: "#fffbf5", borderTop: "1px solid #fde68a", borderBottom: "1px solid #fde68a", padding: "28px 0 32px" }}>
-              <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
-                <div>
-                  <h2 style={{ margin: "0 0 3px", fontSize: 18, fontWeight: 900, color: "#1a2035" }}>
-                    <span style={{ color: "#d97706" }}>⚠</span> Últimas unidades
-                  </h2>
-                  <p style={{ margin: 0, fontSize: 13, color: "#92400e" }}>Stock limitado — aprovechá antes de que se agoten</p>
-                </div>
-                <button onClick={() => { setOrden("stock_asc"); verCatalogo("") }}
-                  style={{ padding: "8px 16px", borderRadius: 9, background: "#e8e8e8", border: "1.5px solid #fde68a", color: "#92400e", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
-                  Ver todos con stock limitado →
-                </button>
-              </div>
-              <div style={{ overflowX: "auto", paddingLeft: 20 }}>
-                <div style={{ display: "flex", gap: 14, paddingRight: 20, paddingBottom: 4 }}>
-                  {productosStockBajo.map(p => (
-                    <div key={p.id} style={{ width: 200, flexShrink: 0 }}>
-                      <TarjetaProducto
-                        p={p}
-                        enCarrito={carrito.find(i => i.producto.id === p.id)?.cantidad ?? 0}
-                        onAgregar={() => agregar(p)}
-                        onCambiar={d => cambiar(p.id, d)}
-                        onDetalle={() => setProductoDetalle(p)}
-                        esFav={favoritos.has(p.id)}
-                        onToggleFav={() => toggleFavorito(p.id)}
-                        tipoCliente={tipoCliente}
-                        onVerPrecio={() => { setLoginModo("login"); setLoginError(""); setAuthModalOpen(true) }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* ── CÓMO FUNCIONA ─────────────────────────────────────────────── */}
           <div style={{ background: "#0f172a", padding: "44px 20px" }}>
@@ -1780,31 +1699,31 @@ export default function Tienda() {
 
           {/* ── CATEGORÍAS ────────────────────────────────────────────────── */}
           {categorias.length > 0 && (
-            <div style={{ background: "#e8e4df", padding: "32px 20px" }}>
+            <div style={{ background: "#1a2035", padding: "32px 20px" }}>
               <div style={{ maxWidth: 1280, margin: "0 auto" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 10 }}>
                   <div>
-                    <h2 style={{ margin: "0 0 4px", fontSize: 19, fontWeight: 900, color: "#1a2035" }}>Categorías</h2>
-                    <p style={{ margin: 0, fontSize: 13, color: "#64748b" }}>{categorias.length} categorías disponibles</p>
+                    <h2 style={{ margin: "0 0 4px", fontSize: 19, fontWeight: 900, color: "white" }}>Categorías</h2>
+                    <p style={{ margin: 0, fontSize: 13, color: "#94b8d8" }}>{categorias.length} categorías disponibles</p>
                   </div>
                   <button onClick={() => setCatModalOpen(true)}
-                    style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 20px", borderRadius: 11, background: "#1a2035", color: "white", border: "none", fontSize: 13, fontWeight: 800, cursor: "pointer", transition: "background 0.15s" }}
-                    onMouseEnter={e => (e.currentTarget.style.background = "#d4688e")}
-                    onMouseLeave={e => (e.currentTarget.style.background = "#1a2035")}>
+                    style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 20px", borderRadius: 11, background: "#d4688e", color: "white", border: "none", fontSize: 13, fontWeight: 800, cursor: "pointer", transition: "background 0.15s" }}
+                    onMouseEnter={e => (e.currentTarget.style.background = "#b05070")}
+                    onMouseLeave={e => (e.currentTarget.style.background = "#d4688e")}>
                     Ver todas las categorías →
                   </button>
                 </div>
-                {/* Top 8 category cards */}
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", gap: 10 }}>
                   {categorias.slice(0, 8).map(cat => {
                     const est = CAT_ESTILO[cat] ?? CAT_DEFAULT
                     return (
                       <button key={cat} onClick={() => verCatalogo(cat)}
-                        style={{ background: "#e8e8e8", border: "1.5px solid #e2e8f0", borderRadius: 11, padding: "14px 16px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 12, transition: "border-color 0.15s, background 0.15s" }}
-                        onMouseEnter={e => { e.currentTarget.style.borderColor = "#d4688e"; e.currentTarget.style.background = "#fff8fb" }}
-                        onMouseLeave={e => { e.currentTarget.style.borderColor = "#e2e8f0"; e.currentTarget.style.background = "white" }}>
-                          <div style={{ minWidth: 0 }}>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: "#1a2035", lineHeight: 1.3 }}>{cat}</div>
+                        style={{ background: "rgba(255,255,255,0.07)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 11, padding: "14px 16px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 12, transition: "all 0.15s" }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = "#d4688e"; e.currentTarget.style.background = "rgba(212,104,142,0.18)" }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; e.currentTarget.style.background = "rgba(255,255,255,0.07)" }}>
+                        <span style={{ fontSize: 20 }}>{est.icon}</span>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: "white", lineHeight: 1.3 }}>{cat}</div>
                         </div>
                       </button>
                     )
@@ -1815,15 +1734,15 @@ export default function Tienda() {
           )}
 
           {/* ── PRODUCTOS DESTACADOS ───────────────────────────────────────── */}
-          <div style={{ background: "#e8e8e8", padding: "32px 20px 40px" }}>
+          <div style={{ background: "#1a2035", padding: "32px 20px 40px" }}>
             <div style={{ maxWidth: 1280, margin: "0 auto" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 10 }}>
                 <div>
-                  <h2 style={{ margin: 0, fontSize: 19, fontWeight: 900, color: "#1a2035" }}>Productos destacados</h2>
-                  <p style={{ margin: "4px 0 0", fontSize: 13, color: "#64748b" }}>Una selección de nuestros productos</p>
+                  <h2 style={{ margin: 0, fontSize: 19, fontWeight: 900, color: "white" }}>Productos destacados</h2>
+                  <p style={{ margin: "4px 0 0", fontSize: 13, color: "#94b8d8" }}>Una selección de nuestros productos</p>
                 </div>
                 <button onClick={() => verCatalogo("")}
-                  style={{ padding: "9px 20px", borderRadius: 10, background: "#e8e8e8", border: "1.5px solid #e2e8f0", fontSize: 13, fontWeight: 700, color: "#1a2035", cursor: "pointer" }}>
+                  style={{ padding: "9px 20px", borderRadius: 10, background: "rgba(255,255,255,0.08)", border: "1.5px solid rgba(255,255,255,0.15)", fontSize: 13, fontWeight: 700, color: "white", cursor: "pointer" }}>
                   Ver todos →
                 </button>
               </div>
