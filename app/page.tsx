@@ -758,6 +758,7 @@ export default function Tienda() {
 
   const totalFiltrados = secciones.reduce((s, g) => s + g.items.length, 0)
   const totalItems = carrito.reduce((s, i) => s + i.cantidad, 0)
+  const tienePrecios = tipoCliente === "veterinario" || tipoCliente === "productor"
   const totalPrecio = carrito.reduce((s, i) => {
     const precio = precioConTipo(i.producto.precio_venta, tipoCliente) ?? i.producto.precio_venta
     return s + precio * i.cantidad
@@ -1385,7 +1386,7 @@ export default function Tienda() {
   // ── RENDER ────────────────────────────────────────────────────────────────
 
   return (
-    <div style={{ minHeight: "100vh", background: "#c8c8c8" }}>
+    <div style={{ minHeight: "100vh", background: vistaHome ? "#c8c8c8" : "#1a2035" }}>
 
       {/* ── BANNER DE ANUNCIO ──────────────────────────────────────────────── */}
       {BANNER_TEXTO && !bannerCerrado && (
@@ -1816,17 +1817,17 @@ export default function Tienda() {
             {/* Breadcrumb */}
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
               <button onClick={() => irAInicio()}
-                style={{ background: "none", border: "none", padding: 0, fontSize: 13, color: "#64748b", cursor: "pointer", fontWeight: 600, transition: "color 0.15s" }}
+                style={{ background: "none", border: "none", padding: 0, fontSize: 13, color: "#94b8d8", cursor: "pointer", fontWeight: 600, transition: "color 0.15s" }}
                 onMouseEnter={e => (e.currentTarget.style.color = "#d4688e")}
-                onMouseLeave={e => (e.currentTarget.style.color = "#64748b")}>
+                onMouseLeave={e => (e.currentTarget.style.color = "#94b8d8")}>
                 ← Inicio
               </button>
-              <span style={{ color: "#cbd5e1", fontSize: 13 }}>›</span>
-              <span style={{ fontSize: 13, fontWeight: 600, color: "#64748b" }}>Catálogo</span>
+              <span style={{ color: "#3d5270", fontSize: 13 }}>›</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#94b8d8" }}>Catálogo</span>
               {(categoriaActiva || esFiltroFavs || busquedaDelay) && (
                 <>
-                  <span style={{ color: "#cbd5e1", fontSize: 13 }}>›</span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: "#1a2035" }}>
+                  <span style={{ color: "#3d5270", fontSize: 13 }}>›</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "white" }}>
                     {esFiltroFavs ? "Mis favoritos" : categoriaActiva || `"${busquedaDelay}"`}
                   </span>
                 </>
@@ -1836,10 +1837,10 @@ export default function Tienda() {
             {totalFiltrados === 0 ? (
               <div style={{ textAlign: "center", padding: "80px 20px" }}>
                 <div style={{ fontSize: 48, marginBottom: 16 }}>🔍</div>
-                <p style={{ fontSize: 17, fontWeight: 800, color: "#1a2035", margin: "0 0 8px" }}>
+                <p style={{ fontSize: 17, fontWeight: 800, color: "white", margin: "0 0 8px" }}>
                   {busqueda ? `Sin resultados para "${busqueda}"` : "Sin productos disponibles"}
                 </p>
-                <p style={{ fontSize: 14, color: "#64748b", margin: "0 0 24px" }}>
+                <p style={{ fontSize: 14, color: "#94b8d8", margin: "0 0 24px" }}>
                   {busqueda ? "Probá con otro término" : "Volvé en unos momentos"}
                 </p>
                 <button onClick={() => irAInicio()}
@@ -1855,8 +1856,8 @@ export default function Tienda() {
                 <div style={{ marginBottom: 18, display: "flex", flexDirection: "column", gap: 10 }}>
                   {/* Fila principal */}
                   <div className="sort-bar" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-                    <p style={{ margin: 0, color: "#64748b", fontSize: 13 }}>
-                      <b style={{ color: "#1a2035" }}>{totalFiltrados.toLocaleString("es-AR")}</b> producto{totalFiltrados !== 1 ? "s" : ""}
+                    <p style={{ margin: 0, color: "#94b8d8", fontSize: 13 }}>
+                      <b style={{ color: "white" }}>{totalFiltrados.toLocaleString("es-AR")}</b> producto{totalFiltrados !== 1 ? "s" : ""}
                       {busquedaDelay && <> para <b style={{ color: "#d4688e" }}>&quot;{busquedaDelay}&quot;</b></>}
                     </p>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -2233,7 +2234,7 @@ export default function Tienda() {
           <button onClick={() => setCarritoOpen(true)}
             style={{ display: "flex", alignItems: "center", gap: 10, background: "#d4688e", color: "white", border: "none", borderRadius: 50, padding: "13px 24px", fontSize: 14, fontWeight: 800, cursor: "pointer", boxShadow: "0 6px 28px rgba(212,104,142,0.55)", whiteSpace: "nowrap" }}>
             <IcoCart size={17} />
-            Ver carrito · {fmt(totalPrecio)}
+            Ver carrito{tienePrecios ? ` · ${fmt(totalPrecio)}` : ""}
             <span style={{ background: "rgba(255,255,255,0.25)", borderRadius: 20, padding: "2px 9px", fontSize: 11, fontWeight: 900 }}>{totalItems}</span>
           </button>
         </div>
@@ -2270,7 +2271,7 @@ export default function Tienda() {
                 <div>
                   <h2 style={{ margin: "0 0 3px", fontSize: 18, fontWeight: 900, color: "white" }}>Tu carrito</h2>
                   <p style={{ margin: 0, fontSize: 13, color: "#64748b" }}>
-                    {totalItems} ítem{totalItems !== 1 ? "s" : ""} · <b style={{ color: "#d4688e" }}>{fmt(totalPrecio)}</b>
+                    {totalItems} ítem{totalItems !== 1 ? "s" : ""}{tienePrecios && <> · <b style={{ color: "#d4688e" }}>{fmt(totalPrecio)}</b></>}
                   </p>
                 </div>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -2367,9 +2368,11 @@ export default function Tienda() {
                             </div>
                             <button onClick={() => quitar(item.producto.id)} style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: 11, fontWeight: 700, padding: "0 4px" }}>Quitar</button>
                           </div>
-                          <span style={{ fontWeight: 900, fontSize: 14, color: "#d4688e" }}>
-                            {fmt((precioConTipo(item.producto.precio_venta, tipoCliente) ?? item.producto.precio_venta) * item.cantidad)}
-                          </span>
+                          {tienePrecios && (
+                            <span style={{ fontWeight: 900, fontSize: 14, color: "#d4688e" }}>
+                              {fmt((precioConTipo(item.producto.precio_venta, tipoCliente) ?? item.producto.precio_venta) * item.cantidad)}
+                            </span>
+                          )}
                         </div>
                         {item.cantidad >= 10 && WHATSAPP && (
                           <a href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hola, consulto precio especial por ${item.cantidad} unidades de ${item.producto.nombre}`)}`}
@@ -2418,9 +2421,9 @@ export default function Tienda() {
                 <div style={{ background: "#e2e2e2", borderRadius: 11, padding: "12px 14px", marginBottom: 12, border: "1px solid #eaecf2" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "#6b7280" }}>
                     <span>Subtotal ({totalItems} ítems)</span>
-                    <span style={{ fontWeight: 800, color: "#1a2035" }}>{fmt(totalPrecio)}</span>
+                    <span style={{ fontWeight: 800, color: "#1a2035" }}>{tienePrecios ? fmt(totalPrecio) : "A confirmar"}</span>
                   </div>
-                  <p style={{ fontSize: 11, color: "#94a3b8", margin: "6px 0 0", lineHeight: 1.5 }}>Precios de referencia — se confirman al coordinar el pedido.</p>
+                  <p style={{ fontSize: 11, color: "#94a3b8", margin: "6px 0 0", lineHeight: 1.5 }}>{tienePrecios ? "Precios de referencia — se confirman al coordinar el pedido." : "Iniciá sesión como veterinario o productor para ver precios."}</p>
                 </div>
                 {WHATSAPP && (
                   <a href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(textoCarritoWA())}`}
@@ -2462,7 +2465,7 @@ export default function Tienda() {
                 <div>
                   <h2 style={{ margin: "0 0 4px", fontSize: 19, fontWeight: 900, color: "white" }}>Completar pedido</h2>
                   <p style={{ margin: 0, fontSize: 13, color: "#64748b" }}>
-                    {totalItems} producto{totalItems !== 1 ? "s" : ""} · <b style={{ color: "#d4688e" }}>{fmt(totalPrecio)}</b>
+                    {totalItems} producto{totalItems !== 1 ? "s" : ""}{tienePrecios && <> · <b style={{ color: "#d4688e" }}>{fmt(totalPrecio)}</b></>}
                   </p>
                 </div>
                 <button onClick={() => setCheckoutOpen(false)} style={{ width: 34, height: 34, borderRadius: 9, border: "1px solid #1e293b", background: "#1e293b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8", flexShrink: 0 }}>
@@ -2543,8 +2546,8 @@ export default function Tienda() {
                   ))}
                 </div>
                 <div style={{ borderTop: "1px solid #e2e8f0", marginTop: 10, paddingTop: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontWeight: 800, color: "#1a2035", fontSize: 14 }}>Total estimado</span>
-                  <span style={{ fontWeight: 900, fontSize: 20, color: "#d4688e" }}>{fmt(totalPrecio)}</span>
+                  <span style={{ fontWeight: 800, color: "#1a2035", fontSize: 14 }}>{tienePrecios ? "Total estimado" : "Total"}</span>
+                  <span style={{ fontWeight: 900, fontSize: 20, color: "#d4688e" }}>{tienePrecios ? fmt(totalPrecio) : "A confirmar"}</span>
                 </div>
               </div>
 
