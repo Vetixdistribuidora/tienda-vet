@@ -54,6 +54,15 @@ type ProductoAdmin = {
   imagen_url: string | null
 }
 
+type ImagenItem = {
+  file: File
+  previewUrl: string
+  productoId: number | null
+  busq: string
+  estado: "pendiente" | "subiendo" | "ok" | "error"
+  errorMsg?: string
+}
+
 // ── Constantes ────────────────────────────────────────────────────────────────
 const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL ?? ""
 const ESTADOS = ["pendiente", "confirmado", "en preparación", "enviado", "entregado", "cancelado"]
@@ -129,6 +138,13 @@ export default function AdminPanel() {
   const [guardandoProd, setGuardandoProd] = useState(false)
   const [subiendoImagen, setSubiendoImagen] = useState(false)
   const [imagenError, setImagenError] = useState("")
+
+  // Modal carga masiva de imágenes
+  const [modalMasivo, setModalMasivo] = useState(false)
+  const [imagenesPendientes, setImagenesPendientes] = useState<ImagenItem[]>([])
+  const [subiendoMasivo, setSubiendoMasivo] = useState(false)
+  const [dropdownIdx, setDropdownIdx] = useState<number | null>(null)
+  const [dragOver, setDragOver] = useState(false)
 
   // ── Auth — escucha cambios de sesión para mantener token siempre fresco ───────
   useEffect(() => {
@@ -330,6 +346,86 @@ export default function AdminPanel() {
     setEditProducto(p => p ? { ...p, imagen_url: url } : p)
     setProductos(ps => ps.map(p => p.id === editProducto.id ? { ...p, imagen_url: url } : p))
     setSubiendoImagen(false)
+  }
+
+  // ── Helpers: carga masiva ─────────────────────────────────────────────────────
+  function normalizarTexto(s: string) {
+    return s.toLowerCase().normalize("NFD").replace(/\p{Mn}/gu, "").replace(/[^a-z0-9]/g, " ").replace(/\s+/g, " ").trim()
+  }
+
+  function autoMatch(filename: string): ProductoAdmin | null {
+    const base = normalizarTexto(filename.replace(/\.[^.]+$/, ""))
+    if (!base) return null
+    const todos = productos
+    return todos.find(p => normalizarTexto(p.nombre) === base)
+      ?? todos.find(p => normalizarTexto(p.nombre).startsWith(base) || base.startsWith(normalizarTexto(p.nombre)))
+      ?? todos.find(p => normalizarTexto(p.nombre).includes(base) || base.includes(normalizarTexto(p.nombre)))
+      ?? null
+  }
+
+  function labelProducto(p: ProductoAdmin) {
+    return p.laboratorio ? `${p.nombre} — ${p.laboratorio}` : p.nombre
+  }
+
+  function agregarImagenes(files: FileList | File[]) {
+    const nuevas: ImagenItem[] = Array.from(files)
+      .filter(f => f.type.startsWith("image/"))
+      .map(file => {
+        const match = autoMatch(file.name)
+        return {
+          file,
+          previewUrl: URL.createObjectURL(file),
+          productoId: match?.id ?? null,
+          busq: match ? labelProducto(match) : "",
+          estado: "pendiente" as const,
+        }
+      })
+    setImagenesPendientes(prev => [...prev, ...nuevas])
+  }
+
+  function asignarProducto(idx: number, producto: ProductoAdmin) {
+    setImagenesPendientes(prev => prev.map((it, i) =>
+      i === idx ? { ...it, productoId: producto.id, busq: labelProducto(producto), estado: "pendiente" } : it
+    ))
+    setDropdownIdx(null)
+  }
+
+  function limpiarMasivo() {
+    imagenesPendientes.forEach(it => URL.revokeObjectURL(it.previewUrl))
+    setImagenesPendientes([])
+    setSubiendoMasivo(false)
+    setDropdownIdx(null)
+  }
+
+  async function subirImagenesMasivo() {
+    const asignadas = imagenesPendientes.filter(it => it.productoId && it.estado !== "ok")
+    if (asignadas.length === 0) return
+    setSubiendoMasivo(true)
+    await supabase.auth.getSession()
+    await Promise.all(
+      imagenesPendientes.map(async (item, idx) => {
+        if (!item.productoId || item.estado === "ok") return
+        setImagenesPendientes(prev => prev.map((it, i) => i === idx ? { ...it, estado: "subiendo" } : it))
+        const ext = item.file.name.split(".").pop()?.toLowerCase() ?? "jpg"
+        const path = `${item.productoId}.${ext}`
+        const { error: upErr } = await supabase.storage
+          .from("productos")
+          .upload(path, item.file, { upsert: true, contentType: item.file.type })
+        if (upErr) {
+          setImagenesPendientes(prev => prev.map((it, i) => i === idx ? { ...it, estado: "error", errorMsg: upErr.message } : it))
+          return
+        }
+        const { data: urlData } = supabase.storage.from("productos").getPublicUrl(path)
+        const url = urlData.publicUrl + "?t=" + Date.now()
+        await apiFetch(`/api/admin/productos/${item.productoId}`, {
+          method: "PATCH",
+          body: JSON.stringify({ imagen_url: url }),
+        })
+        setProductos(ps => ps.map(p => p.id === item.productoId ? { ...p, imagen_url: url } : p))
+        setImagenesPendientes(prev => prev.map((it, i) => i === idx ? { ...it, estado: "ok" } : it))
+      })
+    )
+    setSubiendoMasivo(false)
   }
 
   // ── Derived ───────────────────────────────────────────────────────────────────
@@ -756,6 +852,10 @@ export default function AdminPanel() {
                 {categoriasExistentes.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
               <button onClick={cargarProductos} style={{ padding: "9px 16px", background: "#1a2035", color: "white", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>↺ Actualizar</button>
+              <button onClick={() => { if (productos.length === 0) cargarProductos(); setModalMasivo(true) }}
+                style={{ padding: "9px 16px", background: "#e8197d", color: "white", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>
+                + Cargar imágenes
+              </button>
               <span style={{ fontSize: 12, color: "#64748b", padding: "9px 0" }}>{productosFiltrados.length} productos</span>
             </div>
 
@@ -891,6 +991,153 @@ export default function AdminPanel() {
                 {guardandoProd ? "Guardando..." : "Guardar cambios"}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Modal carga masiva de imágenes ── */}
+      {modalMasivo && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(10,15,28,0.78)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}
+          onClick={e => { if (e.target === e.currentTarget && !subiendoMasivo) { limpiarMasivo(); setModalMasivo(false) } }}>
+          <div style={{ background: "white", borderRadius: 20, width: "100%", maxWidth: 680, maxHeight: "90vh", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(0,0,0,0.45)", overflow: "hidden" }}>
+
+            {/* Header */}
+            <div style={{ padding: "20px 24px 16px", borderBottom: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+              <div>
+                <h2 style={{ margin: 0, fontSize: 17, fontWeight: 900, color: "#1a2035" }}>Carga masiva de imágenes</h2>
+                <p style={{ margin: "3px 0 0", fontSize: 12, color: "#64748b" }}>
+                  Seleccioná varias fotos y asignale un producto a cada una.
+                </p>
+              </div>
+              <button onClick={() => { if (!subiendoMasivo) { limpiarMasivo(); setModalMasivo(false) } }}
+                style={{ width: 32, height: 32, border: "1px solid #e2e8f0", borderRadius: 8, background: "#f8fafc", cursor: "pointer", fontSize: 15, color: "#64748b", flexShrink: 0 }}>✕</button>
+            </div>
+
+            {/* Zona drag & drop */}
+            <div style={{ padding: "16px 24px", flexShrink: 0 }}>
+              <div
+                onDragOver={e => { e.preventDefault(); setDragOver(true) }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={e => { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files.length) agregarImagenes(e.dataTransfer.files) }}
+                style={{ border: `2px dashed ${dragOver ? "#e8197d" : "#cbd5e1"}`, borderRadius: 12, padding: "20px 16px", textAlign: "center", background: dragOver ? "#fff0f7" : "#f8fafc", transition: "all 0.15s", cursor: "default" }}>
+                <div style={{ fontSize: 28, marginBottom: 8 }}>🖼️</div>
+                <p style={{ margin: "0 0 10px", fontSize: 13, color: "#475569", fontWeight: 600 }}>Arrastrá imágenes acá</p>
+                <label style={{ display: "inline-block", padding: "8px 18px", background: "#1a2035", color: "white", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                  O elegí archivos
+                  <input type="file" accept="image/*" multiple style={{ display: "none" }}
+                    onChange={e => { if (e.target.files?.length) agregarImagenes(e.target.files); e.target.value = "" }} />
+                </label>
+              </div>
+            </div>
+
+            {/* Lista de imágenes */}
+            <div style={{ flex: 1, overflowY: "auto", padding: "0 24px 16px" }}>
+              {imagenesPendientes.length === 0 && (
+                <p style={{ textAlign: "center", color: "#94a3b8", fontSize: 13, padding: "24px 0" }}>No hay imágenes cargadas todavía.</p>
+              )}
+              {imagenesPendientes.map((item, idx) => {
+                const prodsFiltrados = productos.filter(p => {
+                  if (!item.busq.trim()) return true
+                  const q = normalizarTexto(item.busq)
+                  return normalizarTexto(p.nombre).includes(q) || normalizarTexto(p.laboratorio ?? "").includes(q)
+                }).slice(0, 8)
+
+                const estadoColor = item.estado === "ok" ? "#16a34a" : item.estado === "error" ? "#dc2626" : item.estado === "subiendo" ? "#7c3aed" : "#64748b"
+                const estadoLabel = item.estado === "ok" ? "✓ Subida" : item.estado === "error" ? "✗ Error" : item.estado === "subiendo" ? "Subiendo..." : item.productoId ? "Listo" : "Sin producto"
+
+                return (
+                  <div key={idx} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "10px 0", borderBottom: "1px solid #f1f5f9" }}>
+                    {/* Preview */}
+                    <img src={item.previewUrl} alt="" style={{ width: 56, height: 56, objectFit: "contain", borderRadius: 8, border: "1px solid #e2e8f0", background: "#f8fafc", flexShrink: 0 }} />
+
+                    {/* Info + selector */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ margin: "0 0 6px", fontSize: 11.5, color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.file.name}</p>
+
+                      {/* Buscador de producto */}
+                      <div style={{ position: "relative" }}>
+                        <input
+                          value={item.busq}
+                          onChange={e => {
+                            const val = e.target.value
+                            setImagenesPendientes(prev => prev.map((it, i) => i === idx ? { ...it, busq: val, productoId: null } : it))
+                            setDropdownIdx(idx)
+                          }}
+                          onFocus={() => setDropdownIdx(idx)}
+                          onBlur={() => setTimeout(() => setDropdownIdx(d => d === idx ? null : d), 150)}
+                          placeholder="Buscar producto o laboratorio..."
+                          disabled={item.estado === "subiendo" || item.estado === "ok"}
+                          style={{ width: "100%", padding: "7px 10px", border: `1.5px solid ${item.productoId ? "#e8197d" : "#e2e8f0"}`, borderRadius: 8, fontSize: 12, outline: "none", boxSizing: "border-box", background: item.estado === "ok" ? "#f0fdf4" : "white" }}
+                        />
+                        {dropdownIdx === idx && prodsFiltrados.length > 0 && (
+                          <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "white", border: "1.5px solid #e2e8f0", borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 10, marginTop: 2, overflow: "hidden" }}>
+                            {prodsFiltrados.map(p => (
+                              <div key={p.id} onMouseDown={() => asignarProducto(idx, p)}
+                                style={{ padding: "9px 12px", cursor: "pointer", borderBottom: "1px solid #f8fafc", display: "flex", alignItems: "center", gap: 8 }}
+                                onMouseEnter={e => (e.currentTarget.style.background = "#fff0f7")}
+                                onMouseLeave={e => (e.currentTarget.style.background = "white")}>
+                                {p.imagen_url
+                                  ? <img src={p.imagen_url} alt="" style={{ width: 28, height: 28, objectFit: "contain", borderRadius: 5, border: "1px solid #e2e8f0", background: "#f8fafc", flexShrink: 0 }} />
+                                  : <div style={{ width: 28, height: 28, borderRadius: 5, background: "#f1f5f9", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, flexShrink: 0 }}>📷</div>}
+                                <div style={{ minWidth: 0 }}>
+                                  <div style={{ fontSize: 12, fontWeight: 700, color: "#1a2035", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.nombre}</div>
+                                  {p.laboratorio && <div style={{ fontSize: 10.5, color: "#16a34a", fontWeight: 600 }}>{p.laboratorio}</div>}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Estado + quitar */}
+                    <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: estadoColor }}>{estadoLabel}</span>
+                      {item.estado !== "subiendo" && item.estado !== "ok" && (
+                        <button onClick={() => setImagenesPendientes(prev => { URL.revokeObjectURL(item.previewUrl); return prev.filter((_, i) => i !== idx) })}
+                          style={{ fontSize: 11, color: "#94a3b8", background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+                          Quitar
+                        </button>
+                      )}
+                      {item.estado === "error" && item.errorMsg && (
+                        <span style={{ fontSize: 10, color: "#dc2626", maxWidth: 100, textAlign: "right" }}>{item.errorMsg}</span>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Footer */}
+            {imagenesPendientes.length > 0 && (
+              <div style={{ padding: "14px 24px", borderTop: "1px solid #e2e8f0", display: "flex", alignItems: "center", gap: 12, flexShrink: 0, background: "#f8fafc" }}>
+                {(() => {
+                  const asignadas = imagenesPendientes.filter(it => it.productoId && it.estado !== "ok").length
+                  const listas = imagenesPendientes.filter(it => it.estado === "ok").length
+                  const errores = imagenesPendientes.filter(it => it.estado === "error").length
+                  return (
+                    <>
+                      <span style={{ fontSize: 12, color: "#64748b", flex: 1 }}>
+                        {asignadas > 0 && <span>{asignadas} para subir · </span>}
+                        {listas > 0 && <span style={{ color: "#16a34a" }}>{listas} subidas · </span>}
+                        {errores > 0 && <span style={{ color: "#dc2626" }}>{errores} con error · </span>}
+                        {imagenesPendientes.filter(it => !it.productoId && it.estado === "pendiente").length > 0 && (
+                          <span style={{ color: "#f59e0b" }}>{imagenesPendientes.filter(it => !it.productoId && it.estado === "pendiente").length} sin asignar</span>
+                        )}
+                      </span>
+                      <button onClick={() => { limpiarMasivo(); setModalMasivo(false) }} disabled={subiendoMasivo}
+                        style={{ padding: "9px 16px", background: "#f1f5f9", color: "#475569", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+                        Cerrar
+                      </button>
+                      <button onClick={subirImagenesMasivo} disabled={subiendoMasivo || asignadas === 0}
+                        style={{ padding: "9px 20px", background: subiendoMasivo || asignadas === 0 ? "#f9a8d4" : "#e8197d", color: "white", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 900, cursor: subiendoMasivo || asignadas === 0 ? "not-allowed" : "pointer", whiteSpace: "nowrap" }}>
+                        {subiendoMasivo ? "Subiendo..." : `Subir ${asignadas} imagen${asignadas !== 1 ? "es" : ""}`}
+                      </button>
+                    </>
+                  )
+                })()}
+              </div>
+            )}
           </div>
         </div>
       )}
