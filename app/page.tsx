@@ -1543,31 +1543,55 @@ export default function Tienda() {
       {vistaHome && (
         <div>
 
-          {/* ── TAGLINE ────────────────────────────────────────────────── */}
-          <div style={{ background: "#e8e4df", borderBottom: "1px solid #d9d4ce", padding: "28px 20px" }}>
-            <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 20, flexWrap: "wrap" }}>
-              <div>
-                <h1 style={{ margin: "0 0 5px", fontSize: "clamp(18px, 2vw, 24px)", fontWeight: 900, color: "#1a2035", letterSpacing: -0.3 }}>
-                  Distribuidora veterinaria al por mayor
-                </h1>
-                <p style={{ margin: 0, fontSize: 13, color: "#64748b", lineHeight: 1.5 }}>
-                  Medicamentos, alimentos y más · Pedidos online 24 hs
-                </p>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
-                {[
-                  { n: productos.length.toLocaleString("es-AR"), label: "Productos" },
-                  { n: categorias.length.toString(), label: "Categorías" },
-                ].map((st, idx) => (
-                  <div key={st.label} style={{ textAlign: "center", paddingLeft: idx > 0 ? 28 : 0, borderLeft: idx > 0 ? "1px solid #c9c4be" : "none" }}>
-                    <div style={{ fontSize: 22, fontWeight: 900, color: "#1a2035", lineHeight: 1 }}>{st.n}</div>
-                    <div style={{ fontSize: 10, color: "#94a3b8", fontWeight: 700, marginTop: 3, textTransform: "uppercase", letterSpacing: 0.8 }}>{st.label}</div>
-                  </div>
-                ))}
-                <button onClick={() => verCatalogo("")}
-                  style={{ background: "#d4688e", color: "white", border: "none", borderRadius: 10, padding: "10px 22px", fontSize: 13, fontWeight: 800, cursor: "pointer", whiteSpace: "nowrap", boxShadow: "0 3px 12px rgba(212,104,142,0.35)" }}>
-                  Ver catálogo →
+          {/* ── HERO ─────────────────────────────────────────────────── */}
+          <div style={{ background: "#1a2035" }}>
+            {/* Barra de stats */}
+            <div style={{ background: "linear-gradient(90deg, #b05070, #d4688e, #c97b9e, #b05070)", backgroundSize: "200% 100%", padding: "9px 24px", display: "flex", justifyContent: "center", gap: 36, flexWrap: "wrap" }}>
+              {[
+                { n: `+${productos.length}`, label: "productos" },
+                { n: `+${laboratorios.length}`, label: "laboratorios" },
+                { n: categorias.length.toString(), label: "categorías" },
+                { n: "24 hs", label: "atención online" },
+              ].map(st => (
+                <div key={st.label} style={{ display: "flex", alignItems: "center", gap: 6, color: "white", fontSize: 12, fontWeight: 600 }}>
+                  <strong style={{ fontSize: 15, fontWeight: 900 }}>{st.n}</strong>{st.label}
+                </div>
+              ))}
+            </div>
+            {/* Cuerpo del hero */}
+            <div style={{ padding: "52px 24px 56px", textAlign: "center", maxWidth: 680, margin: "0 auto" }}>
+              <h1 style={{ margin: "0 0 10px", fontSize: "clamp(26px, 4vw, 44px)", fontWeight: 900, color: "white", lineHeight: 1.2 }}>
+                Tu distribuidora veterinaria <span style={{ color: "#f0c8d8" }}>online</span>
+              </h1>
+              <p style={{ margin: "0 0 30px", fontSize: 14, color: "#94b8d8", lineHeight: 1.75 }}>
+                Medicamentos, vacunas, alimentos balanceados y más al por mayor.<br />
+                Pedís online y coordinamos la entrega.
+              </p>
+              {/* Buscador hero */}
+              <div style={{ position: "relative", maxWidth: 520, margin: "0 auto 26px" }}>
+                <input
+                  value={busqueda}
+                  onChange={e => setBusqueda(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") { if (busqueda.trim()) guardarBusquedaReciente(busqueda); verCatalogo("") } }}
+                  placeholder="Buscá antibióticos, vacunas, alimentos..."
+                  style={{ width: "100%", padding: "15px 140px 15px 20px", borderRadius: 13, border: "1.5px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.07)", color: "white", fontSize: 14, outline: "none", boxSizing: "border-box" }}
+                />
+                <button
+                  onClick={() => { if (busqueda.trim()) guardarBusquedaReciente(busqueda); verCatalogo("") }}
+                  style={{ position: "absolute", right: 6, top: 6, bottom: 6, background: "#d4688e", color: "white", border: "none", borderRadius: 9, padding: "0 20px", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>
+                  Buscar
                 </button>
+              </div>
+              {/* Chips de categorías */}
+              <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
+                {(["Medicamentos", "Vacunas", "Alimento Balanceado", "Antibióticos", "Antiparasitarios", "Pet Shop"] as const).map(cat => (
+                  <button key={cat} onClick={() => verCatalogo(cat)}
+                    style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.7)", borderRadius: 20, padding: "5px 14px", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(212,104,142,0.25)"; e.currentTarget.style.borderColor = "#d4688e"; e.currentTarget.style.color = "white" }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; e.currentTarget.style.color = "rgba(255,255,255,0.7)" }}>
+                    {CAT_ESTILO[cat]?.icon} {cat}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
