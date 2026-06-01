@@ -316,9 +316,9 @@ function FilaListaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFa
         </div>
       ) : (
         <button onClick={e => { e.stopPropagation(); onAgregar() }}
-          style={{ background: "#d4688e", color: "white", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 800, cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, transition: "background 0.15s" }}
-          onMouseEnter={e => (e.currentTarget.style.background = "#d4688e")}
-          onMouseLeave={e => (e.currentTarget.style.background = "#1a2035")}>
+          style={{ background: "#d4688e", color: "white", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 800, cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, transition: "background 0.15s, transform 0.12s" }}
+          onMouseEnter={e => { e.currentTarget.style.background = "#b05070"; e.currentTarget.style.transform = "scale(1.06)" }}
+          onMouseLeave={e => { e.currentTarget.style.background = "#d4688e"; e.currentTarget.style.transform = "scale(1)" }}>
           + Agregar
         </button>
       )}
@@ -412,9 +412,9 @@ function TarjetaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFav,
               <button onClick={e => { e.stopPropagation(); onCambiar(1) }} style={{ width: 26, height: 26, border: "none", borderRadius: 7, background: "#d4688e", color: "white", fontWeight: 900, cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1 }}>+</button>
             </div>
           ) : (
-            <button onClick={e => { e.stopPropagation(); onAgregar() }} style={{ background: "#d4688e", color: "white", border: "none", borderRadius: 9, padding: "8px 13px", fontSize: 12, fontWeight: 800, cursor: "pointer", transition: "background 0.15s", whiteSpace: "nowrap" }}
-              onMouseEnter={e => (e.currentTarget.style.background = "#d4688e")}
-              onMouseLeave={e => (e.currentTarget.style.background = "#1a2035")}>
+            <button onClick={e => { e.stopPropagation(); onAgregar() }} style={{ background: "#d4688e", color: "white", border: "none", borderRadius: 9, padding: "8px 13px", fontSize: 12, fontWeight: 800, cursor: "pointer", transition: "background 0.15s, transform 0.12s", whiteSpace: "nowrap" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#b05070"; e.currentTarget.style.transform = "scale(1.06)" }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#d4688e"; e.currentTarget.style.transform = "scale(1)" }}>
               + Agregar
             </button>
           )}
@@ -1497,6 +1497,8 @@ export default function Tienda() {
             onClick={() => setCarritoOpen(true)}
             className={cartAnimando ? "cart-pop" : ""}
             onAnimationEnd={() => setCartAnimando(false)}
+            onMouseEnter={e => { e.currentTarget.style.background = "#b05070"; e.currentTarget.style.transform = "scale(1.05)" }}
+            onMouseLeave={e => { e.currentTarget.style.background = "#d4688e"; e.currentTarget.style.transform = "scale(1)" }}
             style={{
               display: "flex", alignItems: "center", gap: 7, flexShrink: 0,
               background: "#d4688e",
@@ -1504,7 +1506,7 @@ export default function Tienda() {
               border: "none", borderRadius: 10, padding: "9px 16px", cursor: "pointer",
               fontSize: 13, fontWeight: 800,
               boxShadow: totalItems > 0 ? "0 4px 16px rgba(212,104,142,0.45)" : "0 2px 8px rgba(212,104,142,0.25)",
-              transition: "background 0.2s, box-shadow 0.2s",
+              transition: "background 0.2s, box-shadow 0.2s, transform 0.12s",
             }}>
             <IcoCart size={17} />
             <span className="cart-text">Carrito</span>
