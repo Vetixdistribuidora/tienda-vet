@@ -2423,7 +2423,7 @@ export default function Tienda() {
                     <span>Subtotal ({totalItems} ítems)</span>
                     <span style={{ fontWeight: 800, color: "#1a2035" }}>{tienePrecios ? fmt(totalPrecio) : "A confirmar"}</span>
                   </div>
-                  <p style={{ fontSize: 11, color: "#94a3b8", margin: "6px 0 0", lineHeight: 1.5 }}>{tienePrecios ? "Precios de referencia — se confirman al coordinar el pedido." : "Iniciá sesión como veterinario o productor para ver precios."}</p>
+                  <p style={{ fontSize: 11, color: "#94a3b8", margin: "6px 0 0", lineHeight: 1.5 }}>Los precios se confirman al coordinar el pedido con nosotros.</p>
                 </div>
                 {WHATSAPP && (
                   <a href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(textoCarritoWA())}`}
