@@ -1230,18 +1230,14 @@ export default function Tienda() {
     const notasItems = carrito.filter(i => i.nota).map(i => `• ${i.producto.nombre}: ${i.nota}`).join("\n")
     const notasFinal = [form.notas.trim(), notasItems ? `Notas por producto:\n${notasItems}` : ""].filter(Boolean).join("\n\n") || null
 
-    // Incluir dirección en notas si existe
-    const notasConDir = form.direccion.trim()
-      ? [form.direccion.trim(), notasFinal].filter(Boolean).join("\n")
-      : notasFinal
-
     const { data: pedido, error } = await supabase
       .from("pedidos")
       .insert({
         cliente_nombre: form.nombre.trim(),
         cliente_email: form.email.trim() || usuario?.email || null,
         cliente_telefono: form.telefono.trim(),
-        notas: notasConDir,
+        cliente_direccion: form.direccion.trim() || null,
+        notas: notasFinal,
         total: totalPrecio,
         estado: "pendiente",
         usuario_id: usuario?.id ?? null,
