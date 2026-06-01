@@ -1244,7 +1244,12 @@ export default function Tienda() {
       })
       .select().single()
 
-    if (error || !pedido) { setEnviando(false); setErrPedido("Error al enviar el pedido. Intentá de nuevo."); return }
+    if (error || !pedido) {
+      console.error("Error al insertar pedido:", error)
+      setEnviando(false)
+      setErrPedido("Error al enviar el pedido: " + (error?.message ?? "sin respuesta del servidor"))
+      return
+    }
 
     await supabase.from("pedido_items").insert(
       carrito.map(i => {
