@@ -553,6 +553,7 @@ export default function Tienda() {
   // ── Modo catálogo: true cuando el usuario navega al catálogo explícitamente
   //    (distingue "Inicio" de "Catálogo" aunque no haya filtros activos) ─────
   const [modoCatalogo, setModoCatalogo] = useState(false)
+  const [heroQuery, setHeroQuery] = useState("")
 
   // ── Ref para scroll infinito (sentinel) ───────────────────────────────────
   const sentinelRef = useRef<HTMLDivElement>(null)
@@ -1559,14 +1560,26 @@ export default function Tienda() {
               {/* Buscador hero */}
               <div style={{ position: "relative", maxWidth: 520, margin: "0 auto 26px" }}>
                 <input
-                  value={busqueda}
-                  onChange={e => setBusqueda(e.target.value)}
-                  onKeyDown={e => { if (e.key === "Enter") { if (busqueda.trim()) guardarBusquedaReciente(busqueda); verCatalogo("") } }}
+                  value={heroQuery}
+                  onChange={e => setHeroQuery(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === "Enter") {
+                      const q = heroQuery.trim()
+                      if (q) { guardarBusquedaReciente(q); setBusqueda(q); setBusquedaDelay(q) }
+                      setModoCatalogo(true)
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
+                  }}
                   placeholder="Buscá antibióticos, vacunas, alimentos..."
                   style={{ width: "100%", padding: "15px 140px 15px 20px", borderRadius: 13, border: "1.5px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.07)", color: "white", fontSize: 14, outline: "none", boxSizing: "border-box" }}
                 />
                 <button
-                  onClick={() => { if (busqueda.trim()) guardarBusquedaReciente(busqueda); verCatalogo("") }}
+                  onClick={() => {
+                    const q = heroQuery.trim()
+                    if (q) { guardarBusquedaReciente(q); setBusqueda(q); setBusquedaDelay(q) }
+                    setModoCatalogo(true)
+                    window.scrollTo({ top: 0, behavior: "smooth" })
+                  }}
                   style={{ position: "absolute", right: 6, top: 6, bottom: 6, background: "#d4688e", color: "white", border: "none", borderRadius: 9, padding: "0 20px", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>
                   Buscar
                 </button>
