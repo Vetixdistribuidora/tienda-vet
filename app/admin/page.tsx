@@ -130,8 +130,9 @@ export default function AdminPanel() {
   const [subiendoImagen, setSubiendoImagen] = useState(false)
   const [imagenError, setImagenError] = useState("")
 
-  // ── Auth ──────────────────────────────────────────────────────────────────────
+  // ── Auth — escucha cambios de sesión para mantener token siempre fresco ───────
   useEffect(() => {
+    // Carga inicial
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.access_token && session.user.email === ADMIN_EMAIL) {
         setToken(session.access_token)
@@ -139,6 +140,13 @@ export default function AdminPanel() {
       }
       setVerificando(false)
     })
+    // Listener: actualiza token cada vez que Supabase lo refresca automáticamente
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.access_token && session.user.email === ADMIN_EMAIL) {
+        setToken(session.access_token)
+      }
+    })
+    return () => subscription.unsubscribe()
   }, [])
 
   useEffect(() => {
