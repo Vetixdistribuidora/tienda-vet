@@ -316,7 +316,7 @@ function FilaListaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFa
         </div>
       ) : (
         <button onClick={e => { e.stopPropagation(); onAgregar() }}
-          style={{ background: "#1a2035", color: "white", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 800, cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, transition: "background 0.15s" }}
+          style={{ background: "#d4688e", color: "white", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 800, cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, transition: "background 0.15s" }}
           onMouseEnter={e => (e.currentTarget.style.background = "#d4688e")}
           onMouseLeave={e => (e.currentTarget.style.background = "#1a2035")}>
           + Agregar
@@ -412,7 +412,7 @@ function TarjetaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFav,
               <button onClick={e => { e.stopPropagation(); onCambiar(1) }} style={{ width: 26, height: 26, border: "none", borderRadius: 7, background: "#d4688e", color: "white", fontWeight: 900, cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1 }}>+</button>
             </div>
           ) : (
-            <button onClick={e => { e.stopPropagation(); onAgregar() }} style={{ background: "#1a2035", color: "white", border: "none", borderRadius: 9, padding: "8px 13px", fontSize: 12, fontWeight: 800, cursor: "pointer", transition: "background 0.15s", whiteSpace: "nowrap" }}
+            <button onClick={e => { e.stopPropagation(); onAgregar() }} style={{ background: "#d4688e", color: "white", border: "none", borderRadius: 9, padding: "8px 13px", fontSize: 12, fontWeight: 800, cursor: "pointer", transition: "background 0.15s", whiteSpace: "nowrap" }}
               onMouseEnter={e => (e.currentTarget.style.background = "#d4688e")}
               onMouseLeave={e => (e.currentTarget.style.background = "#1a2035")}>
               + Agregar
@@ -1573,20 +1573,15 @@ export default function Tienda() {
           </div>
 
           {/* ── VENTAJAS ───────────────────────────────────────────────────── */}
-          <div style={{ background: "#e2e2e2", borderBottom: "1px solid #e8edf5", padding: "14px 20px" }}>
-            <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "center", gap: 0, flexWrap: "wrap" }}>
-              {[
-                { texto: "Precios al por mayor" },
-                { texto: "Envíos coordinados" },
-                { texto: "Catálogo actualizado" },
-                { texto: "Atención personalizada" },
-              ].map((v, i) => (
-                <div key={v.texto} style={{ display: "flex", alignItems: "center", gap: 0 }}>
-                  <span style={{ fontSize: 13, color: "#475569", fontWeight: 600, padding: "0 18px", whiteSpace: "nowrap" }}>{v.texto}</span>
-                  {i < 3 && <span style={{ width: 1, height: 14, background: "#dde3ee", flexShrink: 0 }} />}
-                </div>
-              ))}
-            </div>
+          <div style={{ background: "linear-gradient(90deg, #b05070, #d4688e, #c97b9e, #b05070)", backgroundSize: "200% 100%", padding: "9px 24px", display: "flex", justifyContent: "center", gap: 36, flexWrap: "wrap" }}>
+            {[
+              { texto: "✓ Precios al por mayor" },
+              { texto: "✓ Envíos coordinados" },
+              { texto: "✓ Catálogo actualizado" },
+              { texto: "✓ Atención personalizada" },
+            ].map(v => (
+              <span key={v.texto} style={{ fontSize: 12, color: "white", fontWeight: 700, whiteSpace: "nowrap" }}>{v.texto}</span>
+            ))}
           </div>
 
 
@@ -1721,7 +1716,6 @@ export default function Tienda() {
                         style={{ background: "rgba(255,255,255,0.07)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 11, padding: "14px 16px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 12, transition: "all 0.15s" }}
                         onMouseEnter={e => { e.currentTarget.style.borderColor = "#d4688e"; e.currentTarget.style.background = "rgba(212,104,142,0.18)" }}
                         onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; e.currentTarget.style.background = "rgba(255,255,255,0.07)" }}>
-                        <span style={{ fontSize: 20 }}>{est.icon}</span>
                         <div style={{ minWidth: 0 }}>
                           <div style={{ fontSize: 13, fontWeight: 700, color: "white", lineHeight: 1.3 }}>{cat}</div>
                         </div>
@@ -2073,9 +2067,9 @@ export default function Tienda() {
                         </p>
                         <button
                           onClick={() => setVisibles(v => v + 48)}
-                          style={{ padding: "11px 28px", background: "#1a2035", color: "white", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer", letterSpacing: 0.2 }}
-                          onMouseEnter={e => (e.currentTarget.style.background = "#d4688e")}
-                          onMouseLeave={e => (e.currentTarget.style.background = "#1a2035")}
+                          style={{ padding: "11px 28px", background: "#d4688e", color: "white", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer", letterSpacing: 0.2 }}
+                          onMouseEnter={e => (e.currentTarget.style.background = "#b05070")}
+                          onMouseLeave={e => (e.currentTarget.style.background = "#d4688e")}
                         >
                           Cargar más productos
                         </button>
@@ -2233,7 +2227,7 @@ export default function Tienda() {
       {/* ── SCROLL TOP ─────────────────────────────────────────────────────── */}
       {scrollY > 400 && (
         <button className="scroll-top-anim" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          style={{ position: "fixed", bottom: 22, right: 22, width: 42, height: 42, borderRadius: "50%", background: "#1a2035", color: "white", border: "2px solid #2d3a55", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 16px rgba(0,0,0,0.3)", zIndex: 44, fontSize: 17 }}>
+          style={{ position: "fixed", bottom: 22, right: 22, width: 42, height: 42, borderRadius: "50%", background: "#d4688e", color: "white", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 16px rgba(212,104,142,0.45)", zIndex: 44, fontSize: 17 }}>
           ↑
         </button>
       )}
