@@ -155,13 +155,15 @@ export default function AdminPanel() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab])
 
-  // ── API helper ────────────────────────────────────────────────────────────────
-  function apiFetch(path: string, init: RequestInit = {}) {
+  // ── API helper — siempre obtiene token fresco para evitar expiración ──────────
+  async function apiFetch(path: string, init: RequestInit = {}) {
+    const { data: { session } } = await supabase.auth.getSession()
+    const freshToken = session?.access_token ?? token ?? ""
     return fetch(path, {
       ...init,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token ?? ""}`,
+        Authorization: `Bearer ${freshToken}`,
       },
     })
   }
