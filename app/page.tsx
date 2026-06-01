@@ -32,32 +32,37 @@ const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL ?? ""
 const CATEGORIAS_ORDEN = ["Accesorios", "Alimento Balanceado", "Ambiental", "Desinfectantes", "Instrumental y Descartables", "Medicamentos", "Pet Shop", "Antibióticos", "Antiparasitarios", "Suplementos Minerales", "Antiinflamatorios", "Analgésicos y Tranquilizantes", "Vacunas", "Piedras Sanitarias", "Cercos Eléctricos", "Identificación de Ganado", "Snacks", "Protectores Articulares", "Cremas", "Colirios", "Antidiarreicos", "Protectores Hepáticos", "Revulsivos", "Agroinsumos", "Sustituto Lácteo"]
 
 // Colores e iconos por categoría para las tarjetas visuales
+// beige cálido · azul pizarra · verde salvia · rosa pastel
+const _BG1 = "#faf7f4", _C1 = "#6b5744", _B1 = "#e8ddd4" // beige — tratamientos
+const _BG2 = "#f4f6fb", _C2 = "#3d5270", _B2 = "#c8d4e8" // azul pizarra — clínico
+const _BG3 = "#f4f8f4", _C3 = "#3d5e3d", _B3 = "#c4d8c4" // verde salvia — alimentación/campo
+const _BG4 = "#fdf0f5", _C4 = "#b05070", _B4 = "#f0c8d8" // rosa — accesorios/otros
 const CAT_ESTILO: Record<string, { bg: string; color: string; border: string; icon: string }> = {
-  "Medicamentos":                  { bg: "#fef9ec", color: "#92400e", border: "#fde68a", icon: "💊" },
-  "Alimento Balanceado":           { bg: "#f0fdf4", color: "#166534", border: "#bbf7d0", icon: "🌾" },
-  "Pet Shop":                      { bg: "#fdf4ff", color: "#6b21a8", border: "#e9d5ff", icon: "🐾" },
-  "Antibióticos":                  { bg: "#eff6ff", color: "#1e40af", border: "#bfdbfe", icon: "🔬" },
-  "Antiparasitarios":              { bg: "#fff7ed", color: "#9a3412", border: "#fed7aa", icon: "🛡️" },
-  "Vacunas":                       { bg: "#f0fdfa", color: "#0f766e", border: "#99f6e4", icon: "💉" },
-  "Instrumental y Descartables":   { bg: "#f8fafc", color: "#334155", border: "#e2e8f0", icon: "🩺" },
-  "Desinfectantes":                { bg: "#fff1f2", color: "#be123c", border: "#fecdd3", icon: "🧴" },
-  "Snacks":                        { bg: "#fefce8", color: "#854d0e", border: "#fef08a", icon: "🦴" },
-  "Accesorios":                    { bg: "#f0f9ff", color: "#0369a1", border: "#bae6fd", icon: "🎒" },
-  "Ambiental":                     { bg: "#f7fee7", color: "#3f6212", border: "#bbf7d0", icon: "🌿" },
-  "Suplementos Minerales":         { bg: "#fdf4ff", color: "#7e22ce", border: "#d8b4fe", icon: "⚗️" },
-  "Analgésicos y Tranquilizantes": { bg: "#fff7ed", color: "#9a3412", border: "#fed7aa", icon: "💆" },
-  "Antiinflamatorios":             { bg: "#fef2f2", color: "#991b1b", border: "#fecaca", icon: "🔥" },
-  "Cremas":                        { bg: "#fff1f2", color: "#be123c", border: "#fecdd3", icon: "🧴" },
-  "Colirios":                      { bg: "#eff6ff", color: "#1e40af", border: "#bfdbfe", icon: "👁️" },
-  "Cercos Eléctricos":             { bg: "#fefce8", color: "#854d0e", border: "#fef08a", icon: "⚡" },
-  "Identificación de Ganado":      { bg: "#f0fdf4", color: "#166534", border: "#bbf7d0", icon: "🏷️" },
-  "Piedras Sanitarias":            { bg: "#f8fafc", color: "#475569", border: "#e2e8f0", icon: "🪨" },
-  "Protectores Articulares":       { bg: "#fff7ed", color: "#9a3412", border: "#fed7aa", icon: "🦴" },
-  "Protectores Hepáticos":         { bg: "#f0fdfa", color: "#0f766e", border: "#99f6e4", icon: "🫀" },
-  "Revulsivos":                    { bg: "#fdf2f8", color: "#9d174d", border: "#fbcfe8", icon: "🌡️" },
-  "Agroinsumos":                   { bg: "#f7fee7", color: "#3f6212", border: "#bbf7d0", icon: "🌱" },
-  "Sustituto Lácteo":              { bg: "#f0fdf4", color: "#166534", border: "#bbf7d0", icon: "🥛" },
-  "Antidiarreicos":                { bg: "#fff7ed", color: "#9a3412", border: "#fed7aa", icon: "💊" },
+  "Medicamentos":                  { bg: _BG1, color: _C1, border: _B1, icon: "💊" },
+  "Antiparasitarios":              { bg: _BG1, color: _C1, border: _B1, icon: "🛡️" },
+  "Analgésicos y Tranquilizantes": { bg: _BG1, color: _C1, border: _B1, icon: "💆" },
+  "Antiinflamatorios":             { bg: _BG1, color: _C1, border: _B1, icon: "🔥" },
+  "Cremas":                        { bg: _BG1, color: _C1, border: _B1, icon: "🧴" },
+  "Desinfectantes":                { bg: _BG1, color: _C1, border: _B1, icon: "🧴" },
+  "Antidiarreicos":                { bg: _BG1, color: _C1, border: _B1, icon: "💊" },
+  "Revulsivos":                    { bg: _BG1, color: _C1, border: _B1, icon: "🌡️" },
+  "Antibióticos":                  { bg: _BG2, color: _C2, border: _B2, icon: "🔬" },
+  "Vacunas":                       { bg: _BG2, color: _C2, border: _B2, icon: "💉" },
+  "Colirios":                      { bg: _BG2, color: _C2, border: _B2, icon: "👁️" },
+  "Instrumental y Descartables":   { bg: _BG2, color: _C2, border: _B2, icon: "🩺" },
+  "Accesorios":                    { bg: _BG2, color: _C2, border: _B2, icon: "🎒" },
+  "Protectores Articulares":       { bg: _BG2, color: _C2, border: _B2, icon: "🦴" },
+  "Protectores Hepáticos":         { bg: _BG2, color: _C2, border: _B2, icon: "🫀" },
+  "Alimento Balanceado":           { bg: _BG3, color: _C3, border: _B3, icon: "🌾" },
+  "Ambiental":                     { bg: _BG3, color: _C3, border: _B3, icon: "🌿" },
+  "Agroinsumos":                   { bg: _BG3, color: _C3, border: _B3, icon: "🌱" },
+  "Sustituto Lácteo":              { bg: _BG3, color: _C3, border: _B3, icon: "🥛" },
+  "Identificación de Ganado":      { bg: _BG3, color: _C3, border: _B3, icon: "🏷️" },
+  "Snacks":                        { bg: _BG3, color: _C3, border: _B3, icon: "🦴" },
+  "Suplementos Minerales":         { bg: _BG3, color: _C3, border: _B3, icon: "⚗️" },
+  "Pet Shop":                      { bg: _BG4, color: _C4, border: _B4, icon: "🐾" },
+  "Piedras Sanitarias":            { bg: _BG4, color: _C4, border: _B4, icon: "🪨" },
+  "Cercos Eléctricos":             { bg: _BG4, color: _C4, border: _B4, icon: "⚡" },
 }
 const CAT_DEFAULT = { bg: "#f5f7fb", color: "#374151", border: "#e2e8f0", icon: "📦" }
 
@@ -213,7 +218,7 @@ function Toast({ mensaje }: { mensaje: string }) {
       display: "flex", alignItems: "center", gap: 9, maxWidth: 300,
       border: "1px solid #1e293b",
     }}>
-      <span style={{ width: 22, height: 22, background: "#16a34a", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "white" }}>
+      <span style={{ width: 22, height: 22, background: "#d4688e", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "white" }}>
         <IcoCheck />
       </span>
       {mensaje}
@@ -258,7 +263,7 @@ function FilaListaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFa
 
       {/* Lab */}
       {p.laboratorio && (
-        <span className="hide-sm" style={{ fontSize: 9.5, fontWeight: 800, color: "#16a34a", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 20, padding: "2px 8px", whiteSpace: "nowrap", flexShrink: 0 }}>
+        <span className="hide-sm" style={{ fontSize: 9.5, fontWeight: 800, color: "#b05070", background: "#fdf0f5", border: "1px solid #f0c8d8", borderRadius: 20, padding: "2px 8px", whiteSpace: "nowrap", flexShrink: 0 }}>
           {p.laboratorio}
         </span>
       )}
@@ -285,34 +290,34 @@ function FilaListaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFa
       {/* Precio */}
       {tipoCliente === undefined || tipoCliente === null ? (
         <button onClick={e => { e.stopPropagation(); onVerPrecio?.() }}
-          style={{ fontSize: 11, fontWeight: 700, color: "#e8197d", background: "#fff0f7", border: "1px solid #fbcfe8", borderRadius: 7, padding: "5px 10px", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0 }}>
+          style={{ fontSize: 11, fontWeight: 700, color: "#d4688e", background: "#fdf0f5", border: "1px solid #f0c8d8", borderRadius: 7, padding: "5px 10px", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0 }}>
           Ver precio
         </button>
       ) : tipoCliente === "pendiente" ? (
         <span style={{ fontSize: 11, fontWeight: 700, color: "#92400e", flexShrink: 0, whiteSpace: "nowrap" }}>A consultar</span>
       ) : (
-        <span style={{ fontSize: 15, fontWeight: 900, color: "#e8197d", flexShrink: 0, minWidth: 88, textAlign: "right" }}>
+        <span style={{ fontSize: 15, fontWeight: 900, color: "#d4688e", flexShrink: 0, minWidth: 88, textAlign: "right" }}>
           {fmt(precioConTipo(p.precio_venta, tipoCliente)!)}
         </span>
       )}
 
       {/* Favorito */}
       <button onClick={e => { e.stopPropagation(); onToggleFav() }}
-        style={{ width: 28, height: 28, borderRadius: "50%", background: esFav ? "#e8197d" : "#f8fafc", border: esFav ? "none" : "1px solid #e2e8f0", cursor: "pointer", fontSize: 13, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: esFav ? "white" : "#94a3b8", transition: "all 0.15s" }}>
+        style={{ width: 28, height: 28, borderRadius: "50%", background: esFav ? "#d4688e" : "#f8fafc", border: esFav ? "none" : "1px solid #e2e8f0", cursor: "pointer", fontSize: 13, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: esFav ? "white" : "#94a3b8", transition: "all 0.15s" }}>
         {esFav ? "♥" : "♡"}
       </button>
 
       {/* Agregar */}
       {enCarrito > 0 ? (
-        <div style={{ display: "flex", alignItems: "center", gap: 2, background: "#fff0f7", border: "2px solid #e8197d", borderRadius: 9, padding: "2px 3px", flexShrink: 0 }}>
-          <button onClick={e => { e.stopPropagation(); onCambiar(-1) }} style={{ width: 24, height: 24, border: "none", borderRadius: 6, background: "#fce7f3", color: "#be185d", fontWeight: 900, cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>−</button>
+        <div style={{ display: "flex", alignItems: "center", gap: 2, background: "#fdf0f5", border: "2px solid #d4688e", borderRadius: 9, padding: "2px 3px", flexShrink: 0 }}>
+          <button onClick={e => { e.stopPropagation(); onCambiar(-1) }} style={{ width: 24, height: 24, border: "none", borderRadius: 6, background: "#fdf0f5", color: "#be185d", fontWeight: 900, cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>−</button>
           <span style={{ fontSize: 12, fontWeight: 900, color: "#be185d", minWidth: 20, textAlign: "center" }}>{enCarrito}</span>
-          <button onClick={e => { e.stopPropagation(); onCambiar(1) }} style={{ width: 24, height: 24, border: "none", borderRadius: 6, background: "#e8197d", color: "white", fontWeight: 900, cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
+          <button onClick={e => { e.stopPropagation(); onCambiar(1) }} style={{ width: 24, height: 24, border: "none", borderRadius: 6, background: "#d4688e", color: "white", fontWeight: 900, cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
         </div>
       ) : (
         <button onClick={e => { e.stopPropagation(); onAgregar() }}
           style={{ background: "#1a2035", color: "white", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: 800, cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, transition: "background 0.15s" }}
-          onMouseEnter={e => (e.currentTarget.style.background = "#e8197d")}
+          onMouseEnter={e => (e.currentTarget.style.background = "#d4688e")}
           onMouseLeave={e => (e.currentTarget.style.background = "#1a2035")}>
           + Agregar
         </button>
@@ -341,7 +346,7 @@ function TarjetaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFav,
         flexDirection: "column",
         transition: "box-shadow 0.2s, border-color 0.2s, transform 0.18s",
         boxShadow: hover
-          ? "0 12px 32px rgba(232,25,125,0.14), 0 4px 12px rgba(0,0,0,0.1)"
+          ? "0 12px 32px rgba(212,104,142,0.14), 0 4px 12px rgba(0,0,0,0.1)"
           : "0 2px 8px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05)",
         transform: hover ? "translateY(-4px)" : "none",
       }}
@@ -354,18 +359,18 @@ function TarjetaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFav,
         }
         {/* Laboratorio — solo si NO hay ítem en carrito para no solapar */}
         {p.laboratorio && enCarrito === 0 && (
-          <div style={{ position: "absolute", top: 8, left: 8, background: "rgba(255,255,255,0.95)", color: "#16a34a", fontSize: 9.5, fontWeight: 800, padding: "3px 8px", borderRadius: 20, border: "1px solid #d1fae5", maxWidth: "calc(100% - 44px)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", boxShadow: "0 1px 4px rgba(0,0,0,0.08)" }}>
+          <div style={{ position: "absolute", top: 8, left: 8, background: "rgba(255,255,255,0.95)", color: "#b05070", fontSize: 9.5, fontWeight: 800, padding: "3px 8px", borderRadius: 20, border: "1px solid #f0c8d8", maxWidth: "calc(100% - 44px)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", boxShadow: "0 1px 4px rgba(0,0,0,0.08)" }}>
             {p.laboratorio}
           </div>
         )}
         {/* Favorito */}
         <button onClick={e => { e.stopPropagation(); onToggleFav() }}
-          style={{ position: "absolute", top: 8, right: 8, width: 28, height: 28, borderRadius: "50%", background: esFav ? "#e8197d" : "rgba(255,255,255,0.9)", border: esFav ? "none" : "1px solid #e2e8f0", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.1)", transition: "all 0.15s", zIndex: 2 }}>
+          style={{ position: "absolute", top: 8, right: 8, width: 28, height: 28, borderRadius: "50%", background: esFav ? "#d4688e" : "rgba(255,255,255,0.9)", border: esFav ? "none" : "1px solid #e2e8f0", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.1)", transition: "all 0.15s", zIndex: 2 }}>
           {esFav ? "♥" : "♡"}
         </button>
         {/* Check "en carrito" — top-left, reemplaza el badge de lab */}
         {enCarrito > 0 && (
-          <div style={{ position: "absolute", top: 8, left: 8, display: "flex", alignItems: "center", gap: 4, background: "#e8197d", borderRadius: 20, padding: "3px 8px 3px 5px", boxShadow: "0 2px 8px rgba(232,25,125,0.5)", zIndex: 2 }}>
+          <div style={{ position: "absolute", top: 8, left: 8, display: "flex", alignItems: "center", gap: 4, background: "#d4688e", borderRadius: 20, padding: "3px 8px 3px 5px", boxShadow: "0 2px 8px rgba(212,104,142,0.5)", zIndex: 2 }}>
             <span style={{ width: 16, height: 16, borderRadius: "50%", background: "rgba(255,255,255,0.25)", display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}>
               <IcoCheck />
             </span>
@@ -382,7 +387,7 @@ function TarjetaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFav,
       {/* Info */}
       <div style={{ padding: "12px 13px 14px", flex: 1, display: "flex", flexDirection: "column" }}>
         {p.categoria && (
-          <span style={{ fontSize: 9.5, fontWeight: 800, color: "#e8197d", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 5, display: "block" }}>
+          <span style={{ fontSize: 9.5, fontWeight: 800, color: "#d4688e", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 5, display: "block" }}>
             {p.categoria}
           </span>
         )}
@@ -392,23 +397,23 @@ function TarjetaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFav,
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
           {tipoCliente === undefined || tipoCliente === null ? (
             <button onClick={e => { e.stopPropagation(); onVerPrecio?.() }}
-              style={{ fontSize: 11, fontWeight: 700, color: "#e8197d", background: "#fff0f7", border: "1px solid #fbcfe8", borderRadius: 7, padding: "5px 10px", cursor: "pointer", whiteSpace: "nowrap" }}>
+              style={{ fontSize: 11, fontWeight: 700, color: "#d4688e", background: "#fdf0f5", border: "1px solid #f0c8d8", borderRadius: 7, padding: "5px 10px", cursor: "pointer", whiteSpace: "nowrap" }}>
               Ver precio
             </button>
           ) : tipoCliente === "pendiente" ? (
             <span style={{ fontSize: 12, fontWeight: 700, color: "#92400e" }}>A consultar</span>
           ) : (
-            <span style={{ fontSize: 17, fontWeight: 900, color: "#e8197d", letterSpacing: -0.3 }}>{fmt(precioConTipo(p.precio_venta, tipoCliente)!)}</span>
+            <span style={{ fontSize: 17, fontWeight: 900, color: "#d4688e", letterSpacing: -0.3 }}>{fmt(precioConTipo(p.precio_venta, tipoCliente)!)}</span>
           )}
           {enCarrito > 0 ? (
-            <div style={{ display: "flex", alignItems: "center", gap: 2, background: "#fff0f7", border: "2px solid #e8197d", borderRadius: 10, padding: "2px 4px" }}>
-              <button onClick={e => { e.stopPropagation(); onCambiar(-1) }} style={{ width: 26, height: 26, border: "none", borderRadius: 7, background: "#fce7f3", color: "#be185d", fontWeight: 900, cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1 }}>−</button>
+            <div style={{ display: "flex", alignItems: "center", gap: 2, background: "#fdf0f5", border: "2px solid #d4688e", borderRadius: 10, padding: "2px 4px" }}>
+              <button onClick={e => { e.stopPropagation(); onCambiar(-1) }} style={{ width: 26, height: 26, border: "none", borderRadius: 7, background: "#fdf0f5", color: "#be185d", fontWeight: 900, cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1 }}>−</button>
               <span style={{ fontSize: 13, fontWeight: 900, color: "#be185d", minWidth: 22, textAlign: "center" }}>{enCarrito}</span>
-              <button onClick={e => { e.stopPropagation(); onCambiar(1) }} style={{ width: 26, height: 26, border: "none", borderRadius: 7, background: "#e8197d", color: "white", fontWeight: 900, cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1 }}>+</button>
+              <button onClick={e => { e.stopPropagation(); onCambiar(1) }} style={{ width: 26, height: 26, border: "none", borderRadius: 7, background: "#d4688e", color: "white", fontWeight: 900, cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1 }}>+</button>
             </div>
           ) : (
             <button onClick={e => { e.stopPropagation(); onAgregar() }} style={{ background: "#1a2035", color: "white", border: "none", borderRadius: 9, padding: "8px 13px", fontSize: 12, fontWeight: 800, cursor: "pointer", transition: "background 0.15s", whiteSpace: "nowrap" }}
-              onMouseEnter={e => (e.currentTarget.style.background = "#e8197d")}
+              onMouseEnter={e => (e.currentTarget.style.background = "#d4688e")}
               onMouseLeave={e => (e.currentTarget.style.background = "#1a2035")}>
               + Agregar
             </button>
@@ -426,8 +431,8 @@ function TabCategoria({ label, count, activo, onClick }: { label: string; count:
       height: "100%",
       background: "none",
       border: "none",
-      borderBottom: `2.5px solid ${activo ? "#e8197d" : "transparent"}`,
-      color: activo ? "#e8197d" : "#64748b",
+      borderBottom: `2.5px solid ${activo ? "#d4688e" : "transparent"}`,
+      color: activo ? "#d4688e" : "#64748b",
       cursor: "pointer",
       whiteSpace: "nowrap",
       display: "flex", alignItems: "center", gap: 6,
@@ -438,8 +443,8 @@ function TabCategoria({ label, count, activo, onClick }: { label: string; count:
       {label}
       <span style={{
         fontSize: 10, fontWeight: 800,
-        background: activo ? "#fce7f3" : "#f1f5f9",
-        color: activo ? "#e8197d" : "#94a3b8",
+        background: activo ? "#fdf0f5" : "#f1f5f9",
+        color: activo ? "#d4688e" : "#94a3b8",
         borderRadius: 20, padding: "1px 7px",
         transition: "all 0.15s",
       }}>
@@ -1338,16 +1343,16 @@ export default function Tienda() {
       const pu = precioConTipo(i.producto.precio_venta, tipoCliente) ?? i.producto.precio_venta
       return `
       <tr>
-        <td style="padding:9px 12px;border-bottom:1px solid #eee;font-size:13px">${i.producto.nombre}${i.producto.laboratorio ? `<br><span style="font-size:11px;color:#16a34a;font-weight:600">${i.producto.laboratorio}</span>` : ""}${i.nota ? `<br><span style="font-size:11px;color:#64748b;font-style:italic">${i.nota}</span>` : ""}</td>
+        <td style="padding:9px 12px;border-bottom:1px solid #eee;font-size:13px">${i.producto.nombre}${i.producto.laboratorio ? `<br><span style="font-size:11px;color:#b05070;font-weight:600">${i.producto.laboratorio}</span>` : ""}${i.nota ? `<br><span style="font-size:11px;color:#64748b;font-style:italic">${i.nota}</span>` : ""}</td>
         <td style="padding:9px 12px;border-bottom:1px solid #eee;text-align:center;font-size:13px">${i.cantidad}</td>
         <td style="padding:9px 12px;border-bottom:1px solid #eee;text-align:right;font-size:13px">${fmt(pu)}</td>
-        <td style="padding:9px 12px;border-bottom:1px solid #eee;text-align:right;font-size:13px;font-weight:700;color:#e8197d">${fmt(pu * i.cantidad)}</td>
+        <td style="padding:9px 12px;border-bottom:1px solid #eee;text-align:right;font-size:13px;font-weight:700;color:#d4688e">${fmt(pu * i.cantidad)}</td>
       </tr>`
     }).join("")
     const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Pedido VETIX — ${fecha}</title>
 <style>
   *{box-sizing:border-box}body{font-family:system-ui,sans-serif;margin:0;padding:32px;color:#111;max-width:800px;margin:0 auto;padding:32px}
-  .top{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #e8197d;padding-bottom:14px;margin-bottom:24px}
+  .top{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #d4688e;padding-bottom:14px;margin-bottom:24px}
   h1{margin:0;font-size:22px;font-weight:900;color:#1a2035}p.sub{margin:4px 0 0;font-size:12px;color:#64748b}
   .date{font-size:13px;color:#64748b;text-align:right}
   table{width:100%;border-collapse:collapse}
@@ -1366,7 +1371,7 @@ export default function Tienda() {
   <tbody>${lineas}</tbody>
   <tfoot><tr>
     <td colspan="3" style="text-align:right;color:#64748b;font-weight:600;font-size:13px">Total estimado</td>
-    <td style="color:#e8197d;text-align:right">${fmt(totalPrecio)}</td>
+    <td style="color:#d4688e;text-align:right">${fmt(totalPrecio)}</td>
   </tr></tfoot>
 </table>
 <div class="footer">Precios de referencia — sujetos a confirmación al coordinar. VETIX Distribuidora Veterinaria.</div>
@@ -1384,7 +1389,7 @@ export default function Tienda() {
       {/* ── BANNER DE ANUNCIO ──────────────────────────────────────────────── */}
       {BANNER_TEXTO && !bannerCerrado && (
         <div style={{
-          background: "linear-gradient(90deg, #a80d40, #e8197d, #a80d40)",
+          background: "linear-gradient(90deg, #b05070, #d4688e, #b05070)",
           backgroundSize: "200% auto",
           color: "white",
           padding: "10px 20px",
@@ -1436,7 +1441,7 @@ export default function Tienda() {
               onChange={e => setBusqueda(e.target.value)}
               placeholder="Buscar productos, laboratorios... ( / )"
               style={{ width: "100%", paddingLeft: 38, paddingRight: busqueda ? 34 : 14, height: 40, borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 13, outline: "none", background: "#f3f1ee", color: "#1a2035", boxSizing: "border-box", transition: "border-color 0.15s, background 0.15s" }}
-              onFocus={e => { e.target.style.borderColor = "#e8197d"; e.target.style.background = "white"; setSearchFocus(true) }}
+              onFocus={e => { e.target.style.borderColor = "#d4688e"; e.target.style.background = "white"; setSearchFocus(true) }}
               onBlur={e => { e.target.style.borderColor = "#e2e8f0"; e.target.style.background = "#f3f1ee"; setTimeout(() => setSearchFocus(false), 180) }}
               onKeyDown={e => { if (e.key === "Enter" && busqueda.trim()) guardarBusquedaReciente(busqueda) }}
             />
@@ -1481,7 +1486,7 @@ export default function Tienda() {
               style={{ display: "flex", alignItems: "center", gap: 7, padding: "7px 13px", borderRadius: 10, background: "#f8fafc", border: "1px solid #e2e8f0", color: "#1a2035", fontSize: 13, fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap", transition: "all 0.15s" }}
               onMouseEnter={e => { e.currentTarget.style.background = "#f1f5f9"; e.currentTarget.style.borderColor = "#c7d2e0" }}
               onMouseLeave={e => { e.currentTarget.style.background = "#f8fafc"; e.currentTarget.style.borderColor = "#e2e8f0" }}>
-              <span style={{ width: 24, height: 24, borderRadius: "50%", background: "linear-gradient(135deg,#e8197d,#a80d40)", color: "white", fontWeight: 900, fontSize: 11, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <span style={{ width: 24, height: 24, borderRadius: "50%", background: "linear-gradient(135deg,#d4688e,#b05070)", color: "white", fontWeight: 900, fontSize: 11, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 {(perfil ? perfil.nombre : usuario.email)[0].toUpperCase()}
               </span>
               <span className="wa-text">{perfil ? perfil.nombre : usuario.email.split("@")[0]}</span>
@@ -1503,11 +1508,11 @@ export default function Tienda() {
             onAnimationEnd={() => setCartAnimando(false)}
             style={{
               display: "flex", alignItems: "center", gap: 7, flexShrink: 0,
-              background: totalItems > 0 ? "#e8197d" : "#1a2035",
+              background: totalItems > 0 ? "#d4688e" : "#1a2035",
               color: "white",
               border: "none", borderRadius: 10, padding: "9px 16px", cursor: "pointer",
               fontSize: 13, fontWeight: 800,
-              boxShadow: totalItems > 0 ? "0 4px 16px rgba(232,25,125,0.45)" : "none",
+              boxShadow: totalItems > 0 ? "0 4px 16px rgba(212,104,142,0.45)" : "none",
               transition: "background 0.2s, box-shadow 0.2s",
             }}>
             <IcoCart size={17} />
@@ -1526,7 +1531,7 @@ export default function Tienda() {
             <span style={{ position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)", color: "#94a3b8", pointerEvents: "none" }}><IcoSearch /></span>
             <input value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder="Buscar productos..."
               style={{ width: "100%", paddingLeft: 34, paddingRight: 14, height: 38, borderRadius: 9, border: "1.5px solid #e2e8f0", fontSize: 13, outline: "none", background: "#f0f4fb", color: "#1a2035", boxSizing: "border-box" }}
-              onFocus={e => { e.target.style.borderColor = "#e8197d"; e.target.style.background = "white" }}
+              onFocus={e => { e.target.style.borderColor = "#d4688e"; e.target.style.background = "white" }}
               onBlur={e => { e.target.style.borderColor = "#e2e8f0"; e.target.style.background = "#f0f4fb" }} />
           </div>
         </div>
@@ -1560,7 +1565,7 @@ export default function Tienda() {
                   </div>
                 ))}
                 <button onClick={() => verCatalogo("")}
-                  style={{ background: "#e8197d", color: "white", border: "none", borderRadius: 10, padding: "10px 22px", fontSize: 13, fontWeight: 800, cursor: "pointer", whiteSpace: "nowrap", boxShadow: "0 3px 12px rgba(232,25,125,0.35)" }}>
+                  style={{ background: "#d4688e", color: "white", border: "none", borderRadius: 10, padding: "10px 22px", fontSize: 13, fontWeight: 800, cursor: "pointer", whiteSpace: "nowrap", boxShadow: "0 3px 12px rgba(212,104,142,0.35)" }}>
                   Ver catálogo →
                 </button>
               </div>
@@ -1595,7 +1600,7 @@ export default function Tienda() {
                 <div className="marquee-track" style={{ display: "flex", gap: 10, paddingLeft: 20 }}>
                   {[...laboratorios, ...laboratorios].map((lab, i) => (
                     <button key={i} onClick={() => { setModoCatalogo(true); setLaboratoriosFiltro(new Set([lab])); setBusqueda(""); setBusquedaDelay(""); setCategoriaActiva(""); window.scrollTo({ top: 0, behavior: "smooth" }) }}
-                      style={{ padding: "7px 18px", borderRadius: 20, background: "#ecfdf5", border: "1px solid #a7f3d0", fontSize: 12, fontWeight: 700, color: "#065f46", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, transition: "all 0.15s" }}
+                      style={{ padding: "7px 18px", borderRadius: 20, background: "#fdf0f5", border: "1px solid #f0c8d8", fontSize: 12, fontWeight: 700, color: "#b05070", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, transition: "all 0.15s" }}
                       onMouseEnter={e => { e.currentTarget.style.background = "#bbf7d0"; e.currentTarget.style.borderColor = "#6ee7b7"; e.currentTarget.style.color = "#064e3b" }}
                       onMouseLeave={e => { e.currentTarget.style.background = "#ecfdf5"; e.currentTarget.style.borderColor = "#a7f3d0"; e.currentTarget.style.color = "#065f46" }}>
                       {lab}
@@ -1643,11 +1648,11 @@ export default function Tienda() {
 
           {/* ── MIS FAVORITOS ─────────────────────────────────────────────── */}
           {favoritosProductos.length > 0 && (
-            <div style={{ background: "#fff8fb", padding: "28px 0 32px", borderBottom: "1px solid #fce7f3" }}>
+            <div style={{ background: "#fff8fb", padding: "28px 0 32px", borderBottom: "1px solid #fdf0f5" }}>
               <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
                 <div>
                   <h2 style={{ margin: "0 0 3px", fontSize: 18, fontWeight: 900, color: "#1a2035" }}>
-                    <span style={{ color: "#e8197d" }}>♥</span> Mis favoritos
+                    <span style={{ color: "#d4688e" }}>♥</span> Mis favoritos
                   </h2>
                   <p style={{ margin: 0, fontSize: 13, color: "#64748b" }}>
                     {favoritos.size} producto{favoritos.size !== 1 ? "s" : ""} guardado{favoritos.size !== 1 ? "s" : ""}
@@ -1655,11 +1660,11 @@ export default function Tienda() {
                 </div>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   <button onClick={agregarTodosFavs}
-                    style={{ padding: "8px 16px", borderRadius: 9, background: "#e8197d", border: "none", color: "white", fontSize: 12, fontWeight: 800, cursor: "pointer", boxShadow: "0 3px 10px rgba(232,25,125,0.3)" }}>
+                    style={{ padding: "8px 16px", borderRadius: 9, background: "#d4688e", border: "none", color: "white", fontSize: 12, fontWeight: 800, cursor: "pointer", boxShadow: "0 3px 10px rgba(212,104,142,0.3)" }}>
                     + Agregar todos al carrito
                   </button>
                   <button onClick={() => { setModoCatalogo(true); setBusqueda(""); setBusquedaDelay(""); setCategoriaActiva("__favs__") }}
-                    style={{ padding: "8px 14px", borderRadius: 9, background: "white", border: "1.5px solid #fbcfe8", color: "#e8197d", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                    style={{ padding: "8px 14px", borderRadius: 9, background: "white", border: "1.5px solid #f0c8d8", color: "#d4688e", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
                     Ver todos →
                   </button>
                 </div>
@@ -1736,7 +1741,7 @@ export default function Tienda() {
                   { n: "3", titulo: "Te contactamos", desc: "Nos comunicamos para coordinar precio final, forma de pago y entrega o retiro." },
                 ].map(step => (
                   <div key={step.n} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: "26px 22px", display: "flex", flexDirection: "column", gap: 14 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: "50%", background: "#e8197d", color: "white", fontWeight: 900, fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: "50%", background: "#d4688e", color: "white", fontWeight: 900, fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                       {step.n}
                     </div>
                     <div>
@@ -1760,7 +1765,7 @@ export default function Tienda() {
                   </div>
                   <button onClick={() => setCatModalOpen(true)}
                     style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 20px", borderRadius: 11, background: "#1a2035", color: "white", border: "none", fontSize: 13, fontWeight: 800, cursor: "pointer", transition: "background 0.15s" }}
-                    onMouseEnter={e => (e.currentTarget.style.background = "#e8197d")}
+                    onMouseEnter={e => (e.currentTarget.style.background = "#d4688e")}
                     onMouseLeave={e => (e.currentTarget.style.background = "#1a2035")}>
                     Ver todas las categorías →
                   </button>
@@ -1772,7 +1777,7 @@ export default function Tienda() {
                     return (
                       <button key={cat} onClick={() => verCatalogo(cat)}
                         style={{ background: "white", border: "1.5px solid #e2e8f0", borderRadius: 11, padding: "14px 16px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 12, transition: "border-color 0.15s, background 0.15s" }}
-                        onMouseEnter={e => { e.currentTarget.style.borderColor = "#e8197d"; e.currentTarget.style.background = "#fff8fb" }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = "#d4688e"; e.currentTarget.style.background = "#fff8fb" }}
                         onMouseLeave={e => { e.currentTarget.style.borderColor = "#e2e8f0"; e.currentTarget.style.background = "white" }}>
                           <div style={{ minWidth: 0 }}>
                           <div style={{ fontSize: 13, fontWeight: 700, color: "#1a2035", lineHeight: 1.3 }}>{cat}</div>
@@ -1813,7 +1818,7 @@ export default function Tienda() {
               </div>
               <div style={{ textAlign: "center", marginTop: 30 }}>
                 <button onClick={() => verCatalogo("")}
-                  style={{ background: "#e8197d", color: "white", border: "none", borderRadius: 13, padding: "14px 36px", fontSize: 15, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 18px rgba(232,25,125,0.4)" }}>
+                  style={{ background: "#d4688e", color: "white", border: "none", borderRadius: 13, padding: "14px 36px", fontSize: 15, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 18px rgba(212,104,142,0.4)" }}>
                   Ver catálogo completo ({productos.length.toLocaleString("es-AR")} productos) →
                 </button>
               </div>
@@ -1845,7 +1850,7 @@ export default function Tienda() {
             Verificá tu conexión a internet<br/>e intentá de nuevo
           </p>
           <button onClick={() => setReintento(r => r + 1)}
-            style={{ background: "#e8197d", color: "white", border: "none", borderRadius: 13, padding: "13px 32px", fontSize: 15, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 16px rgba(232,25,125,0.4)" }}>
+            style={{ background: "#d4688e", color: "white", border: "none", borderRadius: 13, padding: "13px 32px", fontSize: 15, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 16px rgba(212,104,142,0.4)" }}>
             ↻ Reintentar
           </button>
         </div>
@@ -1860,7 +1865,7 @@ export default function Tienda() {
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
               <button onClick={() => irAInicio()}
                 style={{ background: "none", border: "none", padding: 0, fontSize: 13, color: "#64748b", cursor: "pointer", fontWeight: 600, transition: "color 0.15s" }}
-                onMouseEnter={e => (e.currentTarget.style.color = "#e8197d")}
+                onMouseEnter={e => (e.currentTarget.style.color = "#d4688e")}
                 onMouseLeave={e => (e.currentTarget.style.color = "#64748b")}>
                 ← Inicio
               </button>
@@ -1886,7 +1891,7 @@ export default function Tienda() {
                   {busqueda ? "Probá con otro término" : "Volvé en unos momentos"}
                 </p>
                 <button onClick={() => irAInicio()}
-                  style={{ background: "#e8197d", color: "white", border: "none", borderRadius: 12, padding: "11px 28px", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+                  style={{ background: "#d4688e", color: "white", border: "none", borderRadius: 12, padding: "11px 28px", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
                   ← Volver al inicio
                 </button>
               </div>
@@ -1900,7 +1905,7 @@ export default function Tienda() {
                   <div className="sort-bar" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
                     <p style={{ margin: 0, color: "#64748b", fontSize: 13 }}>
                       <b style={{ color: "#1a2035" }}>{totalFiltrados.toLocaleString("es-AR")}</b> producto{totalFiltrados !== 1 ? "s" : ""}
-                      {busquedaDelay && <> para <b style={{ color: "#e8197d" }}>&quot;{busquedaDelay}&quot;</b></>}
+                      {busquedaDelay && <> para <b style={{ color: "#d4688e" }}>&quot;{busquedaDelay}&quot;</b></>}
                     </p>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       {busqueda && (
@@ -1908,9 +1913,9 @@ export default function Tienda() {
                       )}
                       <button
                         onClick={() => setFiltrosExpandidos(v => !v)}
-                        style={{ display: "flex", alignItems: "center", gap: 5, padding: "7px 12px", border: `1.5px solid ${filtrosActivos > 0 ? "#fbcfe8" : "#e2e8f0"}`, borderRadius: 9, background: filtrosActivos > 0 ? "#fce7f3" : "white", color: filtrosActivos > 0 ? "#e8197d" : "#374151", fontSize: 12, fontWeight: 700, cursor: "pointer", transition: "all 0.15s", whiteSpace: "nowrap" }}>
+                        style={{ display: "flex", alignItems: "center", gap: 5, padding: "7px 12px", border: `1.5px solid ${filtrosActivos > 0 ? "#f0c8d8" : "#e2e8f0"}`, borderRadius: 9, background: filtrosActivos > 0 ? "#fdf0f5" : "white", color: filtrosActivos > 0 ? "#d4688e" : "#374151", fontSize: 12, fontWeight: 700, cursor: "pointer", transition: "all 0.15s", whiteSpace: "nowrap" }}>
                         Filtros {filtrosExpandidos ? "▲" : "▼"}
-                        {filtrosActivos > 0 && <span style={{ background: "#e8197d", color: "white", borderRadius: "50%", width: 16, height: 16, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 900 }}>{filtrosActivos}</span>}
+                        {filtrosActivos > 0 && <span style={{ background: "#d4688e", color: "white", borderRadius: "50%", width: 16, height: 16, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 900 }}>{filtrosActivos}</span>}
                       </button>
                       <select value={orden} onChange={e => setOrden(e.target.value as Orden)}
                         style={{ padding: "7px 11px", border: "1.5px solid #e2e8f0", borderRadius: 9, fontSize: 13, fontWeight: 600, outline: "none", background: "white", color: "#374151", cursor: "pointer" }}>
@@ -1929,7 +1934,7 @@ export default function Tienda() {
                     <div style={{ position: "relative" }}>
                       <button
                         onClick={() => { setCatDropdownOpen(v => !v); setLabDropdownOpen(false) }}
-                        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 10px", border: `1.5px solid ${categoriaActiva ? "#fbcfe8" : "#e2e8f0"}`, borderRadius: 8, fontSize: 12, fontWeight: 600, background: categoriaActiva ? "#fce7f3" : "white", color: categoriaActiva ? "#e8197d" : "#374151", cursor: "pointer", maxWidth: 220, whiteSpace: "nowrap", overflow: "hidden" }}>
+                        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 10px", border: `1.5px solid ${categoriaActiva ? "#f0c8d8" : "#e2e8f0"}`, borderRadius: 8, fontSize: 12, fontWeight: 600, background: categoriaActiva ? "#fdf0f5" : "white", color: categoriaActiva ? "#d4688e" : "#374151", cursor: "pointer", maxWidth: 220, whiteSpace: "nowrap", overflow: "hidden" }}>
                         {categoriaActiva ? `${categoriaActiva} ▾` : "Categorías ▾"}
                       </button>
                       {catDropdownOpen && (
@@ -1939,15 +1944,15 @@ export default function Tienda() {
                             <div style={{ padding: "6px 12px 4px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                               <span style={{ fontSize: 10, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1 }}>Categorías</span>
                               {categoriaActiva && (
-                                <button onClick={() => { setCategoriaActiva(""); setCatDropdownOpen(false) }} style={{ background: "none", border: "none", fontSize: 10, color: "#e8197d", fontWeight: 700, cursor: "pointer" }}>Limpiar</button>
+                                <button onClick={() => { setCategoriaActiva(""); setCatDropdownOpen(false) }} style={{ background: "none", border: "none", fontSize: 10, color: "#d4688e", fontWeight: 700, cursor: "pointer" }}>Limpiar</button>
                               )}
                             </div>
                             {/* Todas */}
                             <button onClick={() => { setCategoriaActiva(""); setCatDropdownOpen(false) }}
-                              style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "7px 12px", background: categoriaActiva === "" ? "#fdf2f8" : "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: categoriaActiva === "" ? 700 : 500, color: categoriaActiva === "" ? "#e8197d" : "#374151", textAlign: "left" }}
+                              style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "7px 12px", background: categoriaActiva === "" ? "#fdf0f5" : "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: categoriaActiva === "" ? 700 : 500, color: categoriaActiva === "" ? "#d4688e" : "#374151", textAlign: "left" }}
                               onMouseEnter={e => { if (categoriaActiva !== "") e.currentTarget.style.background = "#f8fafc" }}
                               onMouseLeave={e => { if (categoriaActiva !== "") e.currentTarget.style.background = "none" }}>
-                              <span style={{ width: 15, height: 15, borderRadius: 4, border: `2px solid ${categoriaActiva === "" ? "#e8197d" : "#d1d5db"}`, background: categoriaActiva === "" ? "#e8197d" : "white", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                              <span style={{ width: 15, height: 15, borderRadius: 4, border: `2px solid ${categoriaActiva === "" ? "#d4688e" : "#d1d5db"}`, background: categoriaActiva === "" ? "#d4688e" : "white", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                 {categoriaActiva === "" && <svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="white" strokeWidth="2.5"><path d="M2 6l3 3 5-5"/></svg>}
                               </span>
                               Todas las categorías
@@ -1957,10 +1962,10 @@ export default function Tienda() {
                               const sel = categoriaActiva === cat
                               return (
                                 <button key={cat} onClick={() => { setCategoriaActiva(cat); setCatDropdownOpen(false) }}
-                                  style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "7px 12px", background: sel ? "#fdf2f8" : "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: sel ? 700 : 500, color: sel ? "#e8197d" : "#374151", textAlign: "left" }}
+                                  style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "7px 12px", background: sel ? "#fdf0f5" : "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: sel ? 700 : 500, color: sel ? "#d4688e" : "#374151", textAlign: "left" }}
                                   onMouseEnter={e => { if (!sel) e.currentTarget.style.background = "#f8fafc" }}
                                   onMouseLeave={e => { if (!sel) e.currentTarget.style.background = "none" }}>
-                                  <span style={{ width: 15, height: 15, borderRadius: 4, border: `2px solid ${sel ? "#e8197d" : "#d1d5db"}`, background: sel ? "#e8197d" : "white", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                  <span style={{ width: 15, height: 15, borderRadius: 4, border: `2px solid ${sel ? "#d4688e" : "#d1d5db"}`, background: sel ? "#d4688e" : "white", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                     {sel && <svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="white" strokeWidth="2.5"><path d="M2 6l3 3 5-5"/></svg>}
                                   </span>
                                   {cat}
@@ -1976,7 +1981,7 @@ export default function Tienda() {
                     <div style={{ position: "relative" }}>
                       <button
                         onClick={() => { setLabDropdownOpen(v => !v); setCatDropdownOpen(false) }}
-                        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 10px", border: `1.5px solid ${laboratoriosFiltro.size > 0 ? "#fbcfe8" : "#e2e8f0"}`, borderRadius: 8, fontSize: 12, fontWeight: 600, background: laboratoriosFiltro.size > 0 ? "#fce7f3" : "white", color: laboratoriosFiltro.size > 0 ? "#e8197d" : "#374151", cursor: "pointer", maxWidth: 200, whiteSpace: "nowrap", overflow: "hidden" }}>
+                        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 10px", border: `1.5px solid ${laboratoriosFiltro.size > 0 ? "#f0c8d8" : "#e2e8f0"}`, borderRadius: 8, fontSize: 12, fontWeight: 600, background: laboratoriosFiltro.size > 0 ? "#fdf0f5" : "white", color: laboratoriosFiltro.size > 0 ? "#d4688e" : "#374151", cursor: "pointer", maxWidth: 200, whiteSpace: "nowrap", overflow: "hidden" }}>
                         {laboratoriosFiltro.size === 0
                           ? "Laboratorio ▾"
                           : laboratoriosFiltro.size === 1
@@ -1990,7 +1995,7 @@ export default function Tienda() {
                             <div style={{ padding: "6px 12px 4px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                               <span style={{ fontSize: 10, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1 }}>Laboratorios</span>
                               {laboratoriosFiltro.size > 0 && (
-                                <button onClick={() => setLaboratoriosFiltro(new Set())} style={{ background: "none", border: "none", fontSize: 10, color: "#e8197d", fontWeight: 700, cursor: "pointer" }}>Limpiar</button>
+                                <button onClick={() => setLaboratoriosFiltro(new Set())} style={{ background: "none", border: "none", fontSize: 10, color: "#d4688e", fontWeight: 700, cursor: "pointer" }}>Limpiar</button>
                               )}
                             </div>
                             {laboratorios.map(lab => {
@@ -2003,10 +2008,10 @@ export default function Tienda() {
                                     return next
                                   })
                                 }}
-                                  style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "7px 12px", background: sel ? "#fdf2f8" : "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: sel ? 700 : 500, color: sel ? "#e8197d" : "#374151", textAlign: "left" }}
+                                  style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "7px 12px", background: sel ? "#fdf0f5" : "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: sel ? 700 : 500, color: sel ? "#d4688e" : "#374151", textAlign: "left" }}
                                   onMouseEnter={e => { if (!sel) e.currentTarget.style.background = "#f8fafc" }}
                                   onMouseLeave={e => { if (!sel) e.currentTarget.style.background = "none" }}>
-                                  <span style={{ width: 15, height: 15, borderRadius: 4, border: `2px solid ${sel ? "#e8197d" : "#d1d5db"}`, background: sel ? "#e8197d" : "white", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                  <span style={{ width: 15, height: 15, borderRadius: 4, border: `2px solid ${sel ? "#d4688e" : "#d1d5db"}`, background: sel ? "#d4688e" : "white", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                     {sel && <svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="white" strokeWidth="2.5"><path d="M2 6l3 3 5-5"/></svg>}
                                   </span>
                                   {lab}
@@ -2023,19 +2028,19 @@ export default function Tienda() {
                       <span style={{ fontSize: 12, fontWeight: 600, color: "#64748b" }}>Precio:</span>
                       <input type="number" placeholder="Mín $" value={precioMin} onChange={e => setPrecioMin(e.target.value)}
                         style={{ width: 82, padding: "6px 8px", borderRadius: 8, border: "1.5px solid #e2e8f0", fontSize: 12, outline: "none", color: "#1a2035" }}
-                        onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                        onFocus={e => (e.target.style.borderColor = "#d4688e")}
                         onBlur={e => (e.target.style.borderColor = "#e2e8f0")} />
                       <span style={{ color: "#94a3b8", fontSize: 12 }}>—</span>
                       <input type="number" placeholder="Máx $" value={precioMax} onChange={e => setPrecioMax(e.target.value)}
                         style={{ width: 82, padding: "6px 8px", borderRadius: 8, border: "1.5px solid #e2e8f0", fontSize: 12, outline: "none", color: "#1a2035" }}
-                        onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                        onFocus={e => (e.target.style.borderColor = "#d4688e")}
                         onBlur={e => (e.target.style.borderColor = "#e2e8f0")} />
                     </div>
 
                     {/* Limpiar filtros */}
                     {(precioMin || precioMax || laboratoriosFiltro.size > 0 || categoriaActiva) && (
                       <button onClick={() => { setPrecioMin(""); setPrecioMax(""); setLaboratoriosFiltro(new Set()); setCategoriaActiva("") }}
-                        style={{ background: "#fce7f3", border: "1px solid #fbcfe8", borderRadius: 8, padding: "6px 10px", fontSize: 12, fontWeight: 700, color: "#e8197d", cursor: "pointer" }}>
+                        style={{ background: "#fdf0f5", border: "1px solid #f0c8d8", borderRadius: 8, padding: "6px 10px", fontSize: 12, fontWeight: 700, color: "#d4688e", cursor: "pointer" }}>
                         ✕ Limpiar filtros
                       </button>
                     )}
@@ -2058,27 +2063,27 @@ export default function Tienda() {
                 {(laboratoriosFiltro.size > 0 || precioMin || precioMax || busqueda || esFiltroFavs) && (
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
                     {busquedaDelay && (
-                      <div style={{ display: "flex", alignItems: "center", gap: 6, background: "#fce7f3", border: "1px solid #fbcfe8", borderRadius: 20, padding: "4px 12px", fontSize: 12, fontWeight: 700, color: "#e8197d" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, background: "#fdf0f5", border: "1px solid #f0c8d8", borderRadius: 20, padding: "4px 12px", fontSize: 12, fontWeight: 700, color: "#d4688e" }}>
                         &quot;{busquedaDelay}&quot;
-                        <button onClick={() => { setBusqueda(""); setBusquedaDelay("") }} style={{ background: "none", border: "none", cursor: "pointer", color: "#e8197d", fontSize: 14, lineHeight: 1, padding: 0, display: "flex" }}>×</button>
+                        <button onClick={() => { setBusqueda(""); setBusquedaDelay("") }} style={{ background: "none", border: "none", cursor: "pointer", color: "#d4688e", fontSize: 14, lineHeight: 1, padding: 0, display: "flex" }}>×</button>
                       </div>
                     )}
                     {[...laboratoriosFiltro].map(lab => (
-                      <div key={lab} style={{ display: "flex", alignItems: "center", gap: 6, background: "#fce7f3", border: "1px solid #fbcfe8", borderRadius: 20, padding: "4px 12px", fontSize: 12, fontWeight: 700, color: "#e8197d" }}>
+                      <div key={lab} style={{ display: "flex", alignItems: "center", gap: 6, background: "#fdf0f5", border: "1px solid #f0c8d8", borderRadius: 20, padding: "4px 12px", fontSize: 12, fontWeight: 700, color: "#d4688e" }}>
                         🔬 {lab}
-                        <button onClick={() => setLaboratoriosFiltro(prev => { const n = new Set(prev); n.delete(lab); return n })} style={{ background: "none", border: "none", cursor: "pointer", color: "#e8197d", fontSize: 14, lineHeight: 1, padding: 0, display: "flex" }}>×</button>
+                        <button onClick={() => setLaboratoriosFiltro(prev => { const n = new Set(prev); n.delete(lab); return n })} style={{ background: "none", border: "none", cursor: "pointer", color: "#d4688e", fontSize: 14, lineHeight: 1, padding: 0, display: "flex" }}>×</button>
                       </div>
                     ))}
                     {(precioMin || precioMax) && (
-                      <div style={{ display: "flex", alignItems: "center", gap: 6, background: "#fce7f3", border: "1px solid #fbcfe8", borderRadius: 20, padding: "4px 12px", fontSize: 12, fontWeight: 700, color: "#e8197d" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, background: "#fdf0f5", border: "1px solid #f0c8d8", borderRadius: 20, padding: "4px 12px", fontSize: 12, fontWeight: 700, color: "#d4688e" }}>
                         Precio: {precioMin ? `$${precioMin}` : "0"} — {precioMax ? `$${precioMax}` : "∞"}
-                        <button onClick={() => { setPrecioMin(""); setPrecioMax("") }} style={{ background: "none", border: "none", cursor: "pointer", color: "#e8197d", fontSize: 14, lineHeight: 1, padding: 0, display: "flex" }}>×</button>
+                        <button onClick={() => { setPrecioMin(""); setPrecioMax("") }} style={{ background: "none", border: "none", cursor: "pointer", color: "#d4688e", fontSize: 14, lineHeight: 1, padding: 0, display: "flex" }}>×</button>
                       </div>
                     )}
                     {esFiltroFavs && (
-                      <div style={{ display: "flex", alignItems: "center", gap: 6, background: "#fce7f3", border: "1px solid #fbcfe8", borderRadius: 20, padding: "4px 12px", fontSize: 12, fontWeight: 700, color: "#e8197d" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, background: "#fdf0f5", border: "1px solid #f0c8d8", borderRadius: 20, padding: "4px 12px", fontSize: 12, fontWeight: 700, color: "#d4688e" }}>
                         ♥ Mis favoritos
-                        <button onClick={() => setCategoriaActiva("")} style={{ background: "none", border: "none", cursor: "pointer", color: "#e8197d", fontSize: 14, lineHeight: 1, padding: 0, display: "flex" }}>×</button>
+                        <button onClick={() => setCategoriaActiva("")} style={{ background: "none", border: "none", cursor: "pointer", color: "#d4688e", fontSize: 14, lineHeight: 1, padding: 0, display: "flex" }}>×</button>
                       </div>
                     )}
                   </div>
@@ -2090,12 +2095,12 @@ export default function Tienda() {
                     <span style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.5, marginRight: 2 }}>Subcategoría:</span>
                     <button
                       onClick={() => setSubcategoriaActiva("")}
-                      style={{ padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: subcategoriaActiva === "" ? 800 : 600, border: `1.5px solid ${subcategoriaActiva === "" ? "#e8197d" : "#e2e8f0"}`, background: subcategoriaActiva === "" ? "#fff0f7" : "white", color: subcategoriaActiva === "" ? "#e8197d" : "#64748b", cursor: "pointer" }}>
+                      style={{ padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: subcategoriaActiva === "" ? 800 : 600, border: `1.5px solid ${subcategoriaActiva === "" ? "#d4688e" : "#e2e8f0"}`, background: subcategoriaActiva === "" ? "#fdf0f5" : "white", color: subcategoriaActiva === "" ? "#d4688e" : "#64748b", cursor: "pointer" }}>
                       Todas
                     </button>
                     {subcategoriasDeCat.map(sub => (
                       <button key={sub} onClick={() => setSubcategoriaActiva(sub === subcategoriaActiva ? "" : sub)}
-                        style={{ padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: sub === subcategoriaActiva ? 800 : 600, border: `1.5px solid ${sub === subcategoriaActiva ? "#e8197d" : "#e2e8f0"}`, background: sub === subcategoriaActiva ? "#fff0f7" : "white", color: sub === subcategoriaActiva ? "#e8197d" : "#64748b", cursor: "pointer" }}>
+                        style={{ padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: sub === subcategoriaActiva ? 800 : 600, border: `1.5px solid ${sub === subcategoriaActiva ? "#d4688e" : "#e2e8f0"}`, background: sub === subcategoriaActiva ? "#fdf0f5" : "white", color: sub === subcategoriaActiva ? "#d4688e" : "#64748b", cursor: "pointer" }}>
                         {sub}
                       </button>
                     ))}
@@ -2126,7 +2131,7 @@ export default function Tienda() {
                         <button
                           onClick={() => setVisibles(v => v + 48)}
                           style={{ padding: "11px 28px", background: "#1a2035", color: "white", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer", letterSpacing: 0.2 }}
-                          onMouseEnter={e => (e.currentTarget.style.background = "#e8197d")}
+                          onMouseEnter={e => (e.currentTarget.style.background = "#d4688e")}
                           onMouseLeave={e => (e.currentTarget.style.background = "#1a2035")}
                         >
                           Cargar más productos
@@ -2162,9 +2167,9 @@ export default function Tienda() {
                   return secciones.map(({ cat, items }) => (
                     <section key={cat} style={{ marginBottom: 48 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-                        <div style={{ width: 4, height: 22, background: "#e8197d", borderRadius: 4 }}/>
+                        <div style={{ width: 4, height: 22, background: "#d4688e", borderRadius: 4 }}/>
                         <h2 style={{ margin: 0, fontSize: 18, fontWeight: 900, color: "#1a2035" }}>{cat}</h2>
-                        <span style={{ fontSize: 11, fontWeight: 800, background: "#fce7f3", color: "#e8197d", padding: "3px 10px", borderRadius: 20, border: "1px solid #fbcfe8" }}>
+                        <span style={{ fontSize: 11, fontWeight: 800, background: "#fdf0f5", color: "#d4688e", padding: "3px 10px", borderRadius: 20, border: "1px solid #f0c8d8" }}>
                           {items.length} {items.length === 1 ? "producto" : "productos"}
                         </span>
                         <div style={{ flex: 1, height: 1, background: "linear-gradient(to right, #e2e8f0, transparent)" }}/>
@@ -2208,8 +2213,8 @@ export default function Tienda() {
                   { v: "Stock actualizado diariamente" },
                 ].map(item => (
                   <div key={item.v} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "#475569" }}>
-                    <span style={{ width: 16, height: 16, borderRadius: "50%", background: "rgba(232,25,125,0.15)", border: "1px solid rgba(232,25,125,0.3)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#e8197d" strokeWidth="3"><path d="M20 6 9 17l-5-5"/></svg>
+                    <span style={{ width: 16, height: 16, borderRadius: "50%", background: "rgba(212,104,142,0.15)", border: "1px solid rgba(212,104,142,0.3)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#d4688e" strokeWidth="3"><path d="M20 6 9 17l-5-5"/></svg>
                     </span>
                     {item.v}
                   </div>
@@ -2231,7 +2236,7 @@ export default function Tienda() {
               <p style={{ fontSize: 13, color: "#475569", margin: "0 0 16px" }}>Te contactamos para coordinar</p>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 <button onClick={() => verCatalogo("")}
-                  style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 16px", borderRadius: 9, background: "rgba(232,25,125,0.1)", border: "1px solid rgba(232,25,125,0.25)", color: "#e8197d", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                  style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 16px", borderRadius: 9, background: "rgba(212,104,142,0.1)", border: "1px solid rgba(212,104,142,0.25)", color: "#d4688e", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
                   Ver catálogo →
                 </button>
                 <button onClick={exportarCSV}
@@ -2274,7 +2279,7 @@ export default function Tienda() {
       {totalItems > 0 && !carritoOpen && !checkoutOpen && !pedidoOk && (
         <div className="fab-mobile" style={{ position: "fixed", bottom: 18, left: "50%", transform: "translateX(-50%)", zIndex: 45 }}>
           <button onClick={() => setCarritoOpen(true)}
-            style={{ display: "flex", alignItems: "center", gap: 10, background: "#e8197d", color: "white", border: "none", borderRadius: 50, padding: "13px 24px", fontSize: 14, fontWeight: 800, cursor: "pointer", boxShadow: "0 6px 28px rgba(232,25,125,0.55)", whiteSpace: "nowrap" }}>
+            style={{ display: "flex", alignItems: "center", gap: 10, background: "#d4688e", color: "white", border: "none", borderRadius: 50, padding: "13px 24px", fontSize: 14, fontWeight: 800, cursor: "pointer", boxShadow: "0 6px 28px rgba(212,104,142,0.55)", whiteSpace: "nowrap" }}>
             <IcoCart size={17} />
             Ver carrito · {fmt(totalPrecio)}
             <span style={{ background: "rgba(255,255,255,0.25)", borderRadius: 20, padding: "2px 9px", fontSize: 11, fontWeight: 900 }}>{totalItems}</span>
@@ -2313,7 +2318,7 @@ export default function Tienda() {
                 <div>
                   <h2 style={{ margin: "0 0 3px", fontSize: 18, fontWeight: 900, color: "white" }}>Tu carrito</h2>
                   <p style={{ margin: 0, fontSize: 13, color: "#64748b" }}>
-                    {totalItems} ítem{totalItems !== 1 ? "s" : ""} · <b style={{ color: "#e8197d" }}>{fmt(totalPrecio)}</b>
+                    {totalItems} ítem{totalItems !== 1 ? "s" : ""} · <b style={{ color: "#d4688e" }}>{fmt(totalPrecio)}</b>
                   </p>
                 </div>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -2346,7 +2351,7 @@ export default function Tienda() {
                     Explorá el catálogo y agregá los productos que necesitás
                   </p>
                   <button onClick={() => { setCarritoOpen(false); verCatalogo("") }}
-                    style={{ background: "#e8197d", color: "white", border: "none", borderRadius: 10, padding: "11px 26px", fontSize: 13, fontWeight: 800, cursor: "pointer", boxShadow: "0 3px 12px rgba(232,25,125,0.3)", marginBottom: 12 }}>
+                    style={{ background: "#d4688e", color: "white", border: "none", borderRadius: 10, padding: "11px 26px", fontSize: 13, fontWeight: 800, cursor: "pointer", boxShadow: "0 3px 12px rgba(212,104,142,0.3)", marginBottom: 12 }}>
                     Ver catálogo →
                   </button>
                   {categorias.length > 0 && (
@@ -2354,7 +2359,7 @@ export default function Tienda() {
                       {categorias.slice(0, 4).map(cat => (
                         <button key={cat} onClick={() => { setCarritoOpen(false); verCatalogo(cat) }}
                           style={{ padding: "5px 12px", borderRadius: 20, background: "white", border: "1.5px solid #e2e8f0", fontSize: 12, fontWeight: 600, color: "#374151", cursor: "pointer" }}
-                          onMouseEnter={e => { e.currentTarget.style.borderColor = "#e8197d"; e.currentTarget.style.color = "#e8197d" }}
+                          onMouseEnter={e => { e.currentTarget.style.borderColor = "#d4688e"; e.currentTarget.style.color = "#d4688e" }}
                           onMouseLeave={e => { e.currentTarget.style.borderColor = "#e2e8f0"; e.currentTarget.style.color = "#374151" }}>
                           {cat}
                         </button>
@@ -2375,7 +2380,7 @@ export default function Tienda() {
                         <p style={{ margin: "0 0 2px", fontSize: 12, fontWeight: 700, color: "#1a2035", lineHeight: 1.35, overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" } as React.CSSProperties}>
                           {item.producto.nombre}
                         </p>
-                        {item.producto.laboratorio && <p style={{ margin: "0 0 7px", fontSize: 10, color: "#16a34a", fontWeight: 700 }}>{item.producto.laboratorio}</p>}
+                        {item.producto.laboratorio && <p style={{ margin: "0 0 7px", fontSize: 10, color: "#b05070", fontWeight: 700 }}>{item.producto.laboratorio}</p>}
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 2, background: "white", border: "1.5px solid #eaecf2", borderRadius: 8, padding: "2px 3px" }}>
@@ -2396,7 +2401,7 @@ export default function Tienda() {
                                     if (e.key === "Enter") (e.target as HTMLInputElement).blur()
                                     if (e.key === "Escape") setCantidadEditando(null)
                                   }}
-                                  style={{ width: 38, textAlign: "center", fontSize: 13, fontWeight: 900, color: "#e8197d", border: "1.5px solid #e8197d", borderRadius: 5, outline: "none", padding: "1px 2px", background: "#fff0f7" }}
+                                  style={{ width: 38, textAlign: "center", fontSize: 13, fontWeight: 900, color: "#d4688e", border: "1.5px solid #d4688e", borderRadius: 5, outline: "none", padding: "1px 2px", background: "#fdf0f5" }}
                                 />
                               ) : (
                                 <span
@@ -2406,11 +2411,11 @@ export default function Tienda() {
                                   {item.cantidad}
                                 </span>
                               )}
-                              <button onClick={() => cambiar(item.producto.id, 1)} style={{ width: 24, height: 24, border: "none", background: "#e8197d", borderRadius: 5, cursor: "pointer", fontWeight: 900, color: "white", fontSize: 15, display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
+                              <button onClick={() => cambiar(item.producto.id, 1)} style={{ width: 24, height: 24, border: "none", background: "#d4688e", borderRadius: 5, cursor: "pointer", fontWeight: 900, color: "white", fontSize: 15, display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
                             </div>
                             <button onClick={() => quitar(item.producto.id)} style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: 11, fontWeight: 700, padding: "0 4px" }}>Quitar</button>
                           </div>
-                          <span style={{ fontWeight: 900, fontSize: 14, color: "#e8197d" }}>
+                          <span style={{ fontWeight: 900, fontSize: 14, color: "#d4688e" }}>
                             {fmt((precioConTipo(item.producto.precio_venta, tipoCliente) ?? item.producto.precio_venta) * item.cantidad)}
                           </span>
                         </div>
@@ -2432,7 +2437,7 @@ export default function Tienda() {
                               onKeyDown={e => { if (e.key === "Escape") setNotaEditando(null) }}
                               rows={2}
                               placeholder="Nota para este ítem (variante, aclaración...)"
-                              style={{ width: "100%", padding: "6px 8px", borderRadius: 7, border: "1.5px solid #e8197d", fontSize: 11, outline: "none", resize: "none", boxSizing: "border-box", color: "#374151", background: "#fff8fb" }}
+                              style={{ width: "100%", padding: "6px 8px", borderRadius: 7, border: "1.5px solid #d4688e", fontSize: 11, outline: "none", resize: "none", boxSizing: "border-box", color: "#374151", background: "#fff8fb" }}
                             />
                           </div>
                         ) : (
@@ -2486,7 +2491,7 @@ export default function Tienda() {
                   }
                   setCarritoOpen(false); setCheckoutOpen(true)
                 }}
-                  style={{ width: "100%", padding: "14px", background: "#e8197d", color: "white", border: "none", borderRadius: 12, fontSize: 15, fontWeight: 900, cursor: "pointer", boxShadow: "0 4px 18px rgba(232,25,125,0.45)", letterSpacing: 0.3 }}>
+                  style={{ width: "100%", padding: "14px", background: "#d4688e", color: "white", border: "none", borderRadius: 12, fontSize: 15, fontWeight: 900, cursor: "pointer", boxShadow: "0 4px 18px rgba(212,104,142,0.45)", letterSpacing: 0.3 }}>
                   Confirmar pedido →
                 </button>
               </div>
@@ -2505,7 +2510,7 @@ export default function Tienda() {
                 <div>
                   <h2 style={{ margin: "0 0 4px", fontSize: 19, fontWeight: 900, color: "white" }}>Completar pedido</h2>
                   <p style={{ margin: 0, fontSize: 13, color: "#64748b" }}>
-                    {totalItems} producto{totalItems !== 1 ? "s" : ""} · <b style={{ color: "#e8197d" }}>{fmt(totalPrecio)}</b>
+                    {totalItems} producto{totalItems !== 1 ? "s" : ""} · <b style={{ color: "#d4688e" }}>{fmt(totalPrecio)}</b>
                   </p>
                 </div>
                 <button onClick={() => setCheckoutOpen(false)} style={{ width: 34, height: 34, borderRadius: 9, border: "1px solid #1e293b", background: "#1e293b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8", flexShrink: 0 }}>
@@ -2520,7 +2525,7 @@ export default function Tienda() {
                   <label style={{ display: "block", fontSize: 10.5, fontWeight: 800, color: "#374151", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>Nombre completo *</label>
                   <input type="text" placeholder="Tu nombre y apellido" value={form.nombre} onChange={e => setField("nombre", e.target.value)}
                     style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: `1.5px solid ${errForm.nombre ? "#ef4444" : "#e2e8f0"}`, fontSize: 14, outline: "none", boxSizing: "border-box" }}
-                    onFocus={e => (e.target.style.borderColor = errForm.nombre ? "#ef4444" : "#e8197d")}
+                    onFocus={e => (e.target.style.borderColor = errForm.nombre ? "#ef4444" : "#d4688e")}
                     onBlur={e => (e.target.style.borderColor = errForm.nombre ? "#ef4444" : "#e2e8f0")}
                   />
                   {errForm.nombre && <p style={{ color: "#ef4444", fontSize: 11, margin: "3px 0 0", fontWeight: 600 }}>{errForm.nombre}</p>}
@@ -2530,7 +2535,7 @@ export default function Tienda() {
                   <label style={{ display: "block", fontSize: 10.5, fontWeight: 800, color: "#374151", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>Teléfono / WA *</label>
                   <input type="tel" placeholder="11 1234-5678" value={form.telefono} onChange={e => setField("telefono", e.target.value)}
                     style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: `1.5px solid ${errForm.telefono ? "#ef4444" : "#e2e8f0"}`, fontSize: 14, outline: "none", boxSizing: "border-box" }}
-                    onFocus={e => (e.target.style.borderColor = errForm.telefono ? "#ef4444" : "#e8197d")}
+                    onFocus={e => (e.target.style.borderColor = errForm.telefono ? "#ef4444" : "#d4688e")}
                     onBlur={e => (e.target.style.borderColor = errForm.telefono ? "#ef4444" : "#e2e8f0")}
                   />
                   {errForm.telefono && <p style={{ color: "#ef4444", fontSize: 11, margin: "3px 0 0", fontWeight: 600 }}>{errForm.telefono}</p>}
@@ -2542,7 +2547,7 @@ export default function Tienda() {
                   </label>
                   <input type="email" placeholder="tu@email.com" value={form.email} onChange={e => setField("email", e.target.value)}
                     style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
-                    onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                    onFocus={e => (e.target.style.borderColor = "#d4688e")}
                     onBlur={e => (e.target.style.borderColor = "#e2e8f0")}
                   />
                 </div>
@@ -2553,7 +2558,7 @@ export default function Tienda() {
                   </label>
                   <input type="text" placeholder="Calle, número, localidad" value={form.direccion} onChange={e => setField("direccion", e.target.value)}
                     style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
-                    onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                    onFocus={e => (e.target.style.borderColor = "#d4688e")}
                     onBlur={e => (e.target.style.borderColor = "#e2e8f0")}
                   />
                 </div>
@@ -2564,7 +2569,7 @@ export default function Tienda() {
                   </label>
                   <textarea placeholder="Horario de entrega, aclaraciones..." value={form.notas} onChange={e => setField("notas", e.target.value)} rows={2}
                     style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", resize: "vertical", boxSizing: "border-box" }}
-                    onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                    onFocus={e => (e.target.style.borderColor = "#d4688e")}
                     onBlur={e => (e.target.style.borderColor = "#e2e8f0")}
                   />
                 </div>
@@ -2587,7 +2592,7 @@ export default function Tienda() {
                 </div>
                 <div style={{ borderTop: "1px solid #e2e8f0", marginTop: 10, paddingTop: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <span style={{ fontWeight: 800, color: "#1a2035", fontSize: 14 }}>Total estimado</span>
-                  <span style={{ fontWeight: 900, fontSize: 20, color: "#e8197d" }}>{fmt(totalPrecio)}</span>
+                  <span style={{ fontWeight: 900, fontSize: 20, color: "#d4688e" }}>{fmt(totalPrecio)}</span>
                 </div>
               </div>
 
@@ -2600,7 +2605,7 @@ export default function Tienda() {
 
             <div style={{ padding: "14px 24px 20px", borderTop: "1px solid #f1f5f9" }}>
               <button onClick={enviar} disabled={enviando}
-                style={{ width: "100%", padding: "15px", fontSize: 15, fontWeight: 900, background: enviando ? "#f9a8d4" : "#e8197d", color: "white", border: "none", borderRadius: 13, cursor: enviando ? "not-allowed" : "pointer", boxShadow: enviando ? "none" : "0 4px 18px rgba(232,25,125,0.45)", letterSpacing: 0.3 }}>
+                style={{ width: "100%", padding: "15px", fontSize: 15, fontWeight: 900, background: enviando ? "#f9a8d4" : "#d4688e", color: "white", border: "none", borderRadius: 13, cursor: enviando ? "not-allowed" : "pointer", boxShadow: enviando ? "none" : "0 4px 18px rgba(212,104,142,0.45)", letterSpacing: 0.3 }}>
                 {enviando ? "Enviando pedido..." : "✓  Confirmar pedido"}
               </button>
               <p style={{ fontSize: 11, color: "#9ca3af", textAlign: "center", margin: "7px 0 0", lineHeight: 1.5 }}>
@@ -2625,13 +2630,13 @@ export default function Tienda() {
               {/* Header */}
               <div style={{ padding: "16px 20px", borderBottom: "1px solid #f1f5f9", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {p.categoria && <span style={{ fontSize: 10, fontWeight: 800, background: "#fce7f3", color: "#e8197d", padding: "3px 10px", borderRadius: 20, border: "1px solid #fbcfe8" }}>{p.categoria}</span>}
-                  {p.laboratorio && <span style={{ fontSize: 10, fontWeight: 800, background: "#f0fdf4", color: "#16a34a", padding: "3px 10px", borderRadius: 20, border: "1px solid #bbf7d0" }}>{p.laboratorio}</span>}
+                  {p.categoria && <span style={{ fontSize: 10, fontWeight: 800, background: "#fdf0f5", color: "#d4688e", padding: "3px 10px", borderRadius: 20, border: "1px solid #f0c8d8" }}>{p.categoria}</span>}
+                  {p.laboratorio && <span style={{ fontSize: 10, fontWeight: 800, background: "#fdf0f5", color: "#b05070", padding: "3px 10px", borderRadius: 20, border: "1px solid #f0c8d8" }}>{p.laboratorio}</span>}
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <button onClick={() => copiarLink(p.id)} title="Copiar link del producto"
                     style={{ width: 34, height: 34, borderRadius: 9, border: "1px solid #e2e8f0", background: "#f8fafc", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", flexShrink: 0, transition: "all 0.15s" }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = "#e8197d"; e.currentTarget.style.color = "#e8197d" }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = "#d4688e"; e.currentTarget.style.color = "#d4688e" }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor = "#e2e8f0"; e.currentTarget.style.color = "#64748b" }}>
                     <IcoShare size={14} />
                   </button>
@@ -2674,7 +2679,7 @@ export default function Tienda() {
                         <>
                           <p style={{ margin: "0 0 8px", fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.5 }}>Precio</p>
                           <button onClick={() => { setProductoDetalle(null); setLoginModo("login"); setLoginError(""); setAuthModalOpen(true) }}
-                            style={{ padding: "10px 18px", background: "#e8197d", color: "white", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>
+                            style={{ padding: "10px 18px", background: "#d4688e", color: "white", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 800, cursor: "pointer" }}>
                             Iniciá sesión para ver el precio
                           </button>
                         </>
@@ -2689,7 +2694,7 @@ export default function Tienda() {
                           <p style={{ margin: "0 0 4px", fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.5 }}>
                             Precio
                           </p>
-                          <p style={{ margin: 0, fontSize: 30, fontWeight: 900, color: "#e8197d", lineHeight: 1 }}>
+                          <p style={{ margin: 0, fontSize: 30, fontWeight: 900, color: "#d4688e", lineHeight: 1 }}>
                             {fmt(precioConTipo(p.precio_venta, tipoCliente)!)}
                           </p>
                           <p style={{ margin: "5px 0 0", fontSize: 11, color: "#94a3b8" }}>Precio sujeto a confirmación</p>
@@ -2721,13 +2726,13 @@ export default function Tienda() {
                     {/* Acciones */}
                     <div style={{ display: "flex", flexDirection: "column", gap: 9, marginTop: "auto" }}>
                       {enCarrito > 0 ? (
-                        <div style={{ display: "flex", alignItems: "center", gap: 0, background: "#fff0f7", border: "2px solid #e8197d", borderRadius: 11, overflow: "hidden" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 0, background: "#fdf0f5", border: "2px solid #d4688e", borderRadius: 11, overflow: "hidden" }}>
                           <button onClick={() => cambiar(p.id, -1)} style={{ flex: 1, padding: "11px 0", border: "none", background: "transparent", color: "#be185d", fontWeight: 900, cursor: "pointer", fontSize: 20, lineHeight: 1 }}>−</button>
                           <span style={{ fontSize: 15, fontWeight: 900, color: "#be185d", minWidth: 40, textAlign: "center" }}>{enCarrito}</span>
-                          <button onClick={() => cambiar(p.id, 1)} style={{ flex: 1, padding: "11px 0", border: "none", background: "#e8197d", color: "white", fontWeight: 900, cursor: "pointer", fontSize: 20, lineHeight: 1 }}>+</button>
+                          <button onClick={() => cambiar(p.id, 1)} style={{ flex: 1, padding: "11px 0", border: "none", background: "#d4688e", color: "white", fontWeight: 900, cursor: "pointer", fontSize: 20, lineHeight: 1 }}>+</button>
                         </div>
                       ) : (
-                        <button onClick={() => { agregar(p) }} style={{ width: "100%", padding: "12px", background: "#e8197d", color: "white", border: "none", borderRadius: 11, fontSize: 14, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 14px rgba(232,25,125,0.35)" }}>
+                        <button onClick={() => { agregar(p) }} style={{ width: "100%", padding: "12px", background: "#d4688e", color: "white", border: "none", borderRadius: 11, fontSize: 14, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 14px rgba(212,104,142,0.35)" }}>
                           + Agregar al carrito
                         </button>
                       )}
@@ -2756,7 +2761,7 @@ export default function Tienda() {
                         {relacionados.map(r => (
                           <button key={r.id} onClick={() => setProductoDetalle(r)}
                             style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", borderRadius: 9, background: "#f8fafc", border: "1px solid #eaecf2", cursor: "pointer", textAlign: "left", transition: "background 0.15s" }}
-                            onMouseEnter={e => (e.currentTarget.style.background = "#fdf2f8")}
+                            onMouseEnter={e => (e.currentTarget.style.background = "#fdf0f5")}
                             onMouseLeave={e => (e.currentTarget.style.background = "#f8fafc")}>
                             <div style={{ width: 38, height: 38, background: "white", borderRadius: 7, flexShrink: 0, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #eaecf2", position: "relative" }}>
                               {r.imagen_url
@@ -2766,7 +2771,7 @@ export default function Tienda() {
                             <span style={{ flex: 1, fontSize: 12, fontWeight: 600, color: "#1a2035", lineHeight: 1.35, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" } as React.CSSProperties}>
                               {r.nombre}
                             </span>
-                            <span style={{ fontSize: 13, fontWeight: 900, color: "#e8197d", flexShrink: 0 }}>
+                            <span style={{ fontSize: 13, fontWeight: 900, color: "#d4688e", flexShrink: 0 }}>
                               {tipoCliente && tipoCliente !== "pendiente" ? fmt(precioConTipo(r.precio_venta, tipoCliente)!) : "—"}
                             </span>
                           </button>
@@ -2843,7 +2848,7 @@ export default function Tienda() {
               {usuario ? (
                 <div style={{ padding: "14px 16px", background: "#0a1120", borderRadius: 13, border: "1px solid #1e293b" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-                    <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,#e8197d,#a80d40)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 900, fontSize: 16, flexShrink: 0 }}>
+                    <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,#d4688e,#b05070)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 900, fontSize: 16, flexShrink: 0 }}>
                       {(perfil ? perfil.nombre : usuario.email)[0].toUpperCase()}
                     </div>
                     <div style={{ minWidth: 0 }}>
@@ -2868,7 +2873,7 @@ export default function Tienda() {
                   </div>
                   {ADMIN_EMAIL && usuario?.email === ADMIN_EMAIL && (
                     <a href="/admin"
-                      style={{ display: "block", textAlign: "center", padding: "9px", borderRadius: 9, background: "#e8197d", color: "white", fontSize: 12, fontWeight: 800, textDecoration: "none", marginTop: 2 }}>
+                      style={{ display: "block", textAlign: "center", padding: "9px", borderRadius: 9, background: "#d4688e", color: "white", fontSize: 12, fontWeight: 800, textDecoration: "none", marginTop: 2 }}>
                       ⚙ Panel Admin
                     </a>
                   )}
@@ -2876,7 +2881,7 @@ export default function Tienda() {
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   <button onClick={() => { setLoginModo("login"); setLoginError(""); setSidebarOpen(false); setAuthModalOpen(true) }}
-                    style={{ width: "100%", padding: "11px", borderRadius: 10, background: "#e8197d", color: "white", border: "none", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>
+                    style={{ width: "100%", padding: "11px", borderRadius: 10, background: "#d4688e", color: "white", border: "none", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>
                     Iniciar sesión
                   </button>
                   <button onClick={() => { setLoginModo("registro"); setLoginError(""); setSidebarOpen(false); setAuthModalOpen(true) }}
@@ -2938,7 +2943,7 @@ export default function Tienda() {
                             <span style={{ fontSize: 12, color: "#64748b" }}>{fecha}</span>
                           </div>
                           <div style={{ textAlign: "right", flexShrink: 0 }}>
-                            <p style={{ margin: 0, fontSize: 15, fontWeight: 900, color: "#e8197d" }}>{fmt(pedido.total)}</p>
+                            <p style={{ margin: 0, fontSize: 15, fontWeight: 900, color: "#d4688e" }}>{fmt(pedido.total)}</p>
                             <p style={{ margin: "2px 0 0", fontSize: 11, color: "#94a3b8" }}>{pedido.pedido_items?.length ?? 0} ítem{(pedido.pedido_items?.length ?? 0) !== 1 ? "s" : ""}</p>
                           </div>
                         </summary>
@@ -2953,9 +2958,9 @@ export default function Tienda() {
                               ))}
                             </div>
                             <button onClick={() => repetirPedido(pedido)}
-                              style={{ width: "100%", padding: "9px", borderRadius: 9, background: "#fff0f7", border: "1.5px solid #fbcfe8", color: "#e8197d", fontSize: 12, fontWeight: 800, cursor: "pointer", transition: "background 0.15s" }}
-                              onMouseEnter={e => (e.currentTarget.style.background = "#fce7f3")}
-                              onMouseLeave={e => (e.currentTarget.style.background = "#fff0f7")}>
+                              style={{ width: "100%", padding: "9px", borderRadius: 9, background: "#fdf0f5", border: "1.5px solid #f0c8d8", color: "#d4688e", fontSize: 12, fontWeight: 800, cursor: "pointer", transition: "background 0.15s" }}
+                              onMouseEnter={e => (e.currentTarget.style.background = "#fdf0f5")}
+                              onMouseLeave={e => (e.currentTarget.style.background = "#fdf0f5")}>
                               ↺ Repetir este pedido
                             </button>
                           </div>
@@ -2996,7 +3001,7 @@ export default function Tienda() {
                   return (
                     <button key={cat} onClick={() => verCatalogo(cat)}
                       style={{ background: "white", border: "1.5px solid #e8ecf2", borderRadius: 10, padding: "12px 14px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 11, transition: "border-color 0.15s, background 0.15s" }}
-                      onMouseEnter={e => { e.currentTarget.style.borderColor = "#e8197d"; e.currentTarget.style.background = "#fff8fb" }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = "#d4688e"; e.currentTarget.style.background = "#fff8fb" }}
                       onMouseLeave={e => { e.currentTarget.style.borderColor = "#e8ecf2"; e.currentTarget.style.background = "white" }}>
                       <div style={{ minWidth: 0 }}>
                         <div style={{ fontSize: 13, fontWeight: 700, color: "#1a2035", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cat}</div>
@@ -3033,14 +3038,14 @@ export default function Tienda() {
                   <label style={{ display: "block", fontSize: 10.5, fontWeight: 800, color: "#374151", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>Nombre *</label>
                   <input type="text" value={editNombre} onChange={e => setEditNombre(e.target.value)}
                     style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
-                    onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                    onFocus={e => (e.target.style.borderColor = "#d4688e")}
                     onBlur={e => (e.target.style.borderColor = "#e2e8f0")} />
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: 10.5, fontWeight: 800, color: "#374151", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>Apellido *</label>
                   <input type="text" value={editApellido} onChange={e => setEditApellido(e.target.value)}
                     style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
-                    onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                    onFocus={e => (e.target.style.borderColor = "#d4688e")}
                     onBlur={e => (e.target.style.borderColor = "#e2e8f0")} />
                 </div>
               </div>
@@ -3048,7 +3053,7 @@ export default function Tienda() {
                 <label style={{ display: "block", fontSize: 10.5, fontWeight: 800, color: "#374151", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>Teléfono / WA *</label>
                 <input type="tel" value={editTelefono} onChange={e => setEditTelefono(e.target.value)}
                   style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
-                  onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                  onFocus={e => (e.target.style.borderColor = "#d4688e")}
                   onBlur={e => (e.target.style.borderColor = "#e2e8f0")} />
               </div>
               <div>
@@ -3057,7 +3062,7 @@ export default function Tienda() {
                 </label>
                 <input type="text" value={editDireccion} onChange={e => setEditDireccion(e.target.value)}
                   style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
-                  onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                  onFocus={e => (e.target.style.borderColor = "#d4688e")}
                   onBlur={e => (e.target.style.borderColor = "#e2e8f0")} />
               </div>
               {editError && (
@@ -3066,7 +3071,7 @@ export default function Tienda() {
                 </p>
               )}
               <button onClick={guardarPerfil} disabled={editGuardando}
-                style={{ width: "100%", padding: "13px", background: editGuardando ? "#f9a8d4" : "#e8197d", color: "white", border: "none", borderRadius: 11, fontSize: 14, fontWeight: 900, cursor: editGuardando ? "not-allowed" : "pointer", boxShadow: editGuardando ? "none" : "0 4px 16px rgba(232,25,125,0.4)", marginTop: 4 }}>
+                style={{ width: "100%", padding: "13px", background: editGuardando ? "#f9a8d4" : "#d4688e", color: "white", border: "none", borderRadius: 11, fontSize: 14, fontWeight: 900, cursor: editGuardando ? "not-allowed" : "pointer", boxShadow: editGuardando ? "none" : "0 4px 16px rgba(212,104,142,0.4)", marginTop: 4 }}>
                 {editGuardando ? "Guardando..." : "Guardar cambios"}
               </button>
             </div>
@@ -3100,7 +3105,7 @@ export default function Tienda() {
             <div style={{ padding: "14px 24px 0", display: "flex", gap: 0, background: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
               {(["login", "registro"] as const).map(modo => (
                 <button key={modo} onClick={() => { setLoginModo(modo); setLoginError("") }}
-                  style={{ padding: "10px 20px", border: "none", background: "transparent", borderBottom: `2.5px solid ${loginModo === modo ? "#e8197d" : "transparent"}`, color: loginModo === modo ? "#e8197d" : "#64748b", fontSize: 13, fontWeight: loginModo === modo ? 800 : 600, cursor: "pointer", transition: "all 0.15s", marginBottom: -1 }}>
+                  style={{ padding: "10px 20px", border: "none", background: "transparent", borderBottom: `2.5px solid ${loginModo === modo ? "#d4688e" : "transparent"}`, color: loginModo === modo ? "#d4688e" : "#64748b", fontSize: 13, fontWeight: loginModo === modo ? 800 : 600, cursor: "pointer", transition: "all 0.15s", marginBottom: -1 }}>
                   {modo === "login" ? "Ingresar" : "Registrarse"}
                 </button>
               ))}
@@ -3117,7 +3122,7 @@ export default function Tienda() {
                       onChange={e => { setLoginEmail(e.target.value); setLoginError("") }}
                       onKeyDown={e => e.key === "Enter" && iniciarSesion()}
                       style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
-                      onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                      onFocus={e => (e.target.style.borderColor = "#d4688e")}
                       onBlur={e => (e.target.style.borderColor = "#e2e8f0")}
                     />
                   </div>
@@ -3127,7 +3132,7 @@ export default function Tienda() {
                       onChange={e => { setLoginPass(e.target.value); setLoginError("") }}
                       onKeyDown={e => e.key === "Enter" && iniciarSesion()}
                       style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
-                      onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                      onFocus={e => (e.target.style.borderColor = "#d4688e")}
                       onBlur={e => (e.target.style.borderColor = "#e2e8f0")}
                     />
                   </div>
@@ -3137,14 +3142,14 @@ export default function Tienda() {
                     </p>
                   )}
                   <button onClick={iniciarSesion} disabled={loginCargando}
-                    style={{ width: "100%", padding: "13px", background: loginCargando ? "#f9a8d4" : "#e8197d", color: "white", border: "none", borderRadius: 11, fontSize: 14, fontWeight: 900, cursor: loginCargando ? "not-allowed" : "pointer", boxShadow: loginCargando ? "none" : "0 4px 16px rgba(232,25,125,0.4)", marginTop: 4 }}>
+                    style={{ width: "100%", padding: "13px", background: loginCargando ? "#f9a8d4" : "#d4688e", color: "white", border: "none", borderRadius: 11, fontSize: 14, fontWeight: 900, cursor: loginCargando ? "not-allowed" : "pointer", boxShadow: loginCargando ? "none" : "0 4px 16px rgba(212,104,142,0.4)", marginTop: 4 }}>
                     {loginCargando ? "Ingresando..." : "Ingresar"}
                   </button>
                   <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 4 }}>
                     <p style={{ margin: 0, fontSize: 12, color: "#64748b" }}>
                       ¿No tenés cuenta?{" "}
                       <button onClick={() => { setLoginModo("registro"); setLoginError("") }}
-                        style={{ background: "none", border: "none", color: "#e8197d", fontWeight: 700, cursor: "pointer", fontSize: 12, padding: 0 }}>
+                        style={{ background: "none", border: "none", color: "#d4688e", fontWeight: 700, cursor: "pointer", fontSize: 12, padding: 0 }}>
                         Registrate acá
                       </button>
                     </p>
@@ -3162,7 +3167,7 @@ export default function Tienda() {
                       <input type="text" placeholder="Juan" value={regNombre}
                         onChange={e => { setRegNombre(e.target.value); setLoginError("") }}
                         style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
-                        onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                        onFocus={e => (e.target.style.borderColor = "#d4688e")}
                         onBlur={e => (e.target.style.borderColor = "#e2e8f0")}
                       />
                     </div>
@@ -3171,7 +3176,7 @@ export default function Tienda() {
                       <input type="text" placeholder="Pérez" value={regApellido}
                         onChange={e => { setRegApellido(e.target.value); setLoginError("") }}
                         style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
-                        onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                        onFocus={e => (e.target.style.borderColor = "#d4688e")}
                         onBlur={e => (e.target.style.borderColor = "#e2e8f0")}
                       />
                     </div>
@@ -3181,7 +3186,7 @@ export default function Tienda() {
                     <input type="email" placeholder="tu@email.com" value={loginEmail}
                       onChange={e => { setLoginEmail(e.target.value); setLoginError("") }}
                       style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
-                      onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                      onFocus={e => (e.target.style.borderColor = "#d4688e")}
                       onBlur={e => (e.target.style.borderColor = "#e2e8f0")}
                     />
                   </div>
@@ -3190,7 +3195,7 @@ export default function Tienda() {
                     <input type="password" placeholder="Mínimo 6 caracteres" value={loginPass}
                       onChange={e => { setLoginPass(e.target.value); setLoginError("") }}
                       style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
-                      onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                      onFocus={e => (e.target.style.borderColor = "#d4688e")}
                       onBlur={e => (e.target.style.borderColor = "#e2e8f0")}
                     />
                   </div>
@@ -3199,7 +3204,7 @@ export default function Tienda() {
                     <input type="tel" placeholder="11 1234-5678" value={regTelefono}
                       onChange={e => { setRegTelefono(e.target.value); setLoginError("") }}
                       style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
-                      onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                      onFocus={e => (e.target.style.borderColor = "#d4688e")}
                       onBlur={e => (e.target.style.borderColor = "#e2e8f0")}
                     />
                   </div>
@@ -3210,7 +3215,7 @@ export default function Tienda() {
                     <input type="text" placeholder="Calle, número, localidad" value={regDireccion}
                       onChange={e => setRegDireccion(e.target.value)}
                       style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
-                      onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                      onFocus={e => (e.target.style.borderColor = "#d4688e")}
                       onBlur={e => (e.target.style.borderColor = "#e2e8f0")}
                     />
                   </div>
@@ -3223,13 +3228,13 @@ export default function Tienda() {
                     Los precios los asigna el equipo VETIX, verás los precios al iniciar sesión.
                   </div>
                   <button onClick={registrar} disabled={loginCargando}
-                    style={{ width: "100%", padding: "13px", background: loginCargando ? "#f9a8d4" : "#e8197d", color: "white", border: "none", borderRadius: 11, fontSize: 14, fontWeight: 900, cursor: loginCargando ? "not-allowed" : "pointer", boxShadow: loginCargando ? "none" : "0 4px 16px rgba(232,25,125,0.4)" }}>
+                    style={{ width: "100%", padding: "13px", background: loginCargando ? "#f9a8d4" : "#d4688e", color: "white", border: "none", borderRadius: 11, fontSize: 14, fontWeight: 900, cursor: loginCargando ? "not-allowed" : "pointer", boxShadow: loginCargando ? "none" : "0 4px 16px rgba(212,104,142,0.4)" }}>
                     {loginCargando ? "Creando cuenta..." : "Crear cuenta"}
                   </button>
                   <p style={{ margin: 0, fontSize: 12, color: "#64748b", textAlign: "center" }}>
                     ¿Ya tenés cuenta?{" "}
                     <button onClick={() => { setLoginModo("login"); setLoginError("") }}
-                      style={{ background: "none", border: "none", color: "#e8197d", fontWeight: 700, cursor: "pointer", fontSize: 12 }}>
+                      style={{ background: "none", border: "none", color: "#d4688e", fontWeight: 700, cursor: "pointer", fontSize: 12 }}>
                       Iniciá sesión
                     </button>
                   </p>
@@ -3293,7 +3298,7 @@ export default function Tienda() {
                 </a>
               )}
               <button onClick={() => { setPedidoOk(false); setCheckoutOpen(false) }}
-                style={{ background: "#e8197d", color: "white", border: "none", borderRadius: 13, padding: "13px 22px", fontSize: 14, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 14px rgba(232,25,125,0.35)" }}>
+                style={{ background: "#d4688e", color: "white", border: "none", borderRadius: 13, padding: "13px 22px", fontSize: 14, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 14px rgba(212,104,142,0.35)" }}>
                 Seguir comprando
               </button>
             </div>

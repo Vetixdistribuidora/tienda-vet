@@ -33,7 +33,7 @@ export default function NotFound() {
           </p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
             <a href={SITE_URL}
-              style={{ display: "flex", alignItems: "center", gap: 8, padding: "13px 26px", background: "#e8197d", color: "white", borderRadius: 12, textDecoration: "none", fontSize: 15, fontWeight: 800, boxShadow: "0 4px 18px rgba(232,25,125,0.4)" }}>
+              style={{ display: "flex", alignItems: "center", gap: 8, padding: "13px 26px", background: "#d4688e", color: "white", borderRadius: 12, textDecoration: "none", fontSize: 15, fontWeight: 800, boxShadow: "0 4px 18px rgba(212,104,142,0.4)" }}>
               🛒 Ir a la tienda
             </a>
             <a href="javascript:history.back()"
@@ -45,7 +45,7 @@ export default function NotFound() {
       </main>
 
       <footer style={{ background: "#0d1120", color: "#475569", textAlign: "center", padding: "18px 20px", fontSize: 13 }}>
-        <a href={SITE_URL} style={{ color: "#e8197d", textDecoration: "none", fontWeight: 700 }}>VETIX Distribuidora</a>
+        <a href={SITE_URL} style={{ color: "#d4688e", textDecoration: "none", fontWeight: 700 }}>VETIX Distribuidora</a>
         {" — "}Distribuidora veterinaria · Pedidos online 24 hs
       </footer>
     </div>

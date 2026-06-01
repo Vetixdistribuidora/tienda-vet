@@ -89,7 +89,7 @@ export default function ResetPassword() {
             </div>
           ) : !ready ? (
             <div style={{ textAlign: "center", padding: "20px 0" }}>
-              <div style={{ width: 40, height: 40, borderRadius: "50%", border: "3px solid #e8197d", borderTopColor: "transparent", margin: "0 auto 16px", animation: "spin 0.8s linear infinite" }} />
+              <div style={{ width: 40, height: 40, borderRadius: "50%", border: "3px solid #d4688e", borderTopColor: "transparent", margin: "0 auto 16px", animation: "spin 0.8s linear infinite" }} />
               <p style={{ fontSize: 13, color: "#64748b", margin: 0 }}>Verificando el link de recuperación...</p>
               <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
             </div>
@@ -106,7 +106,7 @@ export default function ResetPassword() {
                   onChange={e => setPassword(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && handleReset()}
                   style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
-                  onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                  onFocus={e => (e.target.style.borderColor = "#d4688e")}
                   onBlur={e => (e.target.style.borderColor = "#e2e8f0")}
                 />
               </div>
@@ -121,7 +121,7 @@ export default function ResetPassword() {
                   onChange={e => setConfirm(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && handleReset()}
                   style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}
-                  onFocus={e => (e.target.style.borderColor = "#e8197d")}
+                  onFocus={e => (e.target.style.borderColor = "#d4688e")}
                   onBlur={e => (e.target.style.borderColor = "#e2e8f0")}
                 />
               </div>
@@ -133,11 +133,11 @@ export default function ResetPassword() {
               <button
                 onClick={handleReset}
                 disabled={loading}
-                style={{ width: "100%", padding: "13px", background: loading ? "#f9a8d4" : "#e8197d", color: "white", border: "none", borderRadius: 11, fontSize: 14, fontWeight: 900, cursor: loading ? "not-allowed" : "pointer", boxShadow: loading ? "none" : "0 4px 16px rgba(232,25,125,0.4)", marginTop: 4 }}>
+                style={{ width: "100%", padding: "13px", background: loading ? "#f9a8d4" : "#d4688e", color: "white", border: "none", borderRadius: 11, fontSize: 14, fontWeight: 900, cursor: loading ? "not-allowed" : "pointer", boxShadow: loading ? "none" : "0 4px 16px rgba(212,104,142,0.4)", marginTop: 4 }}>
                 {loading ? "Guardando..." : "Guardar nueva contraseña"}
               </button>
               <p style={{ margin: 0, fontSize: 12, color: "#94a3b8", textAlign: "center" }}>
-                <a href="/" style={{ color: "#e8197d", fontWeight: 600, textDecoration: "none" }}>← Volver a la tienda</a>
+                <a href="/" style={{ color: "#d4688e", fontWeight: 600, textDecoration: "none" }}>← Volver a la tienda</a>
               </p>
             </div>
           )}

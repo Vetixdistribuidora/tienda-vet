@@ -60,7 +60,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es-AR">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#e8197d" />
+        <meta name="theme-color" content="#d4688e" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -72,7 +72,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           margin: 0,
           padding: 0,
           fontFamily: "system-ui, -apple-system, 'Segoe UI', sans-serif",
-          background: "#f8fafc",
+          background: "#f0f0f0",
         }}
       >
         {children}

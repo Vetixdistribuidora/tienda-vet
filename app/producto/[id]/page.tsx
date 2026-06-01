@@ -150,7 +150,7 @@ export default async function ProductoPage(
             {/* Badges */}
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               {producto.categoria && (
-                <span style={{ fontSize: 11, fontWeight: 800, background: "#fce7f3", color: "#e8197d", padding: "3px 10px", borderRadius: 20, border: "1px solid #fbcfe8" }}>
+                <span style={{ fontSize: 11, fontWeight: 800, background: "#fdf0f5", color: "#d4688e", padding: "3px 10px", borderRadius: 20, border: "1px solid #f0c8d8" }}>
                   {producto.categoria}
                 </span>
               )}
@@ -169,7 +169,7 @@ export default async function ProductoPage(
             {/* Precio */}
             <div>
               <p style={{ margin: "0 0 4px", fontSize: 12, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.5 }}>Precio de referencia</p>
-              <p style={{ margin: 0, fontSize: 36, fontWeight: 900, color: "#e8197d", lineHeight: 1 }}>{fmt(producto.precio_venta)}</p>
+              <p style={{ margin: 0, fontSize: 36, fontWeight: 900, color: "#d4688e", lineHeight: 1 }}>{fmt(producto.precio_venta)}</p>
               <p style={{ margin: "5px 0 0", fontSize: 12, color: "#94a3b8" }}>Precio sujeto a confirmación al coordinar</p>
             </div>
 
@@ -196,7 +196,7 @@ export default async function ProductoPage(
             {/* CTA */}
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: "auto" }}>
               <a href={tiendaUrl}
-                style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "14px", background: "#e8197d", color: "white", borderRadius: 12, textDecoration: "none", fontSize: 15, fontWeight: 900, boxShadow: "0 4px 18px rgba(232,25,125,0.4)", textAlign: "center" }}>
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "14px", background: "#d4688e", color: "white", borderRadius: 12, textDecoration: "none", fontSize: 15, fontWeight: 900, boxShadow: "0 4px 18px rgba(212,104,142,0.4)", textAlign: "center" }}>
                 🛒 Agregar al carrito en la tienda
               </a>
               {process.env.NEXT_PUBLIC_WHATSAPP && (
@@ -227,7 +227,7 @@ export default async function ProductoPage(
 
       {/* Footer mínimo */}
       <footer style={{ background: "#0d1120", color: "#475569", textAlign: "center", padding: "22px 20px", fontSize: 13 }}>
-        <a href={SITE_URL} style={{ color: "#e8197d", textDecoration: "none", fontWeight: 700 }}>VETIX Distribuidora</a>
+        <a href={SITE_URL} style={{ color: "#d4688e", textDecoration: "none", fontWeight: 700 }}>VETIX Distribuidora</a>
         {" — "}Distribuidora veterinaria al por mayor · Pedidos online las 24 hs
       </footer>
 

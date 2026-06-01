@@ -104,7 +104,7 @@ export default function PedidosPage() {
           <h1 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: "#f1f5f9", display: "flex", alignItems: "center", gap: 10 }}>
             Pedidos
             {totalPendientes > 0 && (
-              <span style={{ background: "#e8197d", color: "white", fontSize: 12, fontWeight: 800, padding: "2px 10px", borderRadius: 20 }}>
+              <span style={{ background: "#d4688e", color: "white", fontSize: 12, fontWeight: 800, padding: "2px 10px", borderRadius: 20 }}>
                 {totalPendientes} pendiente{totalPendientes !== 1 ? "s" : ""}
               </span>
             )}
@@ -161,7 +161,7 @@ export default function PedidosPage() {
                       </div>
                     </div>
                     <div style={{ textAlign: "right", minWidth: 100 }}>
-                      <div style={{ fontWeight: 800, fontSize: 16, color: "#e8197d" }}>{fmt(p.total)}</div>
+                      <div style={{ fontWeight: 800, fontSize: 16, color: "#d4688e" }}>{fmt(p.total)}</div>
                       <div style={{ fontSize: 11, color: "#475569", marginTop: 2 }}>{fmtFecha(p.created_at)}</div>
                     </div>
                     <span style={{ padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, background: est.bg, color: est.color, border: `1px solid ${est.border}` }}>
