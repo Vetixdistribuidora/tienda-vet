@@ -18,7 +18,7 @@ export default function NotFound() {
     }}>
       <header style={{ background: "#0f172a", padding: "0 20px", height: 64, display: "flex", alignItems: "center", boxShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
         <a href={SITE_URL} style={{ display: "inline-flex", alignItems: "center", background: "white", borderRadius: 8, padding: "4px 10px", textDecoration: "none" }}>
-          <Image src="/logo.png" alt="VETIX" height={36} width={144} style={{ height: 36, width: "auto" }} priority />
+          <Image src="/logo vetix.jpeg" alt="VETIX" height={36} width={144} style={{ height: 36, width: "auto" }} priority />
         </a>
       </header>
 
