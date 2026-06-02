@@ -2152,7 +2152,7 @@ export default function Tienda() {
 
             {/* Sobre nosotros */}
             <div style={{ maxWidth: 280 }}>
-              <div style={{ marginBottom: 16 }}>
+              <div style={{ marginBottom: 16, display: "inline-block", background: "#fde8f0", borderRadius: 10, padding: "8px 14px" }}>
                 <LogoMarca height={38} />
               </div>
               <p style={{ fontSize: 13, lineHeight: 1.75, margin: "0 0 14px", color: "#475569" }}>
