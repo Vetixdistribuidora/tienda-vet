@@ -109,7 +109,7 @@ function LogoMarca({ height = 46 }: { height?: number }) {
         alt="VETIX Distribuidora"
         height={height}
         width={height * 4}
-        style={{ height, width: "auto", display: "block" }}
+        style={{ height, width: "auto", display: "block", mixBlendMode: "multiply" }}
         priority
       />
     </div>
