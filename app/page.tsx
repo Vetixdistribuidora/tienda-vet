@@ -2836,10 +2836,10 @@ export default function Tienda() {
                 {/* Header del panel */}
                 <div style={{ padding: "18px 20px 16px", borderBottom: "1px solid #1e293b", background: "#0a1120", display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
                   <button onClick={() => setCatPanelOpen(false)}
-                    style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid #1e293b", background: "#1e293b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8", fontSize: 16, flexShrink: 0 }}>
+                    style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid rgba(212,104,142,0.3)", background: "rgba(212,104,142,0.15)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#f0c8d8", fontSize: 16, flexShrink: 0 }}>
                     ‹
                   </button>
-                  <span style={{ fontSize: 15, fontWeight: 800, color: "white" }}>Categorías</span>
+                  <span style={{ fontSize: 15, fontWeight: 800, color: "#f0c8d8" }}>Categorías</span>
                 </div>
 
                 {/* Lista de categorías */}
