@@ -1430,7 +1430,7 @@ export default function Tienda() {
           <button onClick={() => setSidebarOpen(true)}
             style={{ width: 38, height: 38, borderRadius: 9, background: "#1a2d5a", border: "none", color: "white", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 5, flexShrink: 0, padding: 0, transition: "background 0.15s" }}
             onMouseEnter={e => (e.currentTarget.style.background = "#243d7a")}
-            onMouseLeave={e => (e.currentTarget.style.background = "#f1f5f9")}>
+            onMouseLeave={e => (e.currentTarget.style.background = "#1a2d5a")}>
             <span style={{ display: "block", width: 16, height: 2, background: "currentColor", borderRadius: 2 }}/>
             <span style={{ display: "block", width: 16, height: 2, background: "currentColor", borderRadius: 2 }}/>
             <span style={{ display: "block", width: 16, height: 2, background: "currentColor", borderRadius: 2 }}/>

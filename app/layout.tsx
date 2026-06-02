@@ -50,8 +50,11 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true },
   },
   icons: {
-    icon: { url: "/logo.png", type: "image/png" },
-    apple: "/logo.png",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", type: "image/x-icon" },
+    ],
+    apple: "/favicon.svg",
   },
 }
 
