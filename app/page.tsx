@@ -1414,10 +1414,10 @@ export default function Tienda() {
 
       {/* ── HEADER ─────────────────────────────────────────────────────────── */}
       <header style={{
-        background: "#eef2fa",
+        background: "#c8d5f0",
         position: "sticky", top: 0, zIndex: 40,
-        borderBottom: "1px solid #d8e2f5",
-        boxShadow: "0 2px 12px rgba(15,23,42,0.07)",
+        borderBottom: "1px solid #b0c0e4",
+        boxShadow: "0 2px 12px rgba(15,23,42,0.12)",
       }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px", height: 78, display: "flex", alignItems: "center", gap: 20 }}>
 
@@ -2749,7 +2749,7 @@ export default function Tienda() {
           <div className="sidebar-anim" style={{ position: "fixed", top: 0, left: 0, bottom: 0, width: "min(320px, 90vw)", background: "#0f172a", zIndex: 51, display: "flex", flexDirection: "column", boxShadow: "8px 0 48px rgba(0,0,0,0.35)", overflowY: "auto" }}>
 
             {/* Header del sidebar */}
-            <div style={{ padding: "18px 20px 16px", borderBottom: "1px solid #1e293b", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+            <div style={{ padding: "18px 20px 16px", borderBottom: "1px solid #b0c0e4", background: "#c8d5f0", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
               <LogoMarca />
               <button onClick={() => setSidebarOpen(false)}
                 style={{ width: 34, height: 34, borderRadius: 9, border: "1px solid #1e293b", background: "#1e293b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8" }}>
