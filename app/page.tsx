@@ -1001,15 +1001,17 @@ export default function Tienda() {
   }
 
   function exportarCSV() {
+    if (!tienePrecios) { mostrarToast("⚠ Necesitás cuenta habilitada para descargar la lista de precios"); return }
     const encabezado = ["Nombre", "Categoría", "Laboratorio", "Precio"].join(";")
-    const filas = productos.map(p =>
-      [
+    const filas = productos.map(p => {
+      const precio = precioConTipo(p.precio_venta, tipoCliente)
+      return [
         `"${(p.nombre ?? "").replace(/"/g, '""')}"`,
         `"${(p.categoria ?? "").replace(/"/g, '""')}"`,
         `"${(p.laboratorio ?? "").replace(/"/g, '""')}"`,
-        String(p.precio_venta).replace(".", ","),
+        precio !== null ? String(precio).replace(".", ",") : "",
       ].join(";")
-    )
+    })
     const csv = "﻿" + [encabezado, ...filas].join("\n")
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
     const url = URL.createObjectURL(blob)
@@ -1342,13 +1344,15 @@ export default function Tienda() {
   function imprimirCarrito() {
     const fecha = new Date().toLocaleDateString("es-AR", { day: "2-digit", month: "long", year: "numeric" })
     const lineas = carrito.map(i => {
-      const pu = precioConTipo(i.producto.precio_venta, tipoCliente) ?? i.producto.precio_venta
+      const pu = tienePrecios ? (precioConTipo(i.producto.precio_venta, tipoCliente) ?? 0) : null
       return `
       <tr>
         <td style="padding:9px 12px;border-bottom:1px solid #eee;font-size:13px">${i.producto.nombre}${i.producto.laboratorio ? `<br><span style="font-size:11px;color:#b05070;font-weight:600">${i.producto.laboratorio}</span>` : ""}${i.nota ? `<br><span style="font-size:11px;color:#64748b;font-style:italic">${i.nota}</span>` : ""}</td>
         <td style="padding:9px 12px;border-bottom:1px solid #eee;text-align:center;font-size:13px">${i.cantidad}</td>
+        ${tienePrecios && pu !== null ? `
         <td style="padding:9px 12px;border-bottom:1px solid #eee;text-align:right;font-size:13px">${fmt(pu)}</td>
         <td style="padding:9px 12px;border-bottom:1px solid #eee;text-align:right;font-size:13px;font-weight:700;color:#d4688e">${fmt(pu * i.cantidad)}</td>
+        ` : ""}
       </tr>`
     }).join("")
     const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Pedido VETIX — ${fecha}</title>
@@ -1359,24 +1363,24 @@ export default function Tienda() {
   .date{font-size:13px;color:#64748b;text-align:right}
   table{width:100%;border-collapse:collapse}
   th{background:#0f172a;color:white;padding:9px 12px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
-  th:nth-child(2){text-align:center}th:nth-child(3),th:nth-child(4){text-align:right}
-  tfoot td{padding:12px;font-size:15px;font-weight:900;border-top:2px solid #1a2035}
+  th:nth-child(2){text-align:center}${tienePrecios ? "th:nth-child(3),th:nth-child(4){text-align:right}" : ""}
+  ${tienePrecios ? "tfoot td{padding:12px;font-size:15px;font-weight:900;border-top:2px solid #1a2035}" : ""}
   .footer{margin-top:28px;font-size:11px;color:#94a3b8;text-align:center;border-top:1px solid #eee;padding-top:14px}
   @media print{body{padding:16px}.no-print{display:none}}
 </style></head><body>
 <div class="top">
-  <div><h1>VETIX Distribuidora</h1><p class="sub">Lista de pedido — precios de referencia</p>${perfil ? `<p class="sub" style="margin-top:2px;color:#1a2035;font-weight:700">${perfil.nombre} ${perfil.apellido}</p>` : ""}</div>
+  <div><h1>VETIX Distribuidora</h1><p class="sub">Lista de productos solicitados</p>${perfil ? `<p class="sub" style="margin-top:2px;color:#1a2035;font-weight:700">${perfil.nombre} ${perfil.apellido}</p>` : ""}</div>
   <div class="date">${fecha}</div>
 </div>
 <table>
-  <thead><tr><th>Producto</th><th>Cant.</th><th>Precio unit.</th><th>Subtotal</th></tr></thead>
+  <thead><tr><th>Producto</th><th>Cant.</th>${tienePrecios ? "<th>Precio unit.</th><th>Subtotal</th>" : ""}</tr></thead>
   <tbody>${lineas}</tbody>
-  <tfoot><tr>
+  ${tienePrecios ? `<tfoot><tr>
     <td colspan="3" style="text-align:right;color:#64748b;font-weight:600;font-size:13px">Total estimado</td>
     <td style="color:#d4688e;text-align:right">${fmt(totalPrecio)}</td>
-  </tr></tfoot>
+  </tr></tfoot>` : ""}
 </table>
-<div class="footer">Precios de referencia — sujetos a confirmación al coordinar. VETIX Distribuidora Veterinaria.</div>
+<div class="footer">Los precios se confirman al coordinar el pedido. VETIX Distribuidora Veterinaria.</div>
 <script>window.onload=function(){window.print()}</script>
 </body></html>`
     const win = window.open("", "_blank", "width=900,height=700")
@@ -1708,6 +1712,16 @@ export default function Tienda() {
             </div>
           </div>
 
+          {/* ── VER CATÁLOGO ──────────────────────────────────────────────── */}
+          <div style={{ background: "#1a2035", padding: "32px 20px", borderTop: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
+            <button onClick={() => verCatalogo("")}
+              style={{ display: "inline-flex", alignItems: "center", gap: 12, padding: "18px 48px", borderRadius: 16, background: "#d4688e", color: "white", border: "none", fontSize: 18, fontWeight: 900, cursor: "pointer", boxShadow: "0 6px 28px rgba(212,104,142,0.5)", transition: "background 0.15s, transform 0.12s, box-shadow 0.15s" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#b05070"; e.currentTarget.style.transform = "scale(1.03)"; e.currentTarget.style.boxShadow = "0 8px 36px rgba(212,104,142,0.6)" }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#d4688e"; e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "0 6px 28px rgba(212,104,142,0.5)" }}>
+              Ver catálogo completo — {productos.length.toLocaleString("es-AR")} productos →
+            </button>
+          </div>
+
           {/* ── CHIPS DE CATEGORÍAS ───────────────────────────────────────── */}
           {categorias.length > 0 && (
             <div style={{ background: "#1a2035", padding: "20px 20px 24px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
@@ -1729,16 +1743,6 @@ export default function Tienda() {
               </div>
             </div>
           )}
-
-          {/* ── VER CATÁLOGO ──────────────────────────────────────────────── */}
-          <div style={{ background: "#1a2035", padding: "32px 20px", borderTop: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
-            <button onClick={() => verCatalogo("")}
-              style={{ display: "inline-flex", alignItems: "center", gap: 12, padding: "18px 48px", borderRadius: 16, background: "#d4688e", color: "white", border: "none", fontSize: 18, fontWeight: 900, cursor: "pointer", boxShadow: "0 6px 28px rgba(212,104,142,0.5)", transition: "background 0.15s, transform 0.12s, box-shadow 0.15s" }}
-              onMouseEnter={e => { e.currentTarget.style.background = "#b05070"; e.currentTarget.style.transform = "scale(1.03)"; e.currentTarget.style.boxShadow = "0 8px 36px rgba(212,104,142,0.6)" }}
-              onMouseLeave={e => { e.currentTarget.style.background = "#d4688e"; e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "0 6px 28px rgba(212,104,142,0.5)" }}>
-              Ver catálogo completo — {productos.length.toLocaleString("es-AR")} productos →
-            </button>
-          </div>
 
           {/* ── PRODUCTOS DESTACADOS ───────────────────────────────────────── */}
           <div style={{ background: "#1a2035", padding: "12px 20px 40px" }}>
@@ -2264,11 +2268,13 @@ export default function Tienda() {
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                   {carrito.length > 0 && (
                     <>
+                      {tienePrecios && (
                       <button onClick={imprimirCarrito}
                         title="Imprimir lista"
                         style={{ fontSize: 11, fontWeight: 700, color: "#64748b", background: "none", border: "1px solid #1e293b", borderRadius: 7, padding: "5px 9px", cursor: "pointer" }}>
                         🖨
                       </button>
+                      )}
                       <button onClick={() => { if (confirm("¿Vaciar el carrito?")) setCarrito([]) }}
                         style={{ fontSize: 11, fontWeight: 700, color: "#64748b", background: "none", border: "1px solid #1e293b", borderRadius: 7, padding: "5px 9px", cursor: "pointer" }}>
                         Vaciar
@@ -2753,7 +2759,7 @@ export default function Tienda() {
                 { label: "Categorías", action: () => { setSidebarOpen(false); setCatModalOpen(true) } },
                 ...(favoritos.size > 0 ? [{ label: `Mis favoritos (${favoritos.size})`, action: () => { setSidebarOpen(false); setBusqueda(""); setCategoriaActiva("__favs__") } }] : []),
                 ...(usuario ? [{ label: "Mis pedidos", action: () => { setSidebarOpen(false); cargarMisPedidos(); setPedidosOpen(true) } }] : []),
-                { label: "Descargar lista de precios", action: () => { exportarCSV(); setSidebarOpen(false) } },
+                ...(tienePrecios ? [{ label: "Descargar lista de precios", action: () => { exportarCSV(); setSidebarOpen(false) } }] : []),
               ].map(item => (
                 <button key={item.label} onClick={item.action}
                   style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderRadius: 9, background: "transparent", border: "none", color: "#94a3b8", fontSize: 13.5, fontWeight: 600, cursor: "pointer", textAlign: "left", transition: "color 0.15s, background 0.15s", letterSpacing: 0.1 }}
