@@ -1419,7 +1419,7 @@ export default function Tienda() {
         borderBottom: "1px solid #e8edf5",
         boxShadow: "0 2px 12px rgba(15,23,42,0.07)",
       }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px", height: 64, display: "flex", alignItems: "center", gap: 20 }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px", height: 78, display: "flex", alignItems: "center", gap: 20 }}>
 
           {/* Hamburger */}
           <button onClick={() => setSidebarOpen(true)}
@@ -1432,7 +1432,7 @@ export default function Tienda() {
           </button>
 
           {/* Logo — PNG fondo blanco se funde con el header blanco */}
-          <LogoMarca height={54} />
+          <LogoMarca height={70} />
 
           {/* Search desktop */}
           <div className="header-search" style={{ flex: 1, maxWidth: 500, position: "relative" }}>
