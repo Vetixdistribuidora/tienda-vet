@@ -1708,33 +1708,20 @@ export default function Tienda() {
             </div>
           </div>
 
-          {/* ── CATEGORÍAS ────────────────────────────────────────────────── */}
+          {/* ── CHIPS DE CATEGORÍAS ───────────────────────────────────────── */}
           {categorias.length > 0 && (
-            <div style={{ background: "#1a2035", padding: "32px 20px" }}>
+            <div style={{ background: "#1a2035", padding: "20px 20px 24px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
               <div style={{ maxWidth: 1280, margin: "0 auto" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 10 }}>
-                  <div>
-                    <h2 style={{ margin: "0 0 4px", fontSize: 19, fontWeight: 900, color: "white" }}>Categorías</h2>
-                    <p style={{ margin: 0, fontSize: 13, color: "#94b8d8" }}>{categorias.length} categorías disponibles</p>
-                  </div>
-                  <button onClick={() => setCatModalOpen(true)}
-                    style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 20px", borderRadius: 11, background: "#d4688e", color: "white", border: "none", fontSize: 13, fontWeight: 800, cursor: "pointer", transition: "background 0.15s" }}
-                    onMouseEnter={e => (e.currentTarget.style.background = "#b05070")}
-                    onMouseLeave={e => (e.currentTarget.style.background = "#d4688e")}>
-                    Ver todas las categorías →
-                  </button>
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", gap: 10 }}>
-                  {categorias.slice(0, 8).map(cat => {
+                <p style={{ margin: "0 0 14px", fontSize: 11, fontWeight: 800, color: "#94b8d8", letterSpacing: 1.5, textTransform: "uppercase" }}>Explorá por categoría</p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  {categorias.map(cat => {
                     const est = CAT_ESTILO[cat] ?? CAT_DEFAULT
                     return (
                       <button key={cat} onClick={() => verCatalogo(cat)}
-                        style={{ background: "rgba(255,255,255,0.07)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 11, padding: "14px 16px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 12, transition: "all 0.15s" }}
-                        onMouseEnter={e => { e.currentTarget.style.borderColor = "#d4688e"; e.currentTarget.style.background = "rgba(212,104,142,0.18)" }}
-                        onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; e.currentTarget.style.background = "rgba(255,255,255,0.07)" }}>
-                        <div style={{ minWidth: 0 }}>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: "white", lineHeight: 1.3 }}>{cat}</div>
-                        </div>
+                        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", borderRadius: 20, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.8)", fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "all 0.15s", whiteSpace: "nowrap" }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "rgba(212,104,142,0.25)"; e.currentTarget.style.borderColor = "#d4688e"; e.currentTarget.style.color = "white" }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.07)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; e.currentTarget.style.color = "rgba(255,255,255,0.8)" }}>
+                        <span style={{ fontSize: 14 }}>{est.icon}</span>{cat}
                       </button>
                     )
                   })}
@@ -1746,14 +1733,17 @@ export default function Tienda() {
           {/* ── PRODUCTOS DESTACADOS ───────────────────────────────────────── */}
           <div style={{ background: "#1a2035", padding: "32px 20px 40px" }}>
             <div style={{ maxWidth: 1280, margin: "0 auto" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 10 }}>
+              {/* Ver catálogo — prominente arriba */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
                 <div>
                   <h2 style={{ margin: 0, fontSize: 19, fontWeight: 900, color: "white" }}>Productos destacados</h2>
                   <p style={{ margin: "4px 0 0", fontSize: 13, color: "#94b8d8" }}>Una selección de nuestros productos</p>
                 </div>
                 <button onClick={() => verCatalogo("")}
-                  style={{ padding: "9px 20px", borderRadius: 10, background: "rgba(255,255,255,0.08)", border: "1.5px solid rgba(255,255,255,0.15)", fontSize: 13, fontWeight: 700, color: "white", cursor: "pointer" }}>
-                  Ver todos →
+                  style={{ display: "flex", alignItems: "center", gap: 8, padding: "11px 24px", borderRadius: 11, background: "#d4688e", color: "white", border: "none", fontSize: 14, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 16px rgba(212,104,142,0.4)", transition: "background 0.15s, transform 0.12s" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "#b05070"; e.currentTarget.style.transform = "scale(1.03)" }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "#d4688e"; e.currentTarget.style.transform = "scale(1)" }}>
+                  Ver catálogo completo ({productos.length.toLocaleString("es-AR")} productos) →
                 </button>
               </div>
               <div className="grid-productos" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
@@ -1768,12 +1758,6 @@ export default function Tienda() {
                     onVerPrecio={() => { setLoginModo("login"); setLoginError(""); setAuthModalOpen(true) }}
                   />
                 ))}
-              </div>
-              <div style={{ textAlign: "center", marginTop: 30 }}>
-                <button onClick={() => verCatalogo("")}
-                  style={{ background: "#d4688e", color: "white", border: "none", borderRadius: 13, padding: "14px 36px", fontSize: 15, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 18px rgba(212,104,142,0.4)" }}>
-                  Ver catálogo completo ({productos.length.toLocaleString("es-AR")} productos) →
-                </button>
               </div>
             </div>
           </div>
@@ -2778,23 +2762,6 @@ export default function Tienda() {
               ))}
             </div>
 
-            {/* Categorías rápidas en sidebar */}
-            {categorias.length > 0 && (
-              <div style={{ padding: "8px 14px", borderTop: "1px solid #1e293b" }}>
-                <p style={{ fontSize: 9.5, fontWeight: 800, color: "#334155", letterSpacing: 1.5, textTransform: "uppercase", margin: "10px 0 10px", paddingLeft: 6 }}>Categorías populares</p>
-                {categorias.slice(0, 6).map(cat => {
-                  const est = CAT_ESTILO[cat] ?? CAT_DEFAULT
-                  return (
-                    <button key={cat} onClick={() => verCatalogo(cat)}
-                      style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 9, background: "transparent", border: "none", color: "#94a3b8", fontSize: 13, fontWeight: 600, cursor: "pointer", textAlign: "left", transition: "background 0.15s" }}
-                      onMouseEnter={e => (e.currentTarget.style.background = "#1e293b")}
-                      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                      {cat}
-                    </button>
-                  )
-                })}
-              </div>
-            )}
 
             {/* Auth section */}
             <div style={{ padding: "12px 14px 20px", borderTop: "1px solid #1e293b", marginTop: "auto" }}>
