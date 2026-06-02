@@ -1,18 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-  <!-- Fondo transparente — solo el círculo rosa es visible -->
-  <circle cx="100" cy="100" r="98" fill="#fde8f0"/>
-  <!-- Borde sutil -->
-  <circle cx="100" cy="100" r="97" fill="none" stroke="#f0c8d8" stroke-width="2"/>
-  <!-- VETI en azul oscuro + X en rosa -->
-  <text x="100" y="112" text-anchor="middle"
+  <!-- Fondo completamente transparente — solo el círculo -->
+  <circle cx="100" cy="100" r="90" fill="#fde8f0"/>
+  <circle cx="100" cy="100" r="89" fill="none" stroke="#f0c8d8" stroke-width="2"/>
+  <text x="100" y="110" text-anchor="middle"
     font-family="system-ui,-apple-system,'Segoe UI',sans-serif"
-    font-weight="900" font-size="58" letter-spacing="-1">
+    font-weight="900" font-size="56" letter-spacing="-1">
     <tspan fill="#1a2d5a">VETI</tspan><tspan fill="#d4688e">X</tspan>
   </text>
-  <!-- DISTRIBUIDORA en rosa suave -->
-  <text x="100" y="148" text-anchor="middle"
+  <text x="100" y="145" text-anchor="middle"
     font-family="system-ui,-apple-system,'Segoe UI',sans-serif"
-    font-weight="700" font-size="15" fill="#b05070" letter-spacing="2.5">
+    font-weight="700" font-size="14" fill="#b05070" letter-spacing="2.5">
     DISTRIBUIDORA
   </text>
 </svg>
