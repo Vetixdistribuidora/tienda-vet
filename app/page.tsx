@@ -1811,9 +1811,9 @@ export default function Tienda() {
             {/* Breadcrumb */}
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
               <button onClick={() => irAInicio()}
-                style={{ background: "none", border: "none", padding: 0, fontSize: 13, color: "#94b8d8", cursor: "pointer", fontWeight: 600, transition: "color 0.15s" }}
-                onMouseEnter={e => (e.currentTarget.style.color = "#d4688e")}
-                onMouseLeave={e => (e.currentTarget.style.color = "#94b8d8")}>
+                style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 10, background: "#d4688e", color: "white", border: "none", fontSize: 13, fontWeight: 800, cursor: "pointer", boxShadow: "0 3px 12px rgba(212,104,142,0.35)", transition: "background 0.15s, transform 0.12s" }}
+                onMouseEnter={e => { e.currentTarget.style.background = "#b05070"; e.currentTarget.style.transform = "scale(1.04)" }}
+                onMouseLeave={e => { e.currentTarget.style.background = "#d4688e"; e.currentTarget.style.transform = "scale(1)" }}>
                 ← Inicio
               </button>
               <span style={{ color: "#3d5270", fontSize: 13 }}>›</span>
@@ -2772,9 +2772,9 @@ export default function Tienda() {
                     ...(tienePrecios ? [{ label: "Descargar lista de precios", action: () => { exportarCSV(); setSidebarOpen(false); setCatPanelOpen(false) } }] : []),
                   ].map(item => (
                     <button key={item.label} onClick={item.action}
-                      style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderRadius: 9, background: "transparent", border: "none", color: "#94a3b8", fontSize: 13.5, fontWeight: 600, cursor: "pointer", textAlign: "left", transition: "color 0.15s, background 0.15s" }}
-                      onMouseEnter={e => { e.currentTarget.style.background = "#1e293b"; e.currentTarget.style.color = "white" }}
-                      onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#94a3b8" }}>
+                      style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderRadius: 9, background: "transparent", border: "none", color: "#f0c8d8", fontSize: 13.5, fontWeight: 600, cursor: "pointer", textAlign: "left", transition: "color 0.15s, background 0.15s" }}
+                      onMouseEnter={e => { e.currentTarget.style.background = "rgba(212,104,142,0.15)"; e.currentTarget.style.color = "#fde8f0" }}
+                      onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#f0c8d8" }}>
                       {item.label}
                       <span style={{ fontSize: 11, opacity: 0.4 }}>›</span>
                     </button>
@@ -2782,11 +2782,11 @@ export default function Tienda() {
 
                   {/* Categorías — abre sub-panel */}
                   <button onClick={() => setCatPanelOpen(true)}
-                    style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderRadius: 9, background: "transparent", border: "none", color: "#94a3b8", fontSize: 13.5, fontWeight: 600, cursor: "pointer", textAlign: "left", transition: "color 0.15s, background 0.15s" }}
-                    onMouseEnter={e => { e.currentTarget.style.background = "#1e293b"; e.currentTarget.style.color = "white" }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#94a3b8" }}>
+                    style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderRadius: 9, background: "transparent", border: "none", color: "#f0c8d8", fontSize: 13.5, fontWeight: 600, cursor: "pointer", textAlign: "left", transition: "color 0.15s, background 0.15s" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(212,104,142,0.15)"; e.currentTarget.style.color = "#fde8f0" }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#f0c8d8" }}>
                     Categorías
-                    <span style={{ fontSize: 13 }}>›</span>
+                    <span style={{ fontSize: 13, opacity: 0.5 }}>›</span>
                   </button>
                 </div>
 
@@ -2857,10 +2857,9 @@ export default function Tienda() {
                     const est = CAT_ESTILO[cat] ?? CAT_DEFAULT
                     return (
                       <button key={cat} onClick={() => { verCatalogo(cat); setSidebarOpen(false); setCatPanelOpen(false) }}
-                        style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "11px 14px", borderRadius: 9, background: "transparent", border: "none", color: "#94a3b8", fontSize: 13, fontWeight: 600, cursor: "pointer", textAlign: "left", transition: "color 0.15s, background 0.15s" }}
-                        onMouseEnter={e => { e.currentTarget.style.background = "rgba(212,104,142,0.12)"; e.currentTarget.style.color = "white" }}
-                        onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#94a3b8" }}>
-                        <span style={{ fontSize: 16, flexShrink: 0 }}>{est.icon}</span>
+                        style={{ width: "100%", display: "flex", alignItems: "center", padding: "11px 14px", borderRadius: 9, background: "transparent", border: "none", color: "#f0c8d8", fontSize: 13, fontWeight: 600, cursor: "pointer", textAlign: "left", transition: "color 0.15s, background 0.15s" }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "rgba(212,104,142,0.15)"; e.currentTarget.style.color = "#fde8f0" }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#f0c8d8" }}>
                         {cat}
                       </button>
                     )
