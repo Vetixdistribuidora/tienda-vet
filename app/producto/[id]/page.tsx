@@ -103,7 +103,7 @@ export default async function ProductoPage(
       {/* Header mínimo */}
       <header style={{ background: "#0f172a", padding: "0 20px", height: 64, display: "flex", alignItems: "center", gap: 16, boxShadow: "0 2px 20px rgba(0,0,0,0.4)", position: "sticky", top: 0, zIndex: 10 }}>
         <a href={SITE_URL} style={{ display: "inline-flex", alignItems: "center", background: "transparent", borderRadius: 8, padding: "4px 10px", textDecoration: "none", flexShrink: 0 }}>
-          <Image src="/logo-vetix.jpeg" alt="VETIX Distribuidora" height={36} width={144} style={{ height: 36, width: "auto" }} priority />
+          <Image src="/vetix-azul.jpeg" alt="VETIX Distribuidora" height={36} width={144} style={{ height: 36, width: "auto" }} priority />
         </a>
         <div style={{ flex: 1 }} />
         <a href={SITE_URL} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 10, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", color: "#94b8d8", textDecoration: "none", fontSize: 13, fontWeight: 700 }}>

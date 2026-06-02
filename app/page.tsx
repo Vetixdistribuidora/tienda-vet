@@ -105,7 +105,7 @@ function LogoMarca({ height = 46 }: { height?: number }) {
       lineHeight: 0,
     }}>
       <Image
-        src="/logo-vetix.jpeg"
+        src="/vetix-azul.jpeg"
         alt="VETIX Distribuidora"
         height={height}
         width={height * 4}
