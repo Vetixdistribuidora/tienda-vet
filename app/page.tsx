@@ -1428,8 +1428,8 @@ export default function Tienda() {
 
           {/* Hamburger */}
           <button onClick={() => setSidebarOpen(true)}
-            style={{ width: 38, height: 38, borderRadius: 9, background: "#f1f5f9", border: "1px solid #e2e8f0", color: "#374151", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 5, flexShrink: 0, padding: 0, transition: "background 0.15s" }}
-            onMouseEnter={e => (e.currentTarget.style.background = "#e2e8f0")}
+            style={{ width: 38, height: 38, borderRadius: 9, background: "#1a2d5a", border: "none", color: "white", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 5, flexShrink: 0, padding: 0, transition: "background 0.15s" }}
+            onMouseEnter={e => (e.currentTarget.style.background = "#243d7a")}
             onMouseLeave={e => (e.currentTarget.style.background = "#f1f5f9")}>
             <span style={{ display: "block", width: 16, height: 2, background: "currentColor", borderRadius: 2 }}/>
             <span style={{ display: "block", width: 16, height: 2, background: "currentColor", borderRadius: 2 }}/>
@@ -1482,10 +1482,11 @@ export default function Tienda() {
 
 {/* Login / Usuario */}
           {usuario ? (
-            <button onClick={() => setSidebarOpen(true)}
-              style={{ display: "flex", alignItems: "center", gap: 7, padding: "7px 13px", borderRadius: 10, background: "#e2e2e2", border: "1px solid #e2e8f0", color: "#1a2035", fontSize: 13, fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap", transition: "all 0.15s" }}
-              onMouseEnter={e => { e.currentTarget.style.background = "#f1f5f9"; e.currentTarget.style.borderColor = "#c7d2e0" }}
-              onMouseLeave={e => { e.currentTarget.style.background = "#e2e2e2"; e.currentTarget.style.borderColor = "#e2e8f0" }}>
+            <button onClick={() => abrirEditarPerfil()}
+              title="Editar mi perfil"
+              style={{ display: "flex", alignItems: "center", gap: 7, padding: "7px 13px", borderRadius: 10, background: "#fdf0f5", border: "1px solid #f0c8d8", color: "#1a2035", fontSize: 13, fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap", transition: "all 0.15s" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#f5d8e8"; e.currentTarget.style.borderColor = "#d4688e" }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#fdf0f5"; e.currentTarget.style.borderColor = "#f0c8d8" }}>
               <span style={{ width: 24, height: 24, borderRadius: "50%", background: "linear-gradient(135deg,#d4688e,#b05070)", color: "white", fontWeight: 900, fontSize: 11, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 {(perfil ? perfil.nombre : usuario.email)[0].toUpperCase()}
               </span>
