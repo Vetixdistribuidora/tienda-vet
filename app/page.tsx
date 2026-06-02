@@ -2741,13 +2741,13 @@ export default function Tienda() {
       {sidebarOpen && (
         <>
           <div className="overlay-anim" onClick={() => { setSidebarOpen(false); setCatPanelOpen(false) }}
-            style={{ position: "fixed", inset: 0, background: "rgba(10,15,28,0.6)", zIndex: 50, backdropFilter: "blur(3px)" }} />
+            style={{ position: "fixed", inset: 0, background: "rgba(10,15,28,0.55)", zIndex: 50 }} />
 
           {/* Sidebar — dos paneles deslizantes */}
-          <div className="sidebar-anim" style={{ position: "fixed", top: 0, left: 0, bottom: 0, width: "min(320px, 90vw)", background: "#0f172a", zIndex: 51, overflow: "hidden", boxShadow: "8px 0 48px rgba(0,0,0,0.35)" }}>
+          <div className="sidebar-anim" style={{ position: "fixed", top: 0, left: 0, bottom: 0, width: "min(320px, 90vw)", background: "#0f172a", zIndex: 51, overflow: "hidden", boxShadow: "8px 0 32px rgba(0,0,0,0.3)" }}>
 
             {/* Wrapper deslizante */}
-            <div style={{ display: "flex", width: "200%", height: "100%", transform: catPanelOpen ? "translateX(-50%)" : "translateX(0)", transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1)" }}>
+            <div style={{ display: "flex", width: "200%", height: "100%", transform: catPanelOpen ? "translateX(-50%)" : "translateX(0)", transition: "transform 0.28s cubic-bezier(0.16,1,0.3,1)", willChange: "transform" }}>
 
               {/* ── PANEL PRINCIPAL ── */}
               <div style={{ width: "50%", height: "100%", display: "flex", flexDirection: "column", overflowY: "auto" }}>
