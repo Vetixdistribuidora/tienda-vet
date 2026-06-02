@@ -352,7 +352,7 @@ function TarjetaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFav,
       }}
     >
       {/* Imagen — clickeable para ver detalle */}
-      <div onClick={onDetalle} style={{ height: 166, background: "#f7f8fb", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", position: "relative", flexShrink: 0, cursor: "pointer" }}>
+      <div onClick={onDetalle} style={{ height: 166, background: "white", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", position: "relative", flexShrink: 0, cursor: "pointer" }}>
         {p.imagen_url
           ? <Image src={p.imagen_url} alt={p.nombre} fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" style={{ objectFit: "contain", padding: 10, transition: "transform 0.35s", transform: hover ? "scale(1.07)" : "scale(1)" }} />
           : <div style={{ opacity: 0.4 }}><IcoBox /></div>
@@ -385,7 +385,7 @@ function TarjetaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFav,
       </div>
 
       {/* Info */}
-      <div style={{ padding: "12px 13px 14px", flex: 1, display: "flex", flexDirection: "column" }}>
+      <div style={{ padding: "12px 13px 14px", flex: 1, display: "flex", flexDirection: "column", background: "#fde8f0" }}>
         {p.categoria && (
           <span style={{ fontSize: 9.5, fontWeight: 800, color: "#d4688e", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 5, display: "block" }}>
             {p.categoria}
@@ -1442,9 +1442,9 @@ export default function Tienda() {
               value={busqueda}
               onChange={e => setBusqueda(e.target.value)}
               placeholder="Buscar productos, laboratorios... ( / )"
-              style={{ width: "100%", paddingLeft: 38, paddingRight: busqueda ? 34 : 14, height: 40, borderRadius: 10, border: "1.5px solid #e2e8f0", fontSize: 13, outline: "none", background: "#f3f1ee", color: "#1a2035", boxSizing: "border-box", transition: "border-color 0.15s, background 0.15s" }}
+              style={{ width: "100%", paddingLeft: 38, paddingRight: busqueda ? 34 : 14, height: 40, borderRadius: 10, border: "1.5px solid #f0c8d8", fontSize: 13, outline: "none", background: "#fef4f8", color: "#1a2035", boxSizing: "border-box", transition: "border-color 0.15s, background 0.15s" }}
               onFocus={e => { e.target.style.borderColor = "#d4688e"; e.target.style.background = "white"; setSearchFocus(true) }}
-              onBlur={e => { e.target.style.borderColor = "#e2e8f0"; e.target.style.background = "#f3f1ee"; setTimeout(() => setSearchFocus(false), 180) }}
+              onBlur={e => { e.target.style.borderColor = "#f0c8d8"; e.target.style.background = "#fef4f8"; setTimeout(() => setSearchFocus(false), 180) }}
               onKeyDown={e => { if (e.key === "Enter" && busqueda.trim()) guardarBusquedaReciente(busqueda) }}
             />
             {busqueda && (
