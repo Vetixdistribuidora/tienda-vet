@@ -1848,11 +1848,11 @@ export default function Tienda() {
                 {(() => {
                   const filtrosActivos = [precioMin, precioMax].filter(Boolean).length + laboratoriosFiltro.size + (categoriaActiva ? 1 : 0)
                   return (
-                <div style={{ marginBottom: 18, display: "flex", flexDirection: "column", gap: 10 }}>
+                <div style={{ marginBottom: 18, background: "#fde8f0", borderRadius: 14, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 10, border: "1px solid #f0c8d8" }}>
                   {/* Fila principal */}
                   <div className="sort-bar" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-                    <p style={{ margin: 0, color: "#94b8d8", fontSize: 13 }}>
-                      <b style={{ color: "white" }}>{totalFiltrados.toLocaleString("es-AR")}</b> producto{totalFiltrados !== 1 ? "s" : ""}
+                    <p style={{ margin: 0, color: "#64748b", fontSize: 13 }}>
+                      <b style={{ color: "#1a2035" }}>{totalFiltrados.toLocaleString("es-AR")}</b> producto{totalFiltrados !== 1 ? "s" : ""}
                       {busquedaDelay && <> para <b style={{ color: "#d4688e" }}>&quot;{busquedaDelay}&quot;</b></>}
                     </p>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -1994,7 +1994,7 @@ export default function Tienda() {
                     )}
 
                     {/* Toggle vista */}
-                    <div style={{ marginLeft: "auto", display: "flex", background: "#f1f5f9", borderRadius: 8, padding: 3, gap: 2 }}>
+                    <div style={{ marginLeft: "auto", display: "flex", background: "#f0c8d8", borderRadius: 8, padding: 3, gap: 2 }}>
                       {[{ v: false, icon: "⊞", label: "Grilla" }, { v: true, icon: "≡", label: "Lista" }].map(opt => (
                         <button key={opt.label} onClick={() => setVistaLista(opt.v)}
                           style={{ padding: "5px 10px", borderRadius: 6, border: "none", background: vistaLista === opt.v ? "white" : "transparent", color: vistaLista === opt.v ? "#1a2035" : "#94a3b8", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: vistaLista === opt.v ? "0 1px 4px rgba(0,0,0,0.1)" : "none", transition: "all 0.15s", gap: 4, display: "flex", alignItems: "center" }}>
