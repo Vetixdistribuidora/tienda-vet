@@ -2301,21 +2301,9 @@ export default function Tienda() {
                     Explorá el catálogo y agregá los productos que necesitás
                   </p>
                   <button onClick={() => { setCarritoOpen(false); verCatalogo("") }}
-                    style={{ background: "#d4688e", color: "white", border: "none", borderRadius: 10, padding: "11px 26px", fontSize: 13, fontWeight: 800, cursor: "pointer", boxShadow: "0 3px 12px rgba(212,104,142,0.3)", marginBottom: 12 }}>
+                    style={{ background: "#d4688e", color: "white", border: "none", borderRadius: 10, padding: "11px 26px", fontSize: 13, fontWeight: 800, cursor: "pointer", boxShadow: "0 3px 12px rgba(212,104,142,0.3)" }}>
                     Ver catálogo →
                   </button>
-                  {categorias.length > 0 && (
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", marginTop: 8 }}>
-                      {categorias.slice(0, 4).map(cat => (
-                        <button key={cat} onClick={() => { setCarritoOpen(false); verCatalogo(cat) }}
-                          style={{ padding: "5px 12px", borderRadius: 20, background: "#e8e8e8", border: "1.5px solid #e2e8f0", fontSize: 12, fontWeight: 600, color: "#374151", cursor: "pointer" }}
-                          onMouseEnter={e => { e.currentTarget.style.borderColor = "#d4688e"; e.currentTarget.style.color = "#d4688e" }}
-                          onMouseLeave={e => { e.currentTarget.style.borderColor = "#e2e8f0"; e.currentTarget.style.color = "#374151" }}>
-                          {cat}
-                        </button>
-                      ))}
-                    </div>
-                  )}
                 </div>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
