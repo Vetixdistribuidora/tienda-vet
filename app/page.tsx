@@ -1718,10 +1718,10 @@ export default function Tienda() {
                     const est = CAT_ESTILO[cat] ?? CAT_DEFAULT
                     return (
                       <button key={cat} onClick={() => verCatalogo(cat)}
-                        style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 14px", borderRadius: 20, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.8)", fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "all 0.15s", whiteSpace: "nowrap" }}
+                        style={{ padding: "6px 14px", borderRadius: 20, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.8)", fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "all 0.15s", whiteSpace: "nowrap" }}
                         onMouseEnter={e => { e.currentTarget.style.background = "rgba(212,104,142,0.25)"; e.currentTarget.style.borderColor = "#d4688e"; e.currentTarget.style.color = "white" }}
                         onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.07)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; e.currentTarget.style.color = "rgba(255,255,255,0.8)" }}>
-                        <span style={{ fontSize: 14 }}>{est.icon}</span>{cat}
+                        {cat}
                       </button>
                     )
                   })}
@@ -1730,21 +1730,24 @@ export default function Tienda() {
             </div>
           )}
 
+          {/* ── VER CATÁLOGO ──────────────────────────────────────────────── */}
+          <div style={{ background: "#1a2035", padding: "32px 20px", borderTop: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
+            <button onClick={() => verCatalogo("")}
+              style={{ display: "inline-flex", alignItems: "center", gap: 12, padding: "18px 48px", borderRadius: 16, background: "#d4688e", color: "white", border: "none", fontSize: 18, fontWeight: 900, cursor: "pointer", boxShadow: "0 6px 28px rgba(212,104,142,0.5)", transition: "background 0.15s, transform 0.12s, box-shadow 0.15s" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#b05070"; e.currentTarget.style.transform = "scale(1.03)"; e.currentTarget.style.boxShadow = "0 8px 36px rgba(212,104,142,0.6)" }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#d4688e"; e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "0 6px 28px rgba(212,104,142,0.5)" }}>
+              Ver catálogo completo — {productos.length.toLocaleString("es-AR")} productos →
+            </button>
+          </div>
+
           {/* ── PRODUCTOS DESTACADOS ───────────────────────────────────────── */}
-          <div style={{ background: "#1a2035", padding: "32px 20px 40px" }}>
+          <div style={{ background: "#1a2035", padding: "12px 20px 40px" }}>
             <div style={{ maxWidth: 1280, margin: "0 auto" }}>
-              {/* Ver catálogo — prominente arriba */}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
                 <div>
                   <h2 style={{ margin: 0, fontSize: 19, fontWeight: 900, color: "white" }}>Productos destacados</h2>
                   <p style={{ margin: "4px 0 0", fontSize: 13, color: "#94b8d8" }}>Una selección de nuestros productos</p>
                 </div>
-                <button onClick={() => verCatalogo("")}
-                  style={{ display: "flex", alignItems: "center", gap: 8, padding: "11px 24px", borderRadius: 11, background: "#d4688e", color: "white", border: "none", fontSize: 14, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 16px rgba(212,104,142,0.4)", transition: "background 0.15s, transform 0.12s" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "#b05070"; e.currentTarget.style.transform = "scale(1.03)" }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "#d4688e"; e.currentTarget.style.transform = "scale(1)" }}>
-                  Ver catálogo completo ({productos.length.toLocaleString("es-AR")} productos) →
-                </button>
               </div>
               <div className="grid-productos" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
                 {productosDestacados.map(p => (
