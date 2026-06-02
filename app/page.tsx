@@ -570,6 +570,7 @@ export default function Tienda() {
 
   // ── Sidebar / auth / modal ────────────────────────────────────────────────
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [catPanelOpen, setCatPanelOpen] = useState(false)
   const [catModalOpen, setCatModalOpen] = useState(false)
   const [usuario, setUsuario] = useState<{ email: string; id: string } | null>(null)
   const [loginEmail, setLoginEmail] = useState("")
@@ -2739,111 +2740,135 @@ export default function Tienda() {
       {/* ── SIDEBAR IZQUIERDO ──────────────────────────────────────────────── */}
       {sidebarOpen && (
         <>
-          <div className="overlay-anim" onClick={() => setSidebarOpen(false)}
+          <div className="overlay-anim" onClick={() => { setSidebarOpen(false); setCatPanelOpen(false) }}
             style={{ position: "fixed", inset: 0, background: "rgba(10,15,28,0.6)", zIndex: 50, backdropFilter: "blur(3px)" }} />
-          <div className="sidebar-anim" style={{ position: "fixed", top: 0, left: 0, bottom: 0, width: "min(320px, 90vw)", background: "#0f172a", zIndex: 51, display: "flex", flexDirection: "column", boxShadow: "8px 0 48px rgba(0,0,0,0.35)", overflowY: "auto" }}>
 
-            {/* Header del sidebar */}
-            <div style={{ padding: "18px 20px 16px", borderBottom: "1px solid #f0c8d8", background: "#fde8f0", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
-              <LogoMarca />
-              <button onClick={() => setSidebarOpen(false)}
-                style={{ width: 34, height: 34, borderRadius: 9, border: "1px solid #1e293b", background: "#1e293b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8" }}>
-                <IcoClose />
-              </button>
-            </div>
+          {/* Sidebar — dos paneles deslizantes */}
+          <div className="sidebar-anim" style={{ position: "fixed", top: 0, left: 0, bottom: 0, width: "min(320px, 90vw)", background: "#0f172a", zIndex: 51, overflow: "hidden", boxShadow: "8px 0 48px rgba(0,0,0,0.35)" }}>
 
-            {/* Navegación */}
-            <div style={{ padding: "16px 14px 8px" }}>
-              <p style={{ fontSize: 9.5, fontWeight: 800, color: "#334155", letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 10px", paddingLeft: 6 }}>Navegación</p>
-              {[
-                { label: "Inicio", action: () => { irAInicio(); setSidebarOpen(false) } },
-                { label: "Catálogo completo", action: () => { verCatalogo(""); setSidebarOpen(false) } },
-                ...(favoritos.size > 0 ? [{ label: `Mis favoritos (${favoritos.size})`, action: () => { setSidebarOpen(false); setBusqueda(""); setCategoriaActiva("__favs__") } }] : []),
-                ...(usuario ? [{ label: "Mis pedidos", action: () => { setSidebarOpen(false); window.location.href = "/mis-pedidos" } }] : []),
-                ...(tienePrecios ? [{ label: "Descargar lista de precios", action: () => { exportarCSV(); setSidebarOpen(false) } }] : []),
-              ].map(item => (
-                <button key={item.label} onClick={item.action}
-                  style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderRadius: 9, background: "transparent", border: "none", color: "#94a3b8", fontSize: 13.5, fontWeight: 600, cursor: "pointer", textAlign: "left", transition: "color 0.15s, background 0.15s", letterSpacing: 0.1 }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "#1e293b"; e.currentTarget.style.color = "white" }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#94a3b8" }}>
-                  {item.label}
-                  <span style={{ fontSize: 11, opacity: 0.4 }}>›</span>
-                </button>
-              ))}
-            </div>
+            {/* Wrapper deslizante */}
+            <div style={{ display: "flex", width: "200%", height: "100%", transform: catPanelOpen ? "translateX(-50%)" : "translateX(0)", transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1)" }}>
 
-            {/* Categorías como chips */}
-            {categorias.length > 0 && (
-              <div style={{ padding: "4px 14px 16px", borderTop: "1px solid #1e293b" }}>
-                <p style={{ fontSize: 9.5, fontWeight: 800, color: "#334155", letterSpacing: 1.5, textTransform: "uppercase", margin: "12px 0 10px", paddingLeft: 6 }}>Categorías</p>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                  {categorias.map(cat => (
-                    <button key={cat} onClick={() => { verCatalogo(cat); setSidebarOpen(false) }}
-                      style={{ padding: "5px 12px", borderRadius: 20, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.75)", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s", whiteSpace: "nowrap" }}
-                      onMouseEnter={e => { e.currentTarget.style.background = "rgba(212,104,142,0.25)"; e.currentTarget.style.borderColor = "#d4688e"; e.currentTarget.style.color = "white" }}
-                      onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.07)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; e.currentTarget.style.color = "rgba(255,255,255,0.75)" }}>
-                      {cat}
+              {/* ── PANEL PRINCIPAL ── */}
+              <div style={{ width: "50%", height: "100%", display: "flex", flexDirection: "column", overflowY: "auto" }}>
+
+                {/* Header */}
+                <div style={{ padding: "18px 20px 16px", borderBottom: "1px solid #f0c8d8", background: "#fde8f0", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+                  <LogoMarca />
+                  <button onClick={() => { setSidebarOpen(false); setCatPanelOpen(false) }}
+                    style={{ width: 34, height: 34, borderRadius: 9, border: "1px solid #1e293b", background: "#1e293b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8" }}>
+                    <IcoClose />
+                  </button>
+                </div>
+
+                {/* Navegación */}
+                <div style={{ padding: "16px 14px 8px" }}>
+                  <p style={{ fontSize: 9.5, fontWeight: 800, color: "#334155", letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 10px", paddingLeft: 6 }}>Navegación</p>
+                  {[
+                    { label: "Inicio", action: () => { irAInicio(); setSidebarOpen(false); setCatPanelOpen(false) } },
+                    { label: "Catálogo completo", action: () => { verCatalogo(""); setSidebarOpen(false); setCatPanelOpen(false) } },
+                    ...(favoritos.size > 0 ? [{ label: `Mis favoritos (${favoritos.size})`, action: () => { setSidebarOpen(false); setCatPanelOpen(false); setBusqueda(""); setCategoriaActiva("__favs__") } }] : []),
+                    ...(usuario ? [{ label: "Mis pedidos", action: () => { setSidebarOpen(false); setCatPanelOpen(false); window.location.href = "/mis-pedidos" } }] : []),
+                    ...(tienePrecios ? [{ label: "Descargar lista de precios", action: () => { exportarCSV(); setSidebarOpen(false); setCatPanelOpen(false) } }] : []),
+                  ].map(item => (
+                    <button key={item.label} onClick={item.action}
+                      style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderRadius: 9, background: "transparent", border: "none", color: "#94a3b8", fontSize: 13.5, fontWeight: 600, cursor: "pointer", textAlign: "left", transition: "color 0.15s, background 0.15s" }}
+                      onMouseEnter={e => { e.currentTarget.style.background = "#1e293b"; e.currentTarget.style.color = "white" }}
+                      onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#94a3b8" }}>
+                      {item.label}
+                      <span style={{ fontSize: 11, opacity: 0.4 }}>›</span>
                     </button>
                   ))}
+
+                  {/* Categorías — abre sub-panel */}
+                  <button onClick={() => setCatPanelOpen(true)}
+                    style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderRadius: 9, background: "transparent", border: "none", color: "#94a3b8", fontSize: 13.5, fontWeight: 600, cursor: "pointer", textAlign: "left", transition: "color 0.15s, background 0.15s" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "#1e293b"; e.currentTarget.style.color = "white" }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#94a3b8" }}>
+                    Categorías
+                    <span style={{ fontSize: 13 }}>›</span>
+                  </button>
                 </div>
-              </div>
-            )}
 
-
-            {/* Auth section */}
-            <div style={{ padding: "12px 14px 20px", borderTop: "1px solid #1e293b", marginTop: "auto" }}>
-              <p style={{ fontSize: 9.5, fontWeight: 800, color: "#334155", letterSpacing: 1.5, textTransform: "uppercase", margin: "10px 0 14px", paddingLeft: 6 }}>Mi cuenta</p>
-
-              {usuario ? (
-                <div style={{ padding: "14px 16px", background: "#0a1120", borderRadius: 13, border: "1px solid #1e293b" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-                    <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,#d4688e,#b05070)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 900, fontSize: 16, flexShrink: 0 }}>
-                      {(perfil ? perfil.nombre : usuario.email)[0].toUpperCase()}
-                    </div>
-                    <div style={{ minWidth: 0 }}>
-                      {perfil && (
-                        <p style={{ margin: 0, fontSize: 13, fontWeight: 800, color: "white", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                          {perfil.nombre} {perfil.apellido}
-                        </p>
+                {/* Mi cuenta */}
+                <div style={{ padding: "12px 14px 20px", borderTop: "1px solid #1e293b", marginTop: "auto" }}>
+                  <p style={{ fontSize: 9.5, fontWeight: 800, color: "#334155", letterSpacing: 1.5, textTransform: "uppercase", margin: "10px 0 14px", paddingLeft: 6 }}>Mi cuenta</p>
+                  {usuario ? (
+                    <div style={{ padding: "14px 16px", background: "#0a1120", borderRadius: 13, border: "1px solid #1e293b" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+                        <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,#d4688e,#b05070)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 900, fontSize: 16, flexShrink: 0 }}>
+                          {(perfil ? perfil.nombre : usuario.email)[0].toUpperCase()}
+                        </div>
+                        <div style={{ minWidth: 0 }}>
+                          {perfil && <p style={{ margin: 0, fontSize: 13, fontWeight: 800, color: "white", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{perfil.nombre} {perfil.apellido}</p>}
+                          <p style={{ margin: perfil ? "1px 0 0" : 0, fontSize: 11, color: "#64748b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{usuario.email}</p>
+                          <p style={{ margin: "3px 0 0", fontSize: 10, color: "#4ade80", fontWeight: 600 }}>● Sesión activa</p>
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", gap: 7 }}>
+                        <button onClick={e => { e.stopPropagation(); abrirEditarPerfil() }}
+                          style={{ flex: 1, padding: "9px", borderRadius: 9, background: "#1e293b", border: "1px solid #2d3a55", color: "#94a3b8", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                          Editar perfil
+                        </button>
+                        <button onClick={cerrarSesion}
+                          style={{ flex: 1, padding: "9px", borderRadius: 9, background: "#1e293b", border: "1px solid #2d3a55", color: "#94a3b8", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                          Cerrar sesión
+                        </button>
+                      </div>
+                      {ADMIN_EMAIL && usuario?.email === ADMIN_EMAIL && (
+                        <a href="/admin" style={{ display: "block", textAlign: "center", padding: "9px", borderRadius: 9, background: "#d4688e", color: "white", fontSize: 12, fontWeight: 800, textDecoration: "none", marginTop: 2 }}>
+                          ⚙ Panel Admin
+                        </a>
                       )}
-                      <p style={{ margin: perfil ? "1px 0 0" : 0, fontSize: 11, color: "#64748b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{usuario.email}</p>
-                      <p style={{ margin: "3px 0 0", fontSize: 10, color: "#4ade80", fontWeight: 600 }}>● Sesión activa</p>
                     </div>
-                  </div>
-                  <div style={{ display: "flex", gap: 7 }}>
-                    <button onClick={e => { e.stopPropagation(); abrirEditarPerfil() }}
-                      style={{ flex: 1, padding: "9px", borderRadius: 9, background: "#1e293b", border: "1px solid #2d3a55", color: "#94a3b8", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
-                      Editar perfil
-                    </button>
-                    <button onClick={cerrarSesion}
-                      style={{ flex: 1, padding: "9px", borderRadius: 9, background: "#1e293b", border: "1px solid #2d3a55", color: "#94a3b8", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
-                      Cerrar sesión
-                    </button>
-                  </div>
-                  {ADMIN_EMAIL && usuario?.email === ADMIN_EMAIL && (
-                    <a href="/admin"
-                      style={{ display: "block", textAlign: "center", padding: "9px", borderRadius: 9, background: "#d4688e", color: "white", fontSize: 12, fontWeight: 800, textDecoration: "none", marginTop: 2 }}>
-                      ⚙ Panel Admin
-                    </a>
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      <button onClick={() => { setLoginModo("login"); setLoginError(""); setSidebarOpen(false); setCatPanelOpen(false); setAuthModalOpen(true) }}
+                        style={{ width: "100%", padding: "11px", borderRadius: 10, background: "#d4688e", color: "white", border: "none", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>
+                        Iniciar sesión
+                      </button>
+                      <button onClick={() => { setLoginModo("registro"); setLoginError(""); setSidebarOpen(false); setCatPanelOpen(false); setAuthModalOpen(true) }}
+                        style={{ width: "100%", padding: "11px", borderRadius: 10, background: "transparent", color: "#64748b", border: "1px solid #1e293b", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+                        Crear cuenta
+                      </button>
+                      <p style={{ margin: "6px 0 0", fontSize: 11, color: "#334155", textAlign: "center", lineHeight: 1.5 }}>
+                        Iniciá sesión para ver los precios según tu perfil
+                      </p>
+                    </div>
                   )}
                 </div>
-              ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  <button onClick={() => { setLoginModo("login"); setLoginError(""); setSidebarOpen(false); setAuthModalOpen(true) }}
-                    style={{ width: "100%", padding: "11px", borderRadius: 10, background: "#d4688e", color: "white", border: "none", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>
-                    Iniciar sesión
-                  </button>
-                  <button onClick={() => { setLoginModo("registro"); setLoginError(""); setSidebarOpen(false); setAuthModalOpen(true) }}
-                    style={{ width: "100%", padding: "11px", borderRadius: 10, background: "transparent", color: "#64748b", border: "1px solid #1e293b", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
-                    Crear cuenta
-                  </button>
-                  <p style={{ margin: "6px 0 0", fontSize: 11, color: "#334155", textAlign: "center", lineHeight: 1.5 }}>
-                    Iniciá sesión para ver los precios según tu perfil
-                  </p>
-                </div>
-              )}
-            </div>
+              </div>
 
+              {/* ── PANEL CATEGORÍAS ── */}
+              <div style={{ width: "50%", height: "100%", display: "flex", flexDirection: "column", overflowY: "auto" }}>
+
+                {/* Header del panel */}
+                <div style={{ padding: "18px 20px 16px", borderBottom: "1px solid #1e293b", background: "#0a1120", display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+                  <button onClick={() => setCatPanelOpen(false)}
+                    style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid #1e293b", background: "#1e293b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8", fontSize: 16, flexShrink: 0 }}>
+                    ‹
+                  </button>
+                  <span style={{ fontSize: 15, fontWeight: 800, color: "white" }}>Categorías</span>
+                </div>
+
+                {/* Lista de categorías */}
+                <div style={{ padding: "10px 10px 24px", flex: 1 }}>
+                  {categorias.map(cat => {
+                    const est = CAT_ESTILO[cat] ?? CAT_DEFAULT
+                    return (
+                      <button key={cat} onClick={() => { verCatalogo(cat); setSidebarOpen(false); setCatPanelOpen(false) }}
+                        style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "11px 14px", borderRadius: 9, background: "transparent", border: "none", color: "#94a3b8", fontSize: 13, fontWeight: 600, cursor: "pointer", textAlign: "left", transition: "color 0.15s, background 0.15s" }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "rgba(212,104,142,0.12)"; e.currentTarget.style.color = "white" }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#94a3b8" }}>
+                        <span style={{ fontSize: 16, flexShrink: 0 }}>{est.icon}</span>
+                        {cat}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+            </div>
           </div>
         </>
       )}
