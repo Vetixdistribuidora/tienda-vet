@@ -502,7 +502,7 @@ export default function AdminPanel() {
       <div style={{ background: "#0f172a", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 16px rgba(0,0,0,0.35)" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 20px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 54 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <Image src="/logo.png" alt="VETIX" height={28} width={112} style={{ height: 28, width: "auto" }} priority />
+            <Image src="/vetix-azul.jpeg" alt="VETIX" height={28} width={112} style={{ height: 28, width: "auto", mixBlendMode: "multiply" }} priority />
             <span style={{ fontSize: 10.5, fontWeight: 800, background: "#e8197d", color: "white", borderRadius: 6, padding: "2px 8px", textTransform: "uppercase", letterSpacing: 0.8 }}>Admin</span>
           </div>
           <Link href="/" style={{ fontSize: 12, color: "#64748b", textDecoration: "none", fontWeight: 600 }}>← Tienda</Link>

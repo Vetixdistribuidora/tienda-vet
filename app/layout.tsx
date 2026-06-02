@@ -31,7 +31,7 @@ export const metadata: Metadata = {
       "Distribuidora veterinaria al por mayor. Medicamentos, vacunas, alimentos y accesorios. Pedidos online las 24 hs.",
     images: [
       {
-        url: `${SITE_URL}/logo.png`,
+        url: `${SITE_URL}/vetix-azul.jpeg`,
         width: 800,
         height: 200,
         alt: "VETIX Distribuidora Veterinaria",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     card: "summary",
     title: "VETIX — Tienda Veterinaria Online",
     description: "Distribuidora veterinaria al por mayor. Pedidos online las 24 hs.",
-    images: ["/logo.png"],
+    images: ["/vetix-azul.jpeg"],
   },
   robots: {
     index: true,

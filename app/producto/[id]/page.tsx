@@ -58,13 +58,13 @@ export async function generateMetadata(
       url: `${SITE_URL}/producto/${producto.id}`,
       images: producto.imagen_url
         ? [{ url: producto.imagen_url, alt: producto.nombre }]
-        : [{ url: `${SITE_URL}/logo.png`, alt: "VETIX" }],
+        : [{ url: `${SITE_URL}/vetix-azul.jpeg`, alt: "VETIX" }],
     },
     twitter: {
       card: "summary_large_image",
       title: producto.nombre,
       description,
-      images: producto.imagen_url ? [producto.imagen_url] : [`${SITE_URL}/logo.png`],
+      images: producto.imagen_url ? [producto.imagen_url] : [`${SITE_URL}/vetix-azul.jpeg`],
     },
     alternates: { canonical: `${SITE_URL}/producto/${producto.id}` },
   }
