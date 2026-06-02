@@ -1435,8 +1435,10 @@ export default function Tienda() {
             <span style={{ display: "block", width: 16, height: 2, background: "currentColor", borderRadius: 2 }}/>
           </button>
 
-          {/* Logo — PNG fondo blanco se funde con el header blanco */}
-          <LogoMarca height={70} />
+          {/* Logo — click va al inicio */}
+          <button onClick={() => irAInicio()} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", lineHeight: 0, flexShrink: 0 }}>
+            <LogoMarca height={70} />
+          </button>
 
           {/* Search desktop */}
           <div className="header-search" style={{ flex: 1, maxWidth: 500, position: "relative" }}>
@@ -2754,11 +2756,10 @@ export default function Tienda() {
             <div style={{ padding: "16px 14px 8px" }}>
               <p style={{ fontSize: 9.5, fontWeight: 800, color: "#334155", letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 10px", paddingLeft: 6 }}>Navegación</p>
               {[
-                { label: "Inicio", action: () => irAInicio() },
-                { label: "Catálogo completo", action: () => verCatalogo("") },
-                { label: "Categorías", action: () => { setSidebarOpen(false); setCatModalOpen(true) } },
+                { label: "Inicio", action: () => { irAInicio(); setSidebarOpen(false) } },
+                { label: "Catálogo completo", action: () => { verCatalogo(""); setSidebarOpen(false) } },
                 ...(favoritos.size > 0 ? [{ label: `Mis favoritos (${favoritos.size})`, action: () => { setSidebarOpen(false); setBusqueda(""); setCategoriaActiva("__favs__") } }] : []),
-                ...(usuario ? [{ label: "Mis pedidos", action: () => { setSidebarOpen(false); cargarMisPedidos(); setPedidosOpen(true) } }] : []),
+                ...(usuario ? [{ label: "Mis pedidos", action: () => { setSidebarOpen(false); window.location.href = "/mis-pedidos" } }] : []),
                 ...(tienePrecios ? [{ label: "Descargar lista de precios", action: () => { exportarCSV(); setSidebarOpen(false) } }] : []),
               ].map(item => (
                 <button key={item.label} onClick={item.action}
@@ -2770,6 +2771,23 @@ export default function Tienda() {
                 </button>
               ))}
             </div>
+
+            {/* Categorías como chips */}
+            {categorias.length > 0 && (
+              <div style={{ padding: "4px 14px 16px", borderTop: "1px solid #1e293b" }}>
+                <p style={{ fontSize: 9.5, fontWeight: 800, color: "#334155", letterSpacing: 1.5, textTransform: "uppercase", margin: "12px 0 10px", paddingLeft: 6 }}>Categorías</p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                  {categorias.map(cat => (
+                    <button key={cat} onClick={() => { verCatalogo(cat); setSidebarOpen(false) }}
+                      style={{ padding: "5px 12px", borderRadius: 20, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.75)", fontSize: 11, fontWeight: 600, cursor: "pointer", transition: "all 0.15s", whiteSpace: "nowrap" }}
+                      onMouseEnter={e => { e.currentTarget.style.background = "rgba(212,104,142,0.25)"; e.currentTarget.style.borderColor = "#d4688e"; e.currentTarget.style.color = "white" }}
+                      onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.07)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; e.currentTarget.style.color = "rgba(255,255,255,0.75)" }}>
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
 
             {/* Auth section */}
