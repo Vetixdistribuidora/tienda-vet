@@ -2073,8 +2073,8 @@ export default function Tienda() {
                   const Sentinel = ({ todos, pagina }: { todos: Producto[]; pagina: Producto[] }) =>
                     todos.length > pagina.length ? (
                       <div ref={sentinelRef} style={{ padding: "32px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-                        <p style={{ margin: 0, fontSize: 13, color: "#64748b" }}>
-                          Mostrando <b style={{ color: "#1a2035" }}>{pagina.length}</b> de <b style={{ color: "#1a2035" }}>{todos.length}</b> productos
+                        <p style={{ margin: 0, fontSize: 13, color: "#94b8d8" }}>
+                          Mostrando <b style={{ color: "#d4688e" }}>{pagina.length}</b> de <b style={{ color: "#d4688e" }}>{todos.length}</b> productos
                         </p>
                         <button
                           onClick={() => setVisibles(v => v + 48)}
@@ -2087,8 +2087,8 @@ export default function Tienda() {
                       </div>
                     ) : (
                       <div style={{ padding: "24px 0", textAlign: "center" }}>
-                        <p style={{ margin: 0, fontSize: 12, color: "#94a3b8" }}>
-                          Mostrando todos los <b style={{ color: "#1a2035" }}>{todos.length}</b> productos
+                        <p style={{ margin: 0, fontSize: 12, color: "#94b8d8" }}>
+                          Mostrando todos los <b style={{ color: "#d4688e" }}>{todos.length}</b> productos
                         </p>
                       </div>
                     )
@@ -2258,7 +2258,7 @@ export default function Tienda() {
       {carritoOpen && (
         <>
           <div className="overlay-anim" onClick={() => setCarritoOpen(false)}
-            style={{ position: "fixed", inset: 0, background: "rgba(10,15,28,0.6)", zIndex: 50, backdropFilter: "blur(3px)" }} />
+            style={{ position: "fixed", inset: 0, background: "rgba(10,15,28,0.55)", zIndex: 50 }} />
           <div className="cart-drawer-anim" style={{ position: "fixed", top: 0, right: 0, bottom: 0, width: "min(440px, 100vw)", background: "#e8e8e8", zIndex: 51, display: "flex", flexDirection: "column", boxShadow: "-8px 0 48px rgba(0,0,0,0.25)" }}>
 
             <div style={{ padding: "20px 22px 16px", borderBottom: "1px solid #f1f5f9", background: "#0f172a" }}>
@@ -2454,7 +2454,7 @@ export default function Tienda() {
 
       {/* ── CHECKOUT MODAL ─────────────────────────────────────────────────── */}
       {checkoutOpen && !pedidoOk && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(10,15,28,0.65)", zIndex: 60, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, backdropFilter: "blur(4px)" }}>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(10,15,28,0.65)", zIndex: 60, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
           <div style={{ background: "#e8e8e8", borderRadius: 22, width: "100%", maxWidth: 520, maxHeight: "92vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 32px 80px rgba(0,0,0,0.4)" }}>
 
             <div style={{ padding: "22px 24px 16px", borderBottom: "1px solid #f1f5f9", background: "#0f172a" }}>
@@ -2536,9 +2536,11 @@ export default function Tienda() {
                       <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {i.producto.nombre} <span style={{ color: "#9ca3af" }}>×{i.cantidad}</span>
                       </span>
-                      <span style={{ fontWeight: 700, flexShrink: 0 }}>
-                        {fmt((precioConTipo(i.producto.precio_venta, tipoCliente) ?? i.producto.precio_venta) * i.cantidad)}
-                      </span>
+                      {tienePrecios && (
+                        <span style={{ fontWeight: 700, flexShrink: 0 }}>
+                          {fmt((precioConTipo(i.producto.precio_venta, tipoCliente) ?? 0) * i.cantidad)}
+                        </span>
+                      )}
                     </div>
                   ))}
                 </div>
