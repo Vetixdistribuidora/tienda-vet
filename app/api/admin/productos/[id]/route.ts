@@ -13,9 +13,19 @@ export async function PATCH(
   const { id } = await params
   const body = await req.json()
 
+  // Whitelist de columnas editables — evita asignación masiva de campos arbitrarios
+  const CAMPOS_PERMITIDOS = ["nombre", "precio_venta", "stock", "categoria", "subcategoria", "laboratorio", "imagen_url"] as const
+  const updates: Record<string, unknown> = {}
+  for (const campo of CAMPOS_PERMITIDOS) {
+    if (campo in body) updates[campo] = body[campo]
+  }
+  if (Object.keys(updates).length === 0) {
+    return NextResponse.json({ error: "Sin campos válidos para actualizar" }, { status: 400 })
+  }
+
   const { error } = await getSupabaseAdmin()
     .from("productos")
-    .update(body)
+    .update(updates)
     .eq("id", id)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

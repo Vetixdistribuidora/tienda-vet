@@ -1300,12 +1300,16 @@ export default function Tienda() {
   function waLink() {
     if (!WHATSAPP || !numeroPedido) return "#"
     const lineas = pedidoCarrito.length > 0
-      ? pedidoCarrito.map(i => `• ${i.producto.nombre} x${i.cantidad} — ${fmt(i.producto.precio_venta * i.cantidad)}`).join("\n")
+      ? pedidoCarrito.map(i => {
+          if (!tienePrecios) return `• ${i.producto.nombre} x${i.cantidad}`
+          const pu = precioConTipo(i.producto.precio_venta, tipoCliente) ?? i.producto.precio_venta
+          return `• ${i.producto.nombre} x${i.cantidad} — ${fmt(pu * i.cantidad)}`
+        }).join("\n")
       : ""
     const msg = [
       `Hola! Acabo de hacer el pedido N°${String(numeroPedido).padStart(4, "0")} en la tienda online.`,
       lineas,
-      `*Total estimado: ${fmt(precioFinal)}*`,
+      tienePrecios ? `*Total estimado: ${fmt(precioFinal)}*` : `*Total: a confirmar*`,
       `Quedo a la espera de la confirmación.`,
     ].filter(Boolean).join("\n\n")
     return `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`
@@ -1313,12 +1317,16 @@ export default function Tienda() {
 
   function textoCarritoWA() {
     const lineas = carrito.map(i => {
-      const precio = precioConTipo(i.producto.precio_venta, tipoCliente) ?? i.producto.precio_venta
-      let linea = `• ${i.producto.nombre} x${i.cantidad} — ${fmt(precio * i.cantidad)}`
+      let linea = `• ${i.producto.nombre} x${i.cantidad}`
+      if (tienePrecios) {
+        const precio = precioConTipo(i.producto.precio_venta, tipoCliente) ?? i.producto.precio_venta
+        linea += ` — ${fmt(precio * i.cantidad)}`
+      }
       if (i.nota) linea += ` _(${i.nota})_`
       return linea
     }).join("\n")
-    return `Hola! Me gustaría consultar precios para el siguiente pedido:\n\n${lineas}\n\n*Total estimado: ${fmt(totalPrecio)}*\n\nQuedo a la espera de confirmación.`
+    const total = tienePrecios ? `\n\n*Total estimado: ${fmt(totalPrecio)}*` : ""
+    return `Hola! Me gustaría consultar precios para el siguiente pedido:\n\n${lineas}${total}\n\nQuedo a la espera de confirmación.`
   }
 
   function repetirPedido(pedido: PedidoHistorial) {

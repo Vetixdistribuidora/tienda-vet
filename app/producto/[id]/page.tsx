@@ -45,8 +45,8 @@ export async function generateMetadata(
   const description = [
     producto.laboratorio ? `${producto.laboratorio}.` : "",
     producto.categoria ? `Categoría: ${producto.categoria}.` : "",
-    `Precio de referencia: $${producto.precio_venta.toLocaleString("es-AR", { minimumFractionDigits: 2 })}.`,
-    "Distribuidora VETIX — pedidos online las 24 hs.",
+    producto.stock > 0 ? "Disponible." : "",
+    "Distribuidora VETIX — precios para clientes registrados. Pedidos online las 24 hs.",
   ].filter(Boolean).join(" ")
 
   return {
@@ -71,10 +71,6 @@ export async function generateMetadata(
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
-function fmt(n: number) {
-  return "$" + n.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-}
 
 function stockColor(stock: number) {
   if (stock <= 0)  return { text: "Sin stock",         color: "#ef4444" }
@@ -166,11 +162,12 @@ export default async function ProductoPage(
               {producto.nombre}
             </h1>
 
-            {/* Precio */}
-            <div>
-              <p style={{ margin: "0 0 4px", fontSize: 12, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.5 }}>Precio de referencia</p>
-              <p style={{ margin: 0, fontSize: 36, fontWeight: 900, color: "#d4688e", lineHeight: 1 }}>{fmt(producto.precio_venta)}</p>
-              <p style={{ margin: "5px 0 0", fontSize: 12, color: "#94a3b8" }}>Precio sujeto a confirmación al coordinar</p>
+            {/* Precio — visible solo para clientes registrados dentro de la tienda */}
+            <div style={{ background: "#fdf0f5", borderRadius: 12, padding: "14px 16px", border: "1px solid #f0c8d8" }}>
+              <p style={{ margin: 0, fontSize: 13, fontWeight: 800, color: "#d4688e" }}>Precios para clientes registrados</p>
+              <p style={{ margin: "5px 0 0", fontSize: 12.5, color: "#64748b", lineHeight: 1.5 }}>
+                Iniciá sesión en la tienda con tu cuenta de veterinario o productor para ver el precio y hacer tu pedido.
+              </p>
             </div>
 
             {/* Detalles */}
@@ -216,10 +213,10 @@ export default async function ProductoPage(
         <div style={{ marginTop: 20, background: "white", borderRadius: 14, border: "1px solid #eaecf2", padding: "16px 20px", display: "flex", alignItems: "flex-start", gap: 12 }}>
           <span style={{ fontSize: 20, flexShrink: 0 }}>ℹ️</span>
           <div>
-            <p style={{ margin: "0 0 4px", fontSize: 13, fontWeight: 700, color: "#1a2035" }}>Precios de referencia</p>
+            <p style={{ margin: "0 0 4px", fontSize: 13, fontWeight: 700, color: "#1a2035" }}>Cómo comprar</p>
             <p style={{ margin: 0, fontSize: 13, color: "#64748b", lineHeight: 1.6 }}>
-              Los precios indicados son de referencia y se confirman al coordinar el pedido.
-              Hacé tu pedido online y nos contactamos para coordinar pago, forma de entrega o retiro.
+              Registrate o iniciá sesión en la tienda para ver precios y hacer tu pedido online.
+              Nos contactamos para coordinar pago, forma de entrega o retiro.
             </p>
           </div>
         </div>
