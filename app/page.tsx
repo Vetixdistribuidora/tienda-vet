@@ -571,6 +571,11 @@ export default function Tienda() {
   // ── Sidebar / auth / modal ────────────────────────────────────────────────
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [catPanelOpen, setCatPanelOpen] = useState(false)
+  // ── Categoría expandida (acordeón de subcategorías) en el sidebar ──────────
+  const [sidebarCatExpand, setSidebarCatExpand] = useState("")
+  // Subcategoría pendiente de aplicar tras cambiar de categoría (el effect de
+  // reset la usa para no borrarla cuando navegamos directo a una subcategoría)
+  const pendingSubcat = useRef("")
   const [catModalOpen, setCatModalOpen] = useState(false)
   const [usuario, setUsuario] = useState<{ email: string; id: string } | null>(null)
   const [loginEmail, setLoginEmail] = useState("")
@@ -699,6 +704,16 @@ export default function Tienda() {
     ? [...new Set(productos.filter(p => p.categoria === categoriaActiva && p.subcategoria).map(p => p.subcategoria!))].sort()
     : []
 
+  // Mapa categoría → subcategorías (para el acordeón del sidebar)
+  const subcatsPorCategoria = useMemo(() => {
+    const m: Record<string, string[]> = {}
+    for (const p of productos) {
+      if (p.categoria && p.subcategoria) (m[p.categoria] ??= []).push(p.subcategoria)
+    }
+    for (const k in m) m[k] = [...new Set(m[k])].sort()
+    return m
+  }, [productos])
+
   // Sugerencias de búsqueda (top 7 coincidencias por nombre)
   const sugerencias = useMemo(() => {
     const q = busqueda.trim().toLowerCase()
@@ -811,8 +826,13 @@ export default function Tienda() {
     return () => window.removeEventListener("keydown", onKey)
   }, [imagenZoom, productoDetalle, pedidosOpen, catModalOpen, authModalOpen, editPerfilOpen, sidebarOpen, carritoOpen, checkoutOpen, labDropdownOpen, catDropdownOpen])
 
-  // Reset subcategoría cuando cambia la categoría principal
-  useEffect(() => { setSubcategoriaActiva("") }, [categoriaActiva])
+  // Reset subcategoría cuando cambia la categoría principal.
+  // Si hay una subcategoría "pendiente" (navegación directa desde el sidebar)
+  // la aplicamos en vez de limpiar.
+  useEffect(() => {
+    setSubcategoriaActiva(pendingSubcat.current)
+    pendingSubcat.current = ""
+  }, [categoriaActiva])
 
   // Reset paginación cuando cambian los filtros
   useEffect(() => { setVisibles(48) }, [busquedaDelay, categoriaActiva, subcategoriaActiva, precioMin, precioMax, laboratoriosFiltro, orden])
@@ -957,6 +977,23 @@ export default function Tienda() {
     setPrecioMax("")
     setLaboratoriosFiltro(new Set())
     setSidebarOpen(false)
+    setCatModalOpen(false)
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  // Navega al catálogo de una categoría y deja seleccionada una subcategoría
+  function verCatalogoSub(cat: string, sub: string) {
+    if (categoriaActiva === cat) {
+      // La categoría no cambia → el effect de reset no corre, seteamos directo
+      setSubcategoriaActiva(sub)
+    } else {
+      pendingSubcat.current = sub
+      setModoCatalogo(true)
+      setCategoriaActiva(cat)
+      setBusqueda(""); setBusquedaDelay(""); setPrecioMin(""); setPrecioMax(""); setLaboratoriosFiltro(new Set())
+    }
+    setSidebarOpen(false)
+    setCatPanelOpen(false)
     setCatModalOpen(false)
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
@@ -1933,6 +1970,25 @@ export default function Tienda() {
                       )}
                     </div>
 
+                    {/* Subcategorías — cuadrícula entre Categorías y Laboratorio.
+                        Solo aparece cuando hay una categoría seleccionada con subcategorías. */}
+                    {subcategoriasDeCat.length > 0 && (
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", padding: "5px 9px", background: "white", border: "1.5px solid #f0c8d8", borderRadius: 10 }}>
+                        <span style={{ fontSize: 9.5, fontWeight: 800, color: "#b05070", textTransform: "uppercase", letterSpacing: 0.6, marginRight: 1 }}>Subcategorías</span>
+                        <button
+                          onClick={() => setSubcategoriaActiva("")}
+                          style={{ padding: "3px 11px", borderRadius: 20, fontSize: 12, fontWeight: subcategoriaActiva === "" ? 800 : 600, border: `1.5px solid ${subcategoriaActiva === "" ? "#d4688e" : "#e2e8f0"}`, background: subcategoriaActiva === "" ? "#fdf0f5" : "#f8fafc", color: subcategoriaActiva === "" ? "#d4688e" : "#64748b", cursor: "pointer", whiteSpace: "nowrap" }}>
+                          Todas
+                        </button>
+                        {subcategoriasDeCat.map(sub => (
+                          <button key={sub} onClick={() => setSubcategoriaActiva(sub === subcategoriaActiva ? "" : sub)}
+                            style={{ padding: "3px 11px", borderRadius: 20, fontSize: 12, fontWeight: sub === subcategoriaActiva ? 800 : 600, border: `1.5px solid ${sub === subcategoriaActiva ? "#d4688e" : "#e2e8f0"}`, background: sub === subcategoriaActiva ? "#fdf0f5" : "#f8fafc", color: sub === subcategoriaActiva ? "#d4688e" : "#64748b", cursor: "pointer", whiteSpace: "nowrap" }}>
+                            {sub}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
                     {/* Laboratorio — dropdown multi-select */}
                     <div style={{ position: "relative" }}>
                       <button
@@ -2042,24 +2098,6 @@ export default function Tienda() {
                         <button onClick={() => setCategoriaActiva("")} style={{ background: "none", border: "none", cursor: "pointer", color: "#d4688e", fontSize: 14, lineHeight: 1, padding: 0, display: "flex" }}>×</button>
                       </div>
                     )}
-                  </div>
-                )}
-
-                {/* Chips de subcategoría — aparecen cuando hay subcategorías para la categoría activa */}
-                {subcategoriasDeCat.length > 0 && (
-                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12, alignItems: "center" }}>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.5, marginRight: 2 }}>Subcategoría:</span>
-                    <button
-                      onClick={() => setSubcategoriaActiva("")}
-                      style={{ padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: subcategoriaActiva === "" ? 800 : 600, border: `1.5px solid ${subcategoriaActiva === "" ? "#d4688e" : "#e2e8f0"}`, background: subcategoriaActiva === "" ? "#fdf0f5" : "white", color: subcategoriaActiva === "" ? "#d4688e" : "#64748b", cursor: "pointer" }}>
-                      Todas
-                    </button>
-                    {subcategoriasDeCat.map(sub => (
-                      <button key={sub} onClick={() => setSubcategoriaActiva(sub === subcategoriaActiva ? "" : sub)}
-                        style={{ padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: sub === subcategoriaActiva ? 800 : 600, border: `1.5px solid ${sub === subcategoriaActiva ? "#d4688e" : "#e2e8f0"}`, background: sub === subcategoriaActiva ? "#fdf0f5" : "white", color: sub === subcategoriaActiva ? "#d4688e" : "#64748b", cursor: "pointer" }}>
-                        {sub}
-                      </button>
-                    ))}
                   </div>
                 )}
 
@@ -2850,17 +2888,47 @@ export default function Tienda() {
                   <span style={{ fontSize: 15, fontWeight: 800, color: "#f0c8d8" }}>Categorías</span>
                 </div>
 
-                {/* Lista de categorías */}
+                {/* Lista de categorías — acordeón: al tocar una se expanden sus subcategorías */}
                 <div style={{ padding: "10px 10px 24px", flex: 1 }}>
                   {categorias.map(cat => {
-                    const est = CAT_ESTILO[cat] ?? CAT_DEFAULT
+                    const subs = subcatsPorCategoria[cat] ?? []
+                    const abierta = sidebarCatExpand === cat
                     return (
-                      <button key={cat} onClick={() => { verCatalogo(cat); setSidebarOpen(false); setCatPanelOpen(false) }}
-                        style={{ width: "100%", display: "flex", alignItems: "center", padding: "11px 14px", borderRadius: 9, background: "transparent", border: "none", color: "#f0c8d8", fontSize: 13, fontWeight: 600, cursor: "pointer", textAlign: "left", transition: "color 0.15s, background 0.15s" }}
-                        onMouseEnter={e => { e.currentTarget.style.background = "rgba(212,104,142,0.15)"; e.currentTarget.style.color = "#fde8f0" }}
-                        onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#f0c8d8" }}>
-                        {cat}
-                      </button>
+                      <div key={cat}>
+                        <button
+                          onClick={() => {
+                            if (subs.length === 0) { verCatalogo(cat); setSidebarOpen(false); setCatPanelOpen(false) }
+                            else setSidebarCatExpand(abierta ? "" : cat)
+                          }}
+                          style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "11px 14px", borderRadius: 9, background: abierta ? "rgba(212,104,142,0.12)" : "transparent", border: "none", color: abierta ? "#fde8f0" : "#f0c8d8", fontSize: 13, fontWeight: abierta ? 800 : 600, cursor: "pointer", textAlign: "left", transition: "color 0.15s, background 0.15s" }}
+                          onMouseEnter={e => { if (!abierta) { e.currentTarget.style.background = "rgba(212,104,142,0.15)"; e.currentTarget.style.color = "#fde8f0" } }}
+                          onMouseLeave={e => { if (!abierta) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#f0c8d8" } }}>
+                          <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cat}</span>
+                          {subs.length > 0 && (
+                            <span style={{ fontSize: 13, opacity: 0.6, flexShrink: 0, transform: abierta ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>›</span>
+                          )}
+                        </button>
+                        {abierta && subs.length > 0 && (
+                          <div style={{ display: "flex", flexDirection: "column", gap: 1, padding: "2px 0 8px 8px", marginLeft: 6, borderLeft: "1.5px solid rgba(212,104,142,0.25)" }}>
+                            <button
+                              onClick={() => { verCatalogo(cat); setSidebarOpen(false); setCatPanelOpen(false) }}
+                              style={{ width: "100%", textAlign: "left", padding: "8px 12px", borderRadius: 8, background: "transparent", border: "none", color: "#d4a0b8", fontSize: 12.5, fontWeight: 700, cursor: "pointer", transition: "color 0.15s, background 0.15s" }}
+                              onMouseEnter={e => { e.currentTarget.style.background = "rgba(212,104,142,0.12)"; e.currentTarget.style.color = "#fde8f0" }}
+                              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#d4a0b8" }}>
+                              Ver todo
+                            </button>
+                            {subs.map(sub => (
+                              <button key={sub}
+                                onClick={() => verCatalogoSub(cat, sub)}
+                                style={{ width: "100%", textAlign: "left", padding: "8px 12px", borderRadius: 8, background: "transparent", border: "none", color: "#cbd5e1", fontSize: 12.5, fontWeight: 500, cursor: "pointer", transition: "color 0.15s, background 0.15s", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+                                onMouseEnter={e => { e.currentTarget.style.background = "rgba(212,104,142,0.12)"; e.currentTarget.style.color = "#fde8f0" }}
+                                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#cbd5e1" }}>
+                                {sub}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     )
                   })}
                 </div>
