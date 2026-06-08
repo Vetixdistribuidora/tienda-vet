@@ -519,6 +519,8 @@ export default function Tienda() {
   const [labDropdownOpen, setLabDropdownOpen] = useState(false)
   // ── Dropdown de categorías abierto ────────────────────────────────────────
   const [catDropdownOpen, setCatDropdownOpen] = useState(false)
+  // ── Dropdown de subcategorías abierto ─────────────────────────────────────
+  const [subDropdownOpen, setSubDropdownOpen] = useState(false)
 
   // ── Recientemente vistos (IDs en localStorage) ───────────────────────────
   const [recientesIds, setRecientesIds] = useState<number[]>(() => {
@@ -571,8 +573,9 @@ export default function Tienda() {
   // ── Sidebar / auth / modal ────────────────────────────────────────────────
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [catPanelOpen, setCatPanelOpen] = useState(false)
-  // ── Categoría expandida (acordeón de subcategorías) en el sidebar ──────────
-  const [sidebarCatExpand, setSidebarCatExpand] = useState("")
+  // ── Panel de subcategorías del sidebar (flyout hacia la derecha) ───────────
+  // Guarda la categoría cuyas subcategorías se muestran en el 3er panel.
+  const [subPanelCat, setSubPanelCat] = useState("")
   // Subcategoría pendiente de aplicar tras cambiar de categoría (el effect de
   // reset la usa para no borrarla cuando navegamos directo a una subcategoría)
   const pendingSubcat = useRef("")
@@ -816,15 +819,21 @@ export default function Tienda() {
       if (catModalOpen) { setCatModalOpen(false); return }
       if (authModalOpen) { setAuthModalOpen(false); return }
       if (editPerfilOpen) { setEditPerfilOpen(false); return }
-      if (sidebarOpen) { setSidebarOpen(false); return }
+      if (sidebarOpen) {
+        // Retroceder un panel a la vez: subcategorías → categorías → cerrar
+        if (subPanelCat) { setSubPanelCat(""); return }
+        if (catPanelOpen) { setCatPanelOpen(false); return }
+        setSidebarOpen(false); return
+      }
       if (carritoOpen) { setCarritoOpen(false); return }
       if (checkoutOpen) { setCheckoutOpen(false); return }
       if (labDropdownOpen) { setLabDropdownOpen(false); return }
       if (catDropdownOpen) { setCatDropdownOpen(false); return }
+      if (subDropdownOpen) { setSubDropdownOpen(false); return }
     }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
-  }, [imagenZoom, productoDetalle, pedidosOpen, catModalOpen, authModalOpen, editPerfilOpen, sidebarOpen, carritoOpen, checkoutOpen, labDropdownOpen, catDropdownOpen])
+  }, [imagenZoom, productoDetalle, pedidosOpen, catModalOpen, authModalOpen, editPerfilOpen, sidebarOpen, catPanelOpen, subPanelCat, carritoOpen, checkoutOpen, labDropdownOpen, catDropdownOpen, subDropdownOpen])
 
   // Reset subcategoría cuando cambia la categoría principal.
   // Si hay una subcategoría "pendiente" (navegación directa desde el sidebar)
@@ -994,6 +1003,7 @@ export default function Tienda() {
     }
     setSidebarOpen(false)
     setCatPanelOpen(false)
+    setSubPanelCat("")
     setCatModalOpen(false)
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
@@ -1926,7 +1936,7 @@ export default function Tienda() {
                     {/* Categorías — dropdown single-select */}
                     <div style={{ position: "relative" }}>
                       <button
-                        onClick={() => { setCatDropdownOpen(v => !v); setLabDropdownOpen(false) }}
+                        onClick={() => { setCatDropdownOpen(v => !v); setLabDropdownOpen(false); setSubDropdownOpen(false) }}
                         style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 10px", border: `1.5px solid ${categoriaActiva ? "#f0c8d8" : "#e2e8f0"}`, borderRadius: 8, fontSize: 12, fontWeight: 600, background: categoriaActiva ? "#fdf0f5" : "white", color: categoriaActiva ? "#d4688e" : "#374151", cursor: "pointer", maxWidth: 220, whiteSpace: "nowrap", overflow: "hidden" }}>
                         {categoriaActiva ? `${categoriaActiva} ▾` : "Categorías ▾"}
                       </button>
@@ -1970,29 +1980,59 @@ export default function Tienda() {
                       )}
                     </div>
 
-                    {/* Subcategorías — cuadrícula entre Categorías y Laboratorio.
+                    {/* Subcategorías — dropdown single-select (igual que Categorías).
                         Solo aparece cuando hay una categoría seleccionada con subcategorías. */}
                     {subcategoriasDeCat.length > 0 && (
-                      <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", padding: "5px 9px", background: "white", border: "1.5px solid #f0c8d8", borderRadius: 10 }}>
-                        <span style={{ fontSize: 9.5, fontWeight: 800, color: "#b05070", textTransform: "uppercase", letterSpacing: 0.6, marginRight: 1 }}>Subcategorías</span>
+                      <div style={{ position: "relative" }}>
                         <button
-                          onClick={() => setSubcategoriaActiva("")}
-                          style={{ padding: "3px 11px", borderRadius: 20, fontSize: 12, fontWeight: subcategoriaActiva === "" ? 800 : 600, border: `1.5px solid ${subcategoriaActiva === "" ? "#d4688e" : "#e2e8f0"}`, background: subcategoriaActiva === "" ? "#fdf0f5" : "#f8fafc", color: subcategoriaActiva === "" ? "#d4688e" : "#64748b", cursor: "pointer", whiteSpace: "nowrap" }}>
-                          Todas
+                          onClick={() => { setSubDropdownOpen(v => !v); setCatDropdownOpen(false); setLabDropdownOpen(false) }}
+                          style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 10px", border: `1.5px solid ${subcategoriaActiva ? "#f0c8d8" : "#e2e8f0"}`, borderRadius: 8, fontSize: 12, fontWeight: 600, background: subcategoriaActiva ? "#fdf0f5" : "white", color: subcategoriaActiva ? "#d4688e" : "#374151", cursor: "pointer", maxWidth: 220, whiteSpace: "nowrap", overflow: "hidden" }}>
+                          {subcategoriaActiva ? `${subcategoriaActiva} ▾` : "Subcategoría ▾"}
                         </button>
-                        {subcategoriasDeCat.map(sub => (
-                          <button key={sub} onClick={() => setSubcategoriaActiva(sub === subcategoriaActiva ? "" : sub)}
-                            style={{ padding: "3px 11px", borderRadius: 20, fontSize: 12, fontWeight: sub === subcategoriaActiva ? 800 : 600, border: `1.5px solid ${sub === subcategoriaActiva ? "#d4688e" : "#e2e8f0"}`, background: sub === subcategoriaActiva ? "#fdf0f5" : "#f8fafc", color: sub === subcategoriaActiva ? "#d4688e" : "#64748b", cursor: "pointer", whiteSpace: "nowrap" }}>
-                            {sub}
-                          </button>
-                        ))}
+                        {subDropdownOpen && (
+                          <>
+                            <div onClick={() => setSubDropdownOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 99 }} />
+                            <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, background: "#e8e8e8", border: "1.5px solid #e2e8f0", borderRadius: 11, boxShadow: "0 8px 32px rgba(0,0,0,0.12)", zIndex: 100, minWidth: 230, maxHeight: 320, overflowY: "auto", padding: "6px 0" }}>
+                              <div style={{ padding: "6px 12px 4px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                                <span style={{ fontSize: 10, fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 1 }}>Subcategorías</span>
+                                {subcategoriaActiva && (
+                                  <button onClick={() => { setSubcategoriaActiva(""); setSubDropdownOpen(false) }} style={{ background: "none", border: "none", fontSize: 10, color: "#d4688e", fontWeight: 700, cursor: "pointer" }}>Limpiar</button>
+                                )}
+                              </div>
+                              {/* Todas */}
+                              <button onClick={() => { setSubcategoriaActiva(""); setSubDropdownOpen(false) }}
+                                style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "7px 12px", background: subcategoriaActiva === "" ? "#fdf0f5" : "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: subcategoriaActiva === "" ? 700 : 500, color: subcategoriaActiva === "" ? "#d4688e" : "#374151", textAlign: "left" }}
+                                onMouseEnter={e => { if (subcategoriaActiva !== "") e.currentTarget.style.background = "#e2e2e2" }}
+                                onMouseLeave={e => { if (subcategoriaActiva !== "") e.currentTarget.style.background = "none" }}>
+                                <span style={{ width: 15, height: 15, borderRadius: 4, border: `2px solid ${subcategoriaActiva === "" ? "#d4688e" : "#d1d5db"}`, background: subcategoriaActiva === "" ? "#d4688e" : "white", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                  {subcategoriaActiva === "" && <svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="white" strokeWidth="2.5"><path d="M2 6l3 3 5-5"/></svg>}
+                                </span>
+                                Todas las subcategorías
+                              </button>
+                              {subcategoriasDeCat.map(sub => {
+                                const sel = subcategoriaActiva === sub
+                                return (
+                                  <button key={sub} onClick={() => { setSubcategoriaActiva(sub); setSubDropdownOpen(false) }}
+                                    style={{ width: "100%", display: "flex", alignItems: "center", gap: 9, padding: "7px 12px", background: sel ? "#fdf0f5" : "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: sel ? 700 : 500, color: sel ? "#d4688e" : "#374151", textAlign: "left" }}
+                                    onMouseEnter={e => { if (!sel) e.currentTarget.style.background = "#e2e2e2" }}
+                                    onMouseLeave={e => { if (!sel) e.currentTarget.style.background = "none" }}>
+                                    <span style={{ width: 15, height: 15, borderRadius: 4, border: `2px solid ${sel ? "#d4688e" : "#d1d5db"}`, background: sel ? "#d4688e" : "white", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                      {sel && <svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="white" strokeWidth="2.5"><path d="M2 6l3 3 5-5"/></svg>}
+                                    </span>
+                                    {sub}
+                                  </button>
+                                )
+                              })}
+                            </div>
+                          </>
+                        )}
                       </div>
                     )}
 
                     {/* Laboratorio — dropdown multi-select */}
                     <div style={{ position: "relative" }}>
                       <button
-                        onClick={() => { setLabDropdownOpen(v => !v); setCatDropdownOpen(false) }}
+                        onClick={() => { setLabDropdownOpen(v => !v); setCatDropdownOpen(false); setSubDropdownOpen(false) }}
                         style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 10px", border: `1.5px solid ${laboratoriosFiltro.size > 0 ? "#f0c8d8" : "#e2e8f0"}`, borderRadius: 8, fontSize: 12, fontWeight: 600, background: laboratoriosFiltro.size > 0 ? "#fdf0f5" : "white", color: laboratoriosFiltro.size > 0 ? "#d4688e" : "#374151", cursor: "pointer", maxWidth: 200, whiteSpace: "nowrap", overflow: "hidden" }}>
                         {laboratoriosFiltro.size === 0
                           ? "Laboratorio ▾"
@@ -2777,22 +2817,22 @@ export default function Tienda() {
       {/* ── SIDEBAR IZQUIERDO ──────────────────────────────────────────────── */}
       {sidebarOpen && (
         <>
-          <div className="overlay-anim" onClick={() => { setSidebarOpen(false); setCatPanelOpen(false) }}
+          <div className="overlay-anim" onClick={() => { setSidebarOpen(false); setCatPanelOpen(false); setSubPanelCat("") }}
             style={{ position: "fixed", inset: 0, background: "rgba(10,15,28,0.55)", zIndex: 50 }} />
 
-          {/* Sidebar — dos paneles deslizantes */}
+          {/* Sidebar — tres paneles deslizantes (principal → categorías → subcategorías) */}
           <div className="sidebar-anim" style={{ position: "fixed", top: 0, left: 0, bottom: 0, width: "min(320px, 90vw)", background: "#0f172a", zIndex: 51, overflow: "hidden", boxShadow: "8px 0 32px rgba(0,0,0,0.3)" }}>
 
             {/* Wrapper deslizante */}
-            <div style={{ display: "flex", width: "200%", height: "100%", transform: catPanelOpen ? "translateX(-50%)" : "translateX(0)", transition: "transform 0.28s cubic-bezier(0.16,1,0.3,1)", willChange: "transform" }}>
+            <div style={{ display: "flex", width: "300%", height: "100%", transform: `translateX(${subPanelCat ? "-66.6667%" : catPanelOpen ? "-33.3333%" : "0"})`, transition: "transform 0.28s cubic-bezier(0.16,1,0.3,1)", willChange: "transform" }}>
 
               {/* ── PANEL PRINCIPAL ── */}
-              <div style={{ width: "50%", height: "100%", display: "flex", flexDirection: "column", overflowY: "auto" }}>
+              <div style={{ width: "33.3333%", height: "100%", display: "flex", flexDirection: "column", overflowY: "auto" }}>
 
                 {/* Header */}
                 <div style={{ padding: "18px 20px 16px", borderBottom: "1px solid #f0c8d8", background: "#fde8f0", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
                   <LogoMarca />
-                  <button onClick={() => { setSidebarOpen(false); setCatPanelOpen(false) }}
+                  <button onClick={() => { setSidebarOpen(false); setCatPanelOpen(false); setSubPanelCat("") }}
                     style={{ width: 34, height: 34, borderRadius: 9, border: "1px solid #1e293b", background: "#1e293b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8" }}>
                     <IcoClose />
                   </button>
@@ -2877,7 +2917,7 @@ export default function Tienda() {
               </div>
 
               {/* ── PANEL CATEGORÍAS ── */}
-              <div style={{ width: "50%", height: "100%", display: "flex", flexDirection: "column", overflowY: "auto" }}>
+              <div style={{ width: "33.3333%", height: "100%", display: "flex", flexDirection: "column", overflowY: "auto" }}>
 
                 {/* Header del panel */}
                 <div style={{ padding: "18px 20px 16px", borderBottom: "1px solid #1e293b", background: "#0a1120", display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
@@ -2888,49 +2928,57 @@ export default function Tienda() {
                   <span style={{ fontSize: 15, fontWeight: 800, color: "#f0c8d8" }}>Categorías</span>
                 </div>
 
-                {/* Lista de categorías — acordeón: al tocar una se expanden sus subcategorías */}
+                {/* Lista de categorías — al tocar una con subcategorías se abre el panel de la derecha */}
                 <div style={{ padding: "10px 10px 24px", flex: 1 }}>
                   {categorias.map(cat => {
                     const subs = subcatsPorCategoria[cat] ?? []
-                    const abierta = sidebarCatExpand === cat
                     return (
-                      <div key={cat}>
-                        <button
-                          onClick={() => {
-                            if (subs.length === 0) { verCatalogo(cat); setSidebarOpen(false); setCatPanelOpen(false) }
-                            else setSidebarCatExpand(abierta ? "" : cat)
-                          }}
-                          style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "11px 14px", borderRadius: 9, background: abierta ? "rgba(212,104,142,0.12)" : "transparent", border: "none", color: abierta ? "#fde8f0" : "#f0c8d8", fontSize: 13, fontWeight: abierta ? 800 : 600, cursor: "pointer", textAlign: "left", transition: "color 0.15s, background 0.15s" }}
-                          onMouseEnter={e => { if (!abierta) { e.currentTarget.style.background = "rgba(212,104,142,0.15)"; e.currentTarget.style.color = "#fde8f0" } }}
-                          onMouseLeave={e => { if (!abierta) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#f0c8d8" } }}>
-                          <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cat}</span>
-                          {subs.length > 0 && (
-                            <span style={{ fontSize: 13, opacity: 0.6, flexShrink: 0, transform: abierta ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>›</span>
-                          )}
-                        </button>
-                        {abierta && subs.length > 0 && (
-                          <div style={{ display: "flex", flexDirection: "column", gap: 1, padding: "2px 0 8px 8px", marginLeft: 6, borderLeft: "1.5px solid rgba(212,104,142,0.25)" }}>
-                            <button
-                              onClick={() => { verCatalogo(cat); setSidebarOpen(false); setCatPanelOpen(false) }}
-                              style={{ width: "100%", textAlign: "left", padding: "8px 12px", borderRadius: 8, background: "transparent", border: "none", color: "#d4a0b8", fontSize: 12.5, fontWeight: 700, cursor: "pointer", transition: "color 0.15s, background 0.15s" }}
-                              onMouseEnter={e => { e.currentTarget.style.background = "rgba(212,104,142,0.12)"; e.currentTarget.style.color = "#fde8f0" }}
-                              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#d4a0b8" }}>
-                              Ver todo
-                            </button>
-                            {subs.map(sub => (
-                              <button key={sub}
-                                onClick={() => verCatalogoSub(cat, sub)}
-                                style={{ width: "100%", textAlign: "left", padding: "8px 12px", borderRadius: 8, background: "transparent", border: "none", color: "#cbd5e1", fontSize: 12.5, fontWeight: 500, cursor: "pointer", transition: "color 0.15s, background 0.15s", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
-                                onMouseEnter={e => { e.currentTarget.style.background = "rgba(212,104,142,0.12)"; e.currentTarget.style.color = "#fde8f0" }}
-                                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#cbd5e1" }}>
-                                {sub}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                      <button key={cat}
+                        onClick={() => {
+                          if (subs.length === 0) { verCatalogo(cat); setSidebarOpen(false); setCatPanelOpen(false) }
+                          else setSubPanelCat(cat)
+                        }}
+                        style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "11px 14px", borderRadius: 9, background: "transparent", border: "none", color: "#f0c8d8", fontSize: 13, fontWeight: 600, cursor: "pointer", textAlign: "left", transition: "color 0.15s, background 0.15s" }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "rgba(212,104,142,0.15)"; e.currentTarget.style.color = "#fde8f0" }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#f0c8d8" }}>
+                        <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cat}</span>
+                        {subs.length > 0 && <span style={{ fontSize: 13, opacity: 0.5, flexShrink: 0 }}>›</span>}
+                      </button>
                     )
                   })}
+                </div>
+              </div>
+
+              {/* ── PANEL SUBCATEGORÍAS (flyout a la derecha) ── */}
+              <div style={{ width: "33.3333%", height: "100%", display: "flex", flexDirection: "column", overflowY: "auto" }}>
+
+                {/* Header del panel */}
+                <div style={{ padding: "18px 20px 16px", borderBottom: "1px solid #1e293b", background: "#0a1120", display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+                  <button onClick={() => setSubPanelCat("")}
+                    style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid rgba(212,104,142,0.3)", background: "rgba(212,104,142,0.15)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#f0c8d8", fontSize: 16, flexShrink: 0 }}>
+                    ‹
+                  </button>
+                  <span style={{ fontSize: 15, fontWeight: 800, color: "#f0c8d8", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{subPanelCat || "Subcategorías"}</span>
+                </div>
+
+                {/* Lista de subcategorías de la categoría seleccionada */}
+                <div style={{ padding: "10px 10px 24px", flex: 1 }}>
+                  <button
+                    onClick={() => { verCatalogo(subPanelCat); setSidebarOpen(false); setCatPanelOpen(false); setSubPanelCat("") }}
+                    style={{ width: "100%", textAlign: "left", padding: "11px 14px", borderRadius: 9, background: "transparent", border: "none", color: "#d4a0b8", fontSize: 13, fontWeight: 800, cursor: "pointer", transition: "color 0.15s, background 0.15s" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(212,104,142,0.15)"; e.currentTarget.style.color = "#fde8f0" }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#d4a0b8" }}>
+                    Ver todo
+                  </button>
+                  {(subcatsPorCategoria[subPanelCat] ?? []).map(sub => (
+                    <button key={sub}
+                      onClick={() => verCatalogoSub(subPanelCat, sub)}
+                      style={{ width: "100%", textAlign: "left", padding: "11px 14px", borderRadius: 9, background: "transparent", border: "none", color: "#cbd5e1", fontSize: 13, fontWeight: 500, cursor: "pointer", transition: "color 0.15s, background 0.15s", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+                      onMouseEnter={e => { e.currentTarget.style.background = "rgba(212,104,142,0.15)"; e.currentTarget.style.color = "#fde8f0" }}
+                      onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#cbd5e1" }}>
+                      {sub}
+                    </button>
+                  ))}
                 </div>
               </div>
 
