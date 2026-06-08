@@ -482,6 +482,8 @@ export default function Tienda() {
   const [form, setForm] = useState({ nombre: "", telefono: "", email: "", direccion: "", notas: "" })
   const [errForm, setErrForm] = useState<Record<string, string>>({})
   const [scrollY, setScrollY] = useState(0)
+  // Ancho de ventana — define si el sidebar usa columnas (desktop) o slide (mobile)
+  const [winW, setWinW] = useState(() => (typeof window === "undefined" ? 1200 : window.innerWidth))
 
   // ── Detalle producto ─────────────────────────────────────────────────────
   const [productoDetalle, setProductoDetalle] = useState<Producto | null>(null)
@@ -644,6 +646,14 @@ export default function Tienda() {
     return () => window.removeEventListener("scroll", fn)
   }, [])
 
+  // Window width tracker (para el layout del sidebar)
+  useEffect(() => {
+    const fn = () => setWinW(window.innerWidth)
+    fn()
+    window.addEventListener("resize", fn, { passive: true })
+    return () => window.removeEventListener("resize", fn)
+  }, [])
+
   const categorias = useMemo(() => {
     const set = new Set(productos.map(p => p.categoria).filter(Boolean) as string[])
     return [
@@ -716,6 +726,23 @@ export default function Tienda() {
     for (const k in m) m[k] = [...new Set(m[k])].sort()
     return m
   }, [productos])
+
+  // ── Layout del sidebar ────────────────────────────────────────────────────
+  // En desktop (≥700px) las subcategorías se abren como una COLUMNA nueva a la
+  // derecha (la lista de categorías queda fija y el panel se ensancha).
+  // En mobile, se mantiene el comportamiento de deslizar/reemplazar.
+  const sbColumns = winW >= 700
+  const sbPanelW = Math.min(320, Math.round(winW * 0.9))
+  const sbColPrin = sbColumns ? 300 : sbPanelW
+  const sbColCat  = sbColumns ? 300 : sbPanelW
+  const sbColSub  = sbColumns ? 300 : sbPanelW
+  const sbWrapperW = sbColPrin + sbColCat + sbColSub
+  const sbTranslate = sbColumns
+    ? (catPanelOpen ? sbColPrin : 0)
+    : (subPanelCat ? sbColPrin + sbColCat : catPanelOpen ? sbColPrin : 0)
+  const sbOuterW = sbColumns
+    ? (!catPanelOpen ? sbColPrin : subPanelCat ? sbColCat + sbColSub : sbColCat)
+    : sbPanelW
 
   // Sugerencias de búsqueda (top 7 coincidencias por nombre)
   const sugerencias = useMemo(() => {
@@ -2820,14 +2847,14 @@ export default function Tienda() {
           <div className="overlay-anim" onClick={() => { setSidebarOpen(false); setCatPanelOpen(false); setSubPanelCat("") }}
             style={{ position: "fixed", inset: 0, background: "rgba(10,15,28,0.55)", zIndex: 50 }} />
 
-          {/* Sidebar — tres paneles deslizantes (principal → categorías → subcategorías) */}
-          <div className="sidebar-anim" style={{ position: "fixed", top: 0, left: 0, bottom: 0, width: "min(320px, 90vw)", background: "#0f172a", zIndex: 51, overflow: "hidden", boxShadow: "8px 0 32px rgba(0,0,0,0.3)" }}>
+          {/* Sidebar — en desktop las subcategorías se expanden como columna a la derecha */}
+          <div className="sidebar-anim" style={{ position: "fixed", top: 0, left: 0, bottom: 0, width: sbOuterW, maxWidth: "96vw", background: "#0f172a", zIndex: 51, overflow: "hidden", boxShadow: "8px 0 32px rgba(0,0,0,0.3)", transition: "width 0.28s cubic-bezier(0.16,1,0.3,1)" }}>
 
             {/* Wrapper deslizante */}
-            <div style={{ display: "flex", width: "300%", height: "100%", transform: `translateX(${subPanelCat ? "-66.6667%" : catPanelOpen ? "-33.3333%" : "0"})`, transition: "transform 0.28s cubic-bezier(0.16,1,0.3,1)", willChange: "transform" }}>
+            <div style={{ display: "flex", width: sbWrapperW, height: "100%", transform: `translateX(-${sbTranslate}px)`, transition: "transform 0.28s cubic-bezier(0.16,1,0.3,1)", willChange: "transform" }}>
 
               {/* ── PANEL PRINCIPAL ── */}
-              <div style={{ width: "33.3333%", height: "100%", display: "flex", flexDirection: "column", overflowY: "auto" }}>
+              <div style={{ width: sbColPrin, flexShrink: 0, height: "100%", display: "flex", flexDirection: "column", overflowY: "auto" }}>
 
                 {/* Header */}
                 <div style={{ padding: "18px 20px 16px", borderBottom: "1px solid #f0c8d8", background: "#fde8f0", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
@@ -2917,11 +2944,11 @@ export default function Tienda() {
               </div>
 
               {/* ── PANEL CATEGORÍAS ── */}
-              <div style={{ width: "33.3333%", height: "100%", display: "flex", flexDirection: "column", overflowY: "auto" }}>
+              <div style={{ width: sbColCat, flexShrink: 0, height: "100%", display: "flex", flexDirection: "column", overflowY: "auto", borderRight: sbColumns && subPanelCat ? "1px solid #1e293b" : "none" }}>
 
                 {/* Header del panel */}
                 <div style={{ padding: "18px 20px 16px", borderBottom: "1px solid #1e293b", background: "#0a1120", display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
-                  <button onClick={() => setCatPanelOpen(false)}
+                  <button onClick={() => { setCatPanelOpen(false); setSubPanelCat("") }}
                     style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid rgba(212,104,142,0.3)", background: "rgba(212,104,142,0.15)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#f0c8d8", fontSize: 16, flexShrink: 0 }}>
                     ‹
                   </button>
@@ -2932,25 +2959,26 @@ export default function Tienda() {
                 <div style={{ padding: "10px 10px 24px", flex: 1 }}>
                   {categorias.map(cat => {
                     const subs = subcatsPorCategoria[cat] ?? []
+                    const activa = subPanelCat === cat
                     return (
                       <button key={cat}
                         onClick={() => {
                           if (subs.length === 0) { verCatalogo(cat); setSidebarOpen(false); setCatPanelOpen(false) }
-                          else setSubPanelCat(cat)
+                          else setSubPanelCat(activa ? "" : cat)
                         }}
-                        style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "11px 14px", borderRadius: 9, background: "transparent", border: "none", color: "#f0c8d8", fontSize: 13, fontWeight: 600, cursor: "pointer", textAlign: "left", transition: "color 0.15s, background 0.15s" }}
-                        onMouseEnter={e => { e.currentTarget.style.background = "rgba(212,104,142,0.15)"; e.currentTarget.style.color = "#fde8f0" }}
-                        onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#f0c8d8" }}>
+                        style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "11px 14px", borderRadius: 9, background: activa ? "rgba(212,104,142,0.18)" : "transparent", border: "none", color: activa ? "#fde8f0" : "#f0c8d8", fontSize: 13, fontWeight: activa ? 800 : 600, cursor: "pointer", textAlign: "left", transition: "color 0.15s, background 0.15s" }}
+                        onMouseEnter={e => { if (!activa) { e.currentTarget.style.background = "rgba(212,104,142,0.15)"; e.currentTarget.style.color = "#fde8f0" } }}
+                        onMouseLeave={e => { if (!activa) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#f0c8d8" } }}>
                         <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cat}</span>
-                        {subs.length > 0 && <span style={{ fontSize: 13, opacity: 0.5, flexShrink: 0 }}>›</span>}
+                        {subs.length > 0 && <span style={{ fontSize: 13, opacity: 0.6, flexShrink: 0, transform: activa ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>›</span>}
                       </button>
                     )
                   })}
                 </div>
               </div>
 
-              {/* ── PANEL SUBCATEGORÍAS (flyout a la derecha) ── */}
-              <div style={{ width: "33.3333%", height: "100%", display: "flex", flexDirection: "column", overflowY: "auto" }}>
+              {/* ── PANEL SUBCATEGORÍAS (columna a la derecha en desktop) ── */}
+              <div style={{ width: sbColSub, flexShrink: 0, height: "100%", display: "flex", flexDirection: "column", overflowY: "auto", background: "#0c1322" }}>
 
                 {/* Header del panel */}
                 <div style={{ padding: "18px 20px 16px", borderBottom: "1px solid #1e293b", background: "#0a1120", display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
