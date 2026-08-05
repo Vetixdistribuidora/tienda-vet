@@ -1785,6 +1785,16 @@ export default function Tienda() {
           </div>
 
 
+          {/* ── VER CATÁLOGO ──────────────────────────────────────────────── */}
+          <div style={{ background: "#1a2035", padding: "32px 20px", borderTop: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
+            <button onClick={() => verCatalogo("")}
+              style={{ display: "inline-flex", alignItems: "center", gap: 12, padding: "18px 48px", borderRadius: 16, background: "#d4688e", color: "white", border: "none", fontSize: 18, fontWeight: 900, cursor: "pointer", boxShadow: "0 6px 28px rgba(212,104,142,0.5)", transition: "background 0.15s, transform 0.12s, box-shadow 0.15s" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#b05070"; e.currentTarget.style.transform = "scale(1.03)"; e.currentTarget.style.boxShadow = "0 8px 36px rgba(212,104,142,0.6)" }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#d4688e"; e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "0 6px 28px rgba(212,104,142,0.5)" }}>
+              Ver catálogo completo — {productos.length.toLocaleString("es-AR")} productos →
+            </button>
+          </div>
+
           {/* ── PROMOCIONES (FLYERS) ──────────────────────────────────────── */}
           <PromoFlyers onZoom={setImagenZoom} />
 
@@ -1858,16 +1868,6 @@ export default function Tienda() {
                 ))}
               </div>
             </div>
-          </div>
-
-          {/* ── VER CATÁLOGO ──────────────────────────────────────────────── */}
-          <div style={{ background: "#1a2035", padding: "32px 20px", borderTop: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
-            <button onClick={() => verCatalogo("")}
-              style={{ display: "inline-flex", alignItems: "center", gap: 12, padding: "18px 48px", borderRadius: 16, background: "#d4688e", color: "white", border: "none", fontSize: 18, fontWeight: 900, cursor: "pointer", boxShadow: "0 6px 28px rgba(212,104,142,0.5)", transition: "background 0.15s, transform 0.12s, box-shadow 0.15s" }}
-              onMouseEnter={e => { e.currentTarget.style.background = "#b05070"; e.currentTarget.style.transform = "scale(1.03)"; e.currentTarget.style.boxShadow = "0 8px 36px rgba(212,104,142,0.6)" }}
-              onMouseLeave={e => { e.currentTarget.style.background = "#d4688e"; e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "0 6px 28px rgba(212,104,142,0.5)" }}>
-              Ver catálogo completo — {productos.length.toLocaleString("es-AR")} productos →
-            </button>
           </div>
 
           {/* ── CHIPS DE CATEGORÍAS ───────────────────────────────────────── */}
