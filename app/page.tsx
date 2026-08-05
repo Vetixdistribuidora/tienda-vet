@@ -88,6 +88,22 @@ function precioConTipo(precioVenta: number, tipo: TipoCliente | null): number | 
 const BANNER_TEXTO = ""
 const BANNER_VERSION = "vetix_banner_1"
 
+// ── Promociones (flyers publicitarios) ─────────────────────────────────────
+// Se muestran en un carrusel en el inicio. Para agregar/quitar una promo,
+// poné el archivo en /public/promos y sumá (o borrá) una línea acá.
+// El orden de esta lista es el orden en que aparecen.
+// Para agregar un video en vez de una imagen, poné el .mp4 en /public/promos
+// y sumá la línea con video: true.
+const PROMOS: { src: string; alt: string; video?: boolean }[] = [
+  { src: "/promos/elmer-perfumes.mp4", alt: "Perfume Chic N°1 para mascotas — Elmer", video: true },
+  { src: "/promos/paul-1.jpeg",  alt: "Vacuna Antirrábica PAULVAC — Promoción 9+1" },
+  { src: "/promos/paul-2.jpeg",  alt: "Vacuna Séxtuple Paul 6 — Promoción 10+4" },
+  { src: "/promos/elmer-1.jpeg", alt: "Perfume Chic N°1 para mascotas — Elmer" },
+  { src: "/promos/elmer-2.jpeg", alt: "Perfume Chic N°1 para mascotas — Elmer" },
+  { src: "/promos/elmer-3.jpeg", alt: "Perfume Chic N°1 para mascotas — Elmer" },
+  { src: "/promos/elmer-4.jpeg", alt: "Perfume Chic N°1 para mascotas — Elmer" },
+]
+
 function fmt(n: number) {
   return "$" + n.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
@@ -454,6 +470,111 @@ function TabCategoria({ label, count, activo, onClick }: { label: string; count:
   )
 }
 
+// ── Carrusel de promociones (flyers) ──────────────────────────────────────────
+
+function PromoFlyers({ onZoom }: { onZoom?: (src: string) => void }) {
+  const scrollerRef = useRef<HTMLDivElement>(null)
+  const [activo, setActivo] = useState(0)
+  const [pausado, setPausado] = useState(false)
+
+  const irA = useCallback((i: number) => {
+    const el = scrollerRef.current
+    if (!el) return
+    const n = PROMOS.length
+    const idx = ((i % n) + n) % n
+    const card = el.children[idx] as HTMLElement | undefined
+    if (!card) return
+    const left = card.getBoundingClientRect().left - el.getBoundingClientRect().left + el.scrollLeft
+    el.scrollTo({ left, behavior: "smooth" })
+  }, [])
+
+  // Avance automático (pausado al pasar el mouse por encima)
+  useEffect(() => {
+    if (pausado) return
+    const t = setInterval(() => irA(activo + 1), 4500)
+    return () => clearInterval(t)
+  }, [activo, pausado, irA])
+
+  // Detecta cuál flyer está centrado para marcar el punto activo
+  useEffect(() => {
+    const el = scrollerRef.current
+    if (!el) return
+    let raf = 0
+    const onScroll = () => {
+      cancelAnimationFrame(raf)
+      raf = requestAnimationFrame(() => {
+        const centro = el.scrollLeft + el.clientWidth / 2
+        let best = 0, bestDist = Infinity
+        Array.from(el.children).forEach((c, i) => {
+          const ch = c as HTMLElement
+          const cc = ch.offsetLeft - el.offsetLeft + ch.clientWidth / 2
+          const d = Math.abs(cc - centro)
+          if (d < bestDist) { bestDist = d; best = i }
+        })
+        setActivo(best)
+      })
+    }
+    el.addEventListener("scroll", onScroll, { passive: true })
+    return () => { el.removeEventListener("scroll", onScroll); cancelAnimationFrame(raf) }
+  }, [])
+
+  if (PROMOS.length === 0) return null
+
+  return (
+    <div style={{ background: "#e8e8e8", padding: "30px 0 34px", borderBottom: "1px solid #eaecf2" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px 18px" }}>
+        <span style={{ fontSize: 10, fontWeight: 800, color: "#d4688e", textTransform: "uppercase", letterSpacing: 1.4 }}>Promociones</span>
+        <h2 style={{ margin: "4px 0 3px", fontSize: 20, fontWeight: 900, color: "#1a2035" }}>Ofertas destacadas</h2>
+        <p style={{ margin: 0, fontSize: 13, color: "#64748b" }}>Aprovechá las promos vigentes de nuestros laboratorios</p>
+      </div>
+
+      <div
+        style={{ position: "relative", maxWidth: 1280, margin: "0 auto" }}
+        onMouseEnter={() => setPausado(true)}
+        onMouseLeave={() => setPausado(false)}
+      >
+        {/* Flecha anterior */}
+        <button aria-label="Anterior" onClick={() => irA(activo - 1)} className="hide-sm"
+          style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", zIndex: 3, width: 42, height: 42, borderRadius: "50%", background: "rgba(255,255,255,0.95)", border: "1px solid #e6e2de", boxShadow: "0 3px 12px rgba(0,0,0,0.15)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#1a2035", fontSize: 20, lineHeight: 1 }}>
+          ‹
+        </button>
+
+        {/* Carrusel */}
+        <div ref={scrollerRef}
+          style={{ display: "flex", gap: 16, overflowX: "auto", scrollSnapType: "x mandatory", padding: "4px 20px 8px", scrollbarWidth: "none" }}>
+          {PROMOS.map((promo, i) => (
+            <div key={promo.src}
+              onClick={() => { if (!promo.video) onZoom?.(promo.src) }}
+              style={{ position: "relative", flexShrink: 0, width: "min(76vw, 300px)", aspectRatio: "4 / 5", borderRadius: 16, overflow: "hidden", scrollSnapAlign: "center", cursor: (!promo.video && onZoom) ? "zoom-in" : "default", background: "#f7f8fb", border: "1.5px solid #e6e2de", boxShadow: "0 6px 20px rgba(0,0,0,0.12)" }}>
+              {promo.video ? (
+                <video src={promo.src} muted autoPlay loop playsInline controls
+                  aria-label={promo.alt}
+                  style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+              ) : (
+                <Image src={promo.src} alt={promo.alt} fill sizes="(max-width: 640px) 76vw, 300px" style={{ objectFit: "cover" }} priority={i < 2} />
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Flecha siguiente */}
+        <button aria-label="Siguiente" onClick={() => irA(activo + 1)} className="hide-sm"
+          style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", zIndex: 3, width: 42, height: 42, borderRadius: "50%", background: "rgba(255,255,255,0.95)", border: "1px solid #e6e2de", boxShadow: "0 3px 12px rgba(0,0,0,0.15)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#1a2035", fontSize: 20, lineHeight: 1 }}>
+          ›
+        </button>
+      </div>
+
+      {/* Puntos indicadores */}
+      <div style={{ display: "flex", justifyContent: "center", gap: 7, marginTop: 14 }}>
+        {PROMOS.map((_, i) => (
+          <button key={i} aria-label={`Ir a promo ${i + 1}`} onClick={() => irA(i)}
+            style={{ width: activo === i ? 22 : 8, height: 8, borderRadius: 20, border: "none", padding: 0, cursor: "pointer", background: activo === i ? "#d4688e" : "#cbd0da", transition: "all 0.25s" }} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 // ── Página principal ─────────────────────────────────────────────────────────
 
 export default function Tienda() {
@@ -523,12 +644,6 @@ export default function Tienda() {
   const [catDropdownOpen, setCatDropdownOpen] = useState(false)
   // ── Dropdown de subcategorías abierto ─────────────────────────────────────
   const [subDropdownOpen, setSubDropdownOpen] = useState(false)
-
-  // ── Recientemente vistos (IDs en localStorage) ───────────────────────────
-  const [recientesIds, setRecientesIds] = useState<number[]>(() => {
-    if (typeof window === "undefined") return []
-    try { return JSON.parse(localStorage.getItem("vetix_recientes") ?? "[]") } catch { return [] }
-  })
 
   // ── Ref para foco desde atajo de teclado "/" ──────────────────────────────
   const searchRef = useRef<HTMLInputElement>(null)
@@ -690,13 +805,6 @@ export default function Tienda() {
     const sinImg = productos.filter(p => !p.imagen_url)
     return [...conImg, ...sinImg].slice(0, 8)
   }, [productos])
-
-  const recientesProductos = useMemo(() =>
-    recientesIds
-      .map(id => productos.find(p => p.id === id))
-      .filter((p): p is Producto => p !== undefined)
-      .slice(0, 8)
-  , [recientesIds, productos])
 
   const favoritosProductos = useMemo(() =>
     [...favoritos]
@@ -928,16 +1036,6 @@ export default function Tienda() {
       }
     } catch {}
   }, [])
-
-  // Registrar producto visto recientemente
-  useEffect(() => {
-    if (!productoDetalle) return
-    setRecientesIds(prev => {
-      const next = [productoDetalle.id, ...prev.filter(id => id !== productoDetalle.id)].slice(0, 12)
-      localStorage.setItem("vetix_recientes", JSON.stringify(next))
-      return next
-    })
-  }, [productoDetalle])
 
   // Abrir un producto si la URL tiene ?producto=ID (solo al cargar por primera vez)
   useEffect(() => {
@@ -1691,40 +1789,8 @@ export default function Tienda() {
           </div>
 
 
-          {/* ── RECIENTEMENTE VISTOS ──────────────────────────────────────── */}
-          {recientesProductos.length > 0 && (
-            <div style={{ background: "#e8e8e8", padding: "28px 0 32px", borderBottom: "1px solid #eaecf2" }}>
-              <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <div>
-                  <h2 style={{ margin: "0 0 3px", fontSize: 18, fontWeight: 900, color: "#1a2035" }}>Vistos recientemente</h2>
-                  <p style={{ margin: 0, fontSize: 13, color: "#64748b" }}>Continuá desde donde dejaste</p>
-                </div>
-                <button
-                  onClick={() => { setRecientesIds([]); localStorage.removeItem("vetix_recientes") }}
-                  style={{ background: "none", border: "none", fontSize: 12, color: "#94a3b8", cursor: "pointer", fontWeight: 600 }}>
-                  Borrar historial
-                </button>
-              </div>
-              <div style={{ overflowX: "auto", paddingLeft: 20 }}>
-                <div style={{ display: "flex", gap: 14, paddingRight: 20, paddingBottom: 4 }}>
-                  {recientesProductos.map(p => (
-                    <div key={p.id} style={{ width: 200, flexShrink: 0 }}>
-                      <TarjetaProducto p={p}
-                        enCarrito={carrito.find(i => i.producto.id === p.id)?.cantidad ?? 0}
-                        onAgregar={() => agregar(p)}
-                        onCambiar={d => cambiar(p.id, d)}
-                        onDetalle={() => setProductoDetalle(p)}
-                        esFav={favoritos.has(p.id)}
-                        onToggleFav={() => toggleFavorito(p.id)}
-                        tipoCliente={tipoCliente}
-                        onVerPrecio={() => { setLoginModo("login"); setLoginError(""); setAuthModalOpen(true) }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
+          {/* ── PROMOCIONES (FLYERS) ──────────────────────────────────────── */}
+          <PromoFlyers onZoom={setImagenZoom} />
 
           {/* ── MIS FAVORITOS ─────────────────────────────────────────────── */}
           {favoritosProductos.length > 0 && (
