@@ -98,10 +98,6 @@ const PROMOS: { src: string; alt: string; video?: boolean }[] = [
   { src: "/promos/elmer-perfumes.mp4", alt: "Perfume Chic N°1 para mascotas — Elmer", video: true },
   { src: "/promos/paul-1.jpeg",  alt: "Vacuna Antirrábica PAULVAC — Promoción 9+1" },
   { src: "/promos/paul-2.jpeg",  alt: "Vacuna Séxtuple Paul 6 — Promoción 10+4" },
-  { src: "/promos/elmer-1.jpeg", alt: "Perfume Chic N°1 para mascotas — Elmer" },
-  { src: "/promos/elmer-2.jpeg", alt: "Perfume Chic N°1 para mascotas — Elmer" },
-  { src: "/promos/elmer-3.jpeg", alt: "Perfume Chic N°1 para mascotas — Elmer" },
-  { src: "/promos/elmer-4.jpeg", alt: "Perfume Chic N°1 para mascotas — Elmer" },
 ]
 
 function fmt(n: number) {
