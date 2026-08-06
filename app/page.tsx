@@ -1438,6 +1438,11 @@ export default function Tienda() {
   }
 
   async function enviar() {
+    // No permitir enviar un pedido sin productos (evita pedidos vacíos)
+    if (carrito.length === 0) {
+      setErrPedido("Tu carrito está vacío. Agregá al menos un producto antes de enviar el pedido.")
+      return
+    }
     const e: Record<string, string> = {}
     if (!form.nombre.trim()) e.nombre = "Campo requerido"
     if (!form.telefono.trim()) e.telefono = "Campo requerido"

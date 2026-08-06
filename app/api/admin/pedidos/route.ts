@@ -12,7 +12,8 @@ export async function GET(req: NextRequest) {
   const { data, error } = await getSupabaseAdmin()
     .from("pedidos")
     .select("*, pedido_items(nombre_producto, cantidad, precio_unitario)")
-    .is("deleted_at", null)  // no mostrar pedidos borrados (borrado suave, compartido con distribuidora-vet)
+    .is("nombre_proveedor", null)  // solo pedidos de la tienda (los de proveedores son de distribuidora-vet)
+    .is("deleted_at", null)        // no mostrar pedidos borrados (borrado suave, compartido con distribuidora-vet)
     .order("created_at", { ascending: false })
     .limit(500)
 
