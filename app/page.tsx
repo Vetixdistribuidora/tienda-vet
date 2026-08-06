@@ -17,7 +17,7 @@ type Producto = {
   imagen_url: string | null
 }
 type ItemCarrito = { producto: Producto; cantidad: number; nota?: string }
-type Orden = "az" | "za" | "precio_asc" | "precio_desc" | "stock_asc"
+type Orden = "lab" | "az" | "za" | "precio_asc" | "precio_desc" | "stock_asc"
 type PedidoHistorial = {
   id: number
   created_at: string
@@ -579,7 +579,7 @@ export default function Tienda() {
   const [busqueda, setBusqueda] = useState("")
   const [categoriaActiva, setCategoriaActiva] = useState("")
   const [subcategoriaActiva, setSubcategoriaActiva] = useState("")
-  const [orden, setOrden] = useState<Orden>("az")
+  const [orden, setOrden] = useState<Orden>("lab")
 
   const [carrito, setCarrito] = useState<ItemCarrito[]>(() => {
     if (typeof window === "undefined") return []
@@ -858,7 +858,13 @@ export default function Tienda() {
 
   function ordenar(arr: Producto[]) {
     const s = [...arr]
-    if (orden === "az") s.sort((a, b) => a.nombre.localeCompare(b.nombre, "es"))
+    if (orden === "lab") s.sort((a, b) => {
+      const la = (a.laboratorio || "").trim(), lb = (b.laboratorio || "").trim()
+      if (!la !== !lb) return la ? -1 : 1  // productos sin laboratorio, al final
+      const c = la.localeCompare(lb, "es", { sensitivity: "base" })
+      return c !== 0 ? c : a.nombre.localeCompare(b.nombre, "es")
+    })
+    else if (orden === "az") s.sort((a, b) => a.nombre.localeCompare(b.nombre, "es"))
     else if (orden === "za") s.sort((a, b) => b.nombre.localeCompare(a.nombre, "es"))
     else if (orden === "precio_asc") s.sort((a, b) => a.precio_venta - b.precio_venta)
     else if (orden === "precio_desc") s.sort((a, b) => b.precio_venta - a.precio_venta)
@@ -888,24 +894,22 @@ export default function Tienda() {
   const secciones = useMemo(() => {
     // Vista especial: favoritos
     if (categoriaActiva === "__favs__") {
-      const favIds = favoritos
-      const items = ordenar(filtrarProductos(productos.filter(p => favIds.has(p.id))))
+      const items = ordenar(filtrarProductos(productos.filter(p => favoritos.has(p.id))))
       return items.length > 0 ? [{ cat: "Mis favoritos", items }] : []
     }
-    const grupos: { cat: string; items: Producto[] }[] = []
-    const catsAMostrar = categoriaActiva ? [categoriaActiva] : categorias
-    for (const cat of catsAMostrar) {
-      let base = productos.filter(p => p.categoria === cat)
+    // Categoría específica → una sección con encabezado
+    if (categoriaActiva) {
+      let base = productos.filter(p => p.categoria === categoriaActiva)
       if (subcategoriaActiva) base = base.filter(p => p.subcategoria === subcategoriaActiva)
       const items = ordenar(filtrarProductos(base))
-      if (items.length > 0) grupos.push({ cat, items })
+      return items.length > 0 ? [{ cat: categoriaActiva, items }] : []
     }
-    if (!categoriaActiva) {
-      const sinCat = ordenar(filtrarProductos(productos.filter(p => !p.categoria)))
-      if (sinCat.length > 0) grupos.push({ cat: "Otros", items: sinCat })
-    }
-    return grupos
-  }, [productos, categorias, categoriaActiva, subcategoriaActiva, busquedaDelay, precioMin, precioMax, laboratoriosFiltro, orden, favoritos])
+    // Catálogo general → lista plana ordenada por el criterio elegido (por
+    // defecto, laboratorio). No se agrupa por categoría, así no aparecen
+    // primero los alimentos.
+    const items = ordenar(filtrarProductos(productos))
+    return items.length > 0 ? [{ cat: "Todos", items }] : []
+  }, [productos, categoriaActiva, subcategoriaActiva, busquedaDelay, precioMin, precioMax, laboratoriosFiltro, orden, favoritos])
 
   const totalFiltrados = secciones.reduce((s, g) => s + g.items.length, 0)
   const totalItems = carrito.reduce((s, i) => s + i.cantidad, 0)
@@ -2065,6 +2069,7 @@ export default function Tienda() {
                       </button>
                       <select value={orden} onChange={e => setOrden(e.target.value as Orden)}
                         style={{ padding: "7px 11px", border: "1.5px solid #e2e8f0", borderRadius: 9, fontSize: 13, fontWeight: 600, outline: "none", background: "#e8e8e8", color: "#374151", cursor: "pointer" }}>
+                        <option value="lab">Laboratorio</option>
                         <option value="az">Nombre A → Z</option>
                         <option value="za">Nombre Z → A</option>
                         <option value="precio_asc">Precio: menor primero</option>
