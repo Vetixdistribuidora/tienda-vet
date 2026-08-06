@@ -194,9 +194,7 @@ function HighlightText({ texto, query }: { texto: string; query: string }) {
 
 // Devuelve texto y colores del badge de stock
 function stockLabel(stock: number): { text: string; color: string; bg: string; border: string } | null {
-  if (stock <= 0) return null
-  if (stock === 1) return { text: "¡Última unidad!", color: "#dc2626", bg: "#fef2f2", border: "#fecaca" }
-  if (stock <= 3)  return { text: `Solo ${stock} unidades`, color: "#dc2626", bg: "#fef2f2", border: "#fecaca" }
+  if (stock <= 0) return { text: "Sin stock", color: "#6b7280", bg: "#f3f4f6", border: "#e5e7eb" }
   if (stock <= 10) return { text: "Stock limitado", color: "#92400e", bg: "#fef3c7", border: "#fde68a" }
   return null
 }
@@ -1797,7 +1795,7 @@ export default function Tienda() {
             </div>
             {/* Cuerpo del hero */}
             <div style={{ padding: "52px 24px 56px", textAlign: "center", maxWidth: 680, margin: "0 auto" }}>
-              <h1 style={{ margin: "0 0 10px", fontSize: "clamp(26px, 4vw, 44px)", fontWeight: 900, color: "white", lineHeight: 1.2 }}>
+              <h1 style={{ margin: "0 0 10px", fontSize: "clamp(14px, 4.3vw, 32px)", fontWeight: 900, color: "white", lineHeight: 1.2, whiteSpace: "nowrap" }}>
                 Tu distribuidora veterinaria <span style={{ color: "#f0c8d8" }}>online</span>
               </h1>
               {/* Buscador hero */}
@@ -1830,17 +1828,6 @@ export default function Tienda() {
             </div>
           </div>
 
-          {/* ── VENTAJAS ───────────────────────────────────────────────────── */}
-          <div style={{ background: "linear-gradient(90deg, #b05070, #d4688e, #c97b9e, #b05070)", backgroundSize: "200% 100%", padding: "9px 24px", display: "flex", justifyContent: "center", gap: 36, flexWrap: "wrap" }}>
-            {[
-              { texto: "✓ Precios al por mayor" },
-              { texto: "✓ Envíos coordinados" },
-              { texto: "✓ Catálogo actualizado" },
-              { texto: "✓ Atención personalizada" },
-            ].map(v => (
-              <span key={v.texto} style={{ fontSize: 12, color: "white", fontWeight: 700, whiteSpace: "nowrap" }}>{v.texto}</span>
-            ))}
-          </div>
 
 
           {/* ── VER CATÁLOGO ──────────────────────────────────────────────── */}
