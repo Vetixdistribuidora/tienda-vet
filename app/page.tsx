@@ -708,6 +708,7 @@ export default function Tienda() {
   const [regApellido, setRegApellido] = useState("")
   const [regTelefono, setRegTelefono] = useState("")
   const [regDireccion, setRegDireccion] = useState("")
+  const [regPass2, setRegPass2] = useState("")  // repetir contraseña
   // Editar perfil
   const [editPerfilOpen, setEditPerfilOpen] = useState(false)
   const [editNombre, setEditNombre] = useState("")
@@ -1301,6 +1302,12 @@ export default function Tienda() {
     if (!loginEmail.trim() || !loginPass.trim() || !regNombre.trim() || !regApellido.trim() || !regTelefono.trim()) {
       setLoginError("Completá los campos obligatorios (*)"); return
     }
+    if (loginPass.length < 6) {
+      setLoginError("La contraseña debe tener al menos 6 caracteres"); return
+    }
+    if (loginPass !== regPass2) {
+      setLoginError("Las contraseñas no coinciden. Revisá que sean iguales."); return
+    }
     setLoginCargando(true); setLoginError("")
 
     // 1. Crear usuario en Supabase Auth
@@ -1348,7 +1355,7 @@ export default function Tienda() {
 
     setLoginCargando(false)
     // Limpiar campos
-    setRegNombre(""); setRegApellido(""); setRegTelefono(""); setRegDireccion("")
+    setRegNombre(""); setRegApellido(""); setRegTelefono(""); setRegDireccion(""); setRegPass2("")
     setLoginEmail(""); setLoginPass("")
     setAuthModalOpen(false)
     mostrarToast("¡Cuenta creada! Si pedimos confirmar tu email, revisá tu casilla.")
@@ -3436,6 +3443,18 @@ export default function Tienda() {
                       onFocus={e => (e.target.style.borderColor = "#d4688e")}
                       onBlur={e => (e.target.style.borderColor = "#e2e8f0")}
                     />
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: 10.5, fontWeight: 800, color: "#374151", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>Repetir contraseña *</label>
+                    <input type="password" placeholder="Repetí la contraseña" value={regPass2}
+                      onChange={e => { setRegPass2(e.target.value); setLoginError("") }}
+                      style={{ width: "100%", padding: "10px 13px", borderRadius: 10, border: `1.5px solid ${regPass2 && loginPass !== regPass2 ? "#fca5a5" : "#e2e8f0"}`, fontSize: 14, outline: "none", boxSizing: "border-box" }}
+                      onFocus={e => (e.target.style.borderColor = "#d4688e")}
+                      onBlur={e => (e.target.style.borderColor = regPass2 && loginPass !== regPass2 ? "#fca5a5" : "#e2e8f0")}
+                    />
+                    {regPass2 && loginPass !== regPass2 && (
+                      <p style={{ margin: "5px 0 0", fontSize: 11, color: "#dc2626", fontWeight: 600 }}>Las contraseñas no coinciden</p>
+                    )}
                   </div>
                   <div>
                     <label style={{ display: "block", fontSize: 10.5, fontWeight: 800, color: "#374151", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>Teléfono / WA *</label>
