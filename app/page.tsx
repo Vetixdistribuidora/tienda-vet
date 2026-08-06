@@ -2902,11 +2902,27 @@ export default function Tienda() {
                   </div>
                 </div>
 
-                {/* Productos relacionados */}
+                {/* Productos relacionados — por relevancia: subcategoría > categoría > laboratorio */}
                 {(() => {
+                  const norm = (s: string | null) => (s ?? "").trim().toLowerCase()
+                  const pCat = norm(p.categoria), pSub = norm(p.subcategoria), pLab = norm(p.laboratorio)
                   const relacionados = productos
-                    .filter(r => r.id !== p.id && (r.categoria === p.categoria || r.laboratorio === p.laboratorio))
+                    .filter(r => r.id !== p.id)
+                    .map(r => {
+                      let score = 0
+                      if (pSub && norm(r.subcategoria) === pSub) score += 3  // misma subcategoría (ej. Antiparasitario)
+                      if (pCat && norm(r.categoria) === pCat) score += 2      // misma categoría
+                      if (pLab && norm(r.laboratorio) === pLab) score += 1    // mismo laboratorio
+                      return { r, score }
+                    })
+                    .filter(x => x.score > 0)
+                    .sort((a, b) =>
+                      b.score - a.score
+                      || (Number(!!b.r.imagen_url) - Number(!!a.r.imagen_url))
+                      || a.r.nombre.localeCompare(b.r.nombre, "es")
+                    )
                     .slice(0, 4)
+                    .map(x => x.r)
                   if (relacionados.length === 0) return null
                   return (
                     <div style={{ borderTop: "1px solid #f1f5f9", padding: "16px 20px 20px" }}>
