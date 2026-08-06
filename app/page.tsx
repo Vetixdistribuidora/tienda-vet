@@ -318,7 +318,9 @@ function FilaListaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFa
       </button>
 
       {/* Agregar */}
-      {enCarrito > 0 ? (
+      {p.stock <= 0 ? (
+        <span style={{ fontSize: 11, fontWeight: 800, color: "#6b7280", background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: 8, padding: "7px 12px", whiteSpace: "nowrap", flexShrink: 0 }}>Sin stock</span>
+      ) : enCarrito > 0 ? (
         <div style={{ display: "flex", alignItems: "center", gap: 2, background: "#fdf0f5", border: "2px solid #d4688e", borderRadius: 9, padding: "2px 3px", flexShrink: 0 }}>
           <button onClick={e => { e.stopPropagation(); onCambiar(-1) }} style={{ width: 24, height: 24, border: "none", borderRadius: 6, background: "#fdf0f5", color: "#be185d", fontWeight: 900, cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>−</button>
           <span style={{ fontSize: 12, fontWeight: 900, color: "#be185d", minWidth: 20, textAlign: "center" }}>{enCarrito}</span>
@@ -415,7 +417,9 @@ function TarjetaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFav,
           ) : (
             <span style={{ fontSize: 17, fontWeight: 900, color: "#d4688e", letterSpacing: -0.3 }}>{fmt(precioConTipo(p.precio_venta, tipoCliente)!)}</span>
           )}
-          {enCarrito > 0 ? (
+          {p.stock <= 0 ? (
+            <span style={{ fontSize: 12, fontWeight: 800, color: "#6b7280", background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: 9, padding: "8px 13px", whiteSpace: "nowrap" }}>Sin stock</span>
+          ) : enCarrito > 0 ? (
             <div style={{ display: "flex", alignItems: "center", gap: 2, background: "#fdf0f5", border: "2px solid #d4688e", borderRadius: 10, padding: "2px 4px" }}>
               <button onClick={e => { e.stopPropagation(); onCambiar(-1) }} style={{ width: 26, height: 26, border: "none", borderRadius: 7, background: "#fdf0f5", color: "#be185d", fontWeight: 900, cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1 }}>−</button>
               <span style={{ fontSize: 13, fontWeight: 900, color: "#be185d", minWidth: 22, textAlign: "center" }}>{enCarrito}</span>
@@ -724,17 +728,25 @@ export default function Tienda() {
       try {
         let todos: Producto[] = []
         let desde = 0
+        let usarRpc = true
+        const COLS = "id, nombre, precio_venta, stock, categoria, subcategoria, laboratorio, imagen_url"
         while (true) {
-          const { data, error } = await supabase
-            .from("productos")
-            .select("id, nombre, precio_venta, stock, categoria, subcategoria, laboratorio, imagen_url")
-            .gt("stock", 0)
-            .order("nombre")
-            .range(desde, desde + 999)
-          if (error || !data || data.length === 0) break
+          let data: Producto[] | null
+          if (usarRpc) {
+            // catalogo_tienda: productos con stock O con ventas recientes.
+            const r = await supabase.rpc("catalogo_tienda").select(COLS).order("nombre").range(desde, desde + 999)
+            if (r.error) { usarRpc = false; continue }  // la función aún no existe → fallback a la query clásica
+            data = r.data as Producto[]
+          } else {
+            const r = await supabase.from("productos").select(COLS).gt("stock", 0).order("nombre").range(desde, desde + 999)
+            if (r.error) break
+            data = r.data as Producto[]
+          }
+          if (!data || data.length === 0) break
           todos = [...todos, ...data]
           if (data.length < 1000) break
           desde += 1000
+          if (desde >= 20000) break  // seguro anti-bucle
         }
         if (todos.length === 0) throw new Error("Sin datos")
         setProductos(todos)
@@ -855,19 +867,25 @@ export default function Tienda() {
   }, [busqueda, productos])
 
   function ordenar(arr: Producto[]) {
-    const s = [...arr]
-    if (orden === "lab") s.sort((a, b) => {
-      const la = (a.laboratorio || "").trim(), lb = (b.laboratorio || "").trim()
-      if (!la !== !lb) return la ? -1 : 1  // productos sin laboratorio, al final
-      const c = la.localeCompare(lb, "es", { sensitivity: "base" })
-      return c !== 0 ? c : a.nombre.localeCompare(b.nombre, "es")
+    const cmp = (a: Producto, b: Producto) => {
+      if (orden === "lab") {
+        const la = (a.laboratorio || "").trim(), lb = (b.laboratorio || "").trim()
+        if (!la !== !lb) return la ? -1 : 1  // productos sin laboratorio, al final
+        const c = la.localeCompare(lb, "es", { sensitivity: "base" })
+        return c !== 0 ? c : a.nombre.localeCompare(b.nombre, "es")
+      }
+      if (orden === "za") return b.nombre.localeCompare(a.nombre, "es")
+      if (orden === "precio_asc") return a.precio_venta - b.precio_venta
+      if (orden === "precio_desc") return b.precio_venta - a.precio_venta
+      if (orden === "stock_asc") return a.stock - b.stock
+      return a.nombre.localeCompare(b.nombre, "es")  // "az"
+    }
+    return [...arr].sort((a, b) => {
+      // Productos sin stock, siempre al final
+      const av = a.stock > 0 ? 0 : 1, bv = b.stock > 0 ? 0 : 1
+      if (av !== bv) return av - bv
+      return cmp(a, b)
     })
-    else if (orden === "az") s.sort((a, b) => a.nombre.localeCompare(b.nombre, "es"))
-    else if (orden === "za") s.sort((a, b) => b.nombre.localeCompare(a.nombre, "es"))
-    else if (orden === "precio_asc") s.sort((a, b) => a.precio_venta - b.precio_venta)
-    else if (orden === "precio_desc") s.sort((a, b) => b.precio_venta - a.precio_venta)
-    else if (orden === "stock_asc") s.sort((a, b) => a.stock - b.stock)
-    return s
   }
 
   function filtrarProductos(arr: Producto[]) {
@@ -1418,6 +1436,7 @@ export default function Tienda() {
   }
 
   const agregar = useCallback((p: Producto) => {
+    if (p.stock <= 0) { mostrarToast("Producto sin stock"); return }
     setCarrito(prev => {
       const idx = prev.findIndex(i => i.producto.id === p.id)
       if (idx >= 0) {
@@ -2888,7 +2907,11 @@ export default function Tienda() {
 
                     {/* Acciones */}
                     <div style={{ display: "flex", flexDirection: "column", gap: 9, marginTop: "auto" }}>
-                      {enCarrito > 0 ? (
+                      {p.stock <= 0 ? (
+                        <button disabled style={{ width: "100%", padding: "12px", background: "#f3f4f6", color: "#6b7280", border: "1px solid #e5e7eb", borderRadius: 11, fontSize: 14, fontWeight: 800, cursor: "not-allowed" }}>
+                          Sin stock
+                        </button>
+                      ) : enCarrito > 0 ? (
                         <div style={{ display: "flex", alignItems: "center", gap: 0, background: "#fdf0f5", border: "2px solid #d4688e", borderRadius: 11, overflow: "hidden" }}>
                           <button onClick={() => cambiar(p.id, -1)} style={{ flex: 1, padding: "11px 0", border: "none", background: "transparent", color: "#be185d", fontWeight: 900, cursor: "pointer", fontSize: 20, lineHeight: 1 }}>−</button>
                           <span style={{ fontSize: 15, fontWeight: 900, color: "#be185d", minWidth: 40, textAlign: "center" }}>{enCarrito}</span>
