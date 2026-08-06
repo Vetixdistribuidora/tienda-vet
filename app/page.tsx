@@ -1222,8 +1222,36 @@ export default function Tienda() {
       .select("*")
       .eq("id", userId)
       .maybeSingle()
-    if (!data) return
-    const p = data as PerfilUsuario
+    let p: PerfilUsuario
+    if (data) {
+      p = data as PerfilUsuario
+    } else {
+      // Auto-reparación: el perfil no existe (pasa cuando el registro se hizo con
+      // confirmación de email y el guardado quedó bloqueado por falta de sesión).
+      // Ahora que hay sesión activa lo creamos, usando los datos que quedaron
+      // guardados en la cuenta de auth al registrarse.
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      const meta = (user.user_metadata ?? {}) as { nombre?: string; apellido?: string; telefono?: string; direccion?: string }
+      p = {
+        id: userId,
+        email: user.email ?? "",
+        nombre: meta.nombre ?? "",
+        apellido: meta.apellido ?? "",
+        telefono: meta.telefono ?? "",
+        direccion: meta.direccion ?? "",
+        tipo_cliente: "pendiente",
+      }
+      await supabase.from("tienda_perfiles").upsert({
+        id: p.id,
+        email: p.email,
+        nombre: p.nombre,
+        apellido: p.apellido,
+        telefono: p.telefono,
+        direccion: p.direccion || null,
+        tipo_cliente: p.tipo_cliente,
+      }, { onConflict: "id" })
+    }
 
     // Re-verificar tipo_cliente contra clientes (el admin puede haberlo asignado
     // después del registro, o cambiado). Siempre gana el valor de clientes.
@@ -1279,6 +1307,17 @@ export default function Tienda() {
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: loginEmail.trim(),
       password: loginPass,
+      options: {
+        // Guardamos los datos en la cuenta de auth. Así, si el guardado del perfil
+        // se bloquea por la confirmación de email, no se pierden: el perfil se
+        // recrea solo con estos datos la primera vez que el cliente inicia sesión.
+        data: {
+          nombre: regNombre.trim(),
+          apellido: regApellido.trim(),
+          telefono: regTelefono.trim(),
+          direccion: regDireccion.trim(),
+        },
+      },
     })
     if (authError || !authData.user) {
       setLoginCargando(false)
