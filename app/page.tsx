@@ -1315,6 +1315,9 @@ export default function Tienda() {
       email: loginEmail.trim(),
       password: loginPass,
       options: {
+        // El link de confirmación del email vuelve SIEMPRE a la tienda (no a la
+        // app interna de distribuidora, que comparte el mismo Supabase).
+        emailRedirectTo: typeof window !== "undefined" ? window.location.origin : undefined,
         // Guardamos los datos en la cuenta de auth. Así, si el guardado del perfil
         // se bloquea por la confirmación de email, no se pierden: el perfil se
         // recrea solo con estos datos la primera vez que el cliente inicia sesión.
