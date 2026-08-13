@@ -752,7 +752,13 @@ export default function Tienda() {
         // Deduplicar registros repetidos del mismo producto. La base tiene
         // duplicados (un registro viejo sin stock y uno nuevo con stock, por
         // reimportaciones). Nos quedamos con el que tiene stock / es más nuevo.
-        const normNombre = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "")
+        const normNombre = (s: string) => {
+          let n = s.toLowerCase().trim()
+          n = n.replace(/^\s*\d+\s*-?\s*/, "")             // quita código inicial ("10011 - ", "1060 ")
+          const sinMarca = n.replace(/^[a-zà-ÿ]+\s*-\s*/, "")  // quita marca inicial ("alimasc - ")
+          if (sinMarca.replace(/[^a-z0-9]/g, "").length >= 6) n = sinMarca
+          return n.replace(/[^a-z0-9]/g, "")
+        }
         const porNombre = new Map<string, Producto>()
         for (const p of todos) {
           const k = normNombre(p.nombre)
