@@ -12,21 +12,29 @@ export async function GET(req: NextRequest) {
   const db = getSupabaseAdmin()
   const SELECT = "id, nombre, precio_venta, stock, categoria, subcategoria, laboratorio, imagen_url"
 
-  // ── 1. Traer todos los productos con stock > 0 (paginando de a 1000) ────────
+  // ── 1. Traer el MISMO catálogo que ve la tienda (stock > 0 + ventas
+  //       recientes), así el panel admin y la tienda coinciden y se puede
+  //       gestionar todo lo que ve el cliente. Fallback a stock>0 si la
+  //       función catalogo_tienda no existe. ──────────────────────────────────
   const conStock: ProdRow[] = []
   let desde = 0
+  let usarRpc = true
   while (true) {
-    const { data, error } = await db
-      .from("productos")
-      .select(SELECT)
-      .gt("stock", 0)
-      .order("nombre")
-      .range(desde, desde + 999)
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    let data: ProdRow[] | null
+    if (usarRpc) {
+      const r = await db.rpc("catalogo_tienda").select(SELECT).order("nombre").range(desde, desde + 999)
+      if (r.error) { usarRpc = false; desde = 0; continue }
+      data = r.data as ProdRow[]
+    } else {
+      const r = await db.from("productos").select(SELECT).gt("stock", 0).order("nombre").range(desde, desde + 999)
+      if (r.error) return NextResponse.json({ error: r.error.message }, { status: 500 })
+      data = r.data as ProdRow[]
+    }
     if (!data || data.length === 0) break
     conStock.push(...data)
     if (data.length < 1000) break
     desde += 1000
+    if (desde >= 20000) break
   }
 
   // ── 2. Traer todos los producto_id que aparecen en pedido_items ─────────────
