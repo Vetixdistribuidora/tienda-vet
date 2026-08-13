@@ -749,7 +749,22 @@ export default function Tienda() {
           if (desde >= 20000) break  // seguro anti-bucle
         }
         if (todos.length === 0) throw new Error("Sin datos")
-        setProductos(todos)
+        // Deduplicar registros repetidos del mismo producto. La base tiene
+        // duplicados (un registro viejo sin stock y uno nuevo con stock, por
+        // reimportaciones). Nos quedamos con el que tiene stock / es más nuevo.
+        const normNombre = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "")
+        const porNombre = new Map<string, Producto>()
+        for (const p of todos) {
+          const k = normNombre(p.nombre)
+          const prev = porNombre.get(k)
+          if (!prev) { porNombre.set(k, p); continue }
+          const mejor =
+            (p.stock > 0) !== (prev.stock > 0) ? (p.stock > 0 ? p : prev)
+            : p.stock !== prev.stock ? (p.stock > prev.stock ? p : prev)
+            : (p.id > prev.id ? p : prev)
+          porNombre.set(k, mejor)
+        }
+        setProductos([...porNombre.values()])
       } catch (e) {
         console.error("Error cargando productos:", e)
         setErrorCarga(true)
