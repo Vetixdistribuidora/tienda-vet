@@ -752,16 +752,28 @@ export default function Tienda() {
         // Deduplicar registros repetidos del mismo producto. La base tiene
         // duplicados (un registro viejo sin stock y uno nuevo con stock, por
         // reimportaciones). Nos quedamos con el que tiene stock / es más nuevo.
-        const normNombre = (s: string) => {
+        // Dedup SEGURO: solo fusiona si el nombre "sin prefijo" (sin código ni
+        // marca inicial) coincide EXACTO con el nombre completo de otro producto.
+        // Así agrupa duplicados reales (ej. "ALIMASC - DESTETE PROT 30" con
+        // "DESTETE PROT 30") sin mezclar productos distintos (colores, medidas,
+        // códigos diferentes, o nombres que solo comparten "x 500 ml").
+        const simpleNorm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "")
+        const stripPrefix = (s: string) => {
           let n = s.toLowerCase().trim()
-          n = n.replace(/^\s*\d+\s*-?\s*/, "")             // quita código inicial ("10011 - ", "1060 ")
-          const sinMarca = n.replace(/^[a-zà-ÿ]+\s*-\s*/, "")  // quita marca inicial ("alimasc - ")
-          if (sinMarca.replace(/[^a-z0-9]/g, "").length >= 6) n = sinMarca
+          n = n.replace(/^\s*\d+\s*-?\s*/, "")        // código inicial ("00237-", "1060 ")
+          n = n.replace(/^[a-zà-ÿ]+\s*-\s*/, "")       // marca inicial ("alimasc - ")
           return n.replace(/[^a-z0-9]/g, "")
+        }
+        const nombresCompletos = new Set(todos.map(p => simpleNorm(p.nombre)))
+        const claveDe = (p: Producto) => {
+          const full = simpleNorm(p.nombre)
+          const stripped = stripPrefix(p.nombre)
+          if (stripped !== full && stripped.length >= 4 && nombresCompletos.has(stripped)) return stripped
+          return full
         }
         const porNombre = new Map<string, Producto>()
         for (const p of todos) {
-          const k = normNombre(p.nombre)
+          const k = claveDe(p)
           const prev = porNombre.get(k)
           if (!prev) { porNombre.set(k, p); continue }
           const mejor =
