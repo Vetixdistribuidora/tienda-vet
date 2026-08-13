@@ -749,6 +749,8 @@ export default function Tienda() {
           if (desde >= 20000) break  // seguro anti-bucle
         }
         if (todos.length === 0) throw new Error("Sin datos")
+        // Ocultar productos sin precio (precio_venta = 0): se verían como "$0".
+        todos = todos.filter(p => p.precio_venta > 0)
         // Deduplicar registros repetidos del mismo producto. La base tiene
         // duplicados (un registro viejo sin stock y uno nuevo con stock, por
         // reimportaciones). Nos quedamos con el que tiene stock / es más nuevo.
