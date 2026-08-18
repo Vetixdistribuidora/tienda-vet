@@ -14,7 +14,7 @@ export async function PATCH(
   const body = await req.json()
 
   // Whitelist de columnas editables — evita asignación masiva de campos arbitrarios
-  const CAMPOS_PERMITIDOS = ["nombre", "precio_venta", "stock", "categoria", "subcategoria", "laboratorio", "imagen_url"] as const
+  const CAMPOS_PERMITIDOS = ["nombre", "precio_venta", "stock", "categoria", "subcategoria", "laboratorio", "imagen_url", "oculto_tienda"] as const
   const updates: Record<string, unknown> = {}
   for (const campo of CAMPOS_PERMITIDOS) {
     if (campo in body) updates[campo] = body[campo]

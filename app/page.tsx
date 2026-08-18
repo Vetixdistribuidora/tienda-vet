@@ -15,6 +15,7 @@ type Producto = {
   subcategoria: string | null
   laboratorio: string | null
   imagen_url: string | null
+  oculto_tienda?: boolean
 }
 type ItemCarrito = { producto: Producto; cantidad: number; nota?: string }
 type Orden = "lab" | "az" | "za" | "precio_asc" | "precio_desc" | "stock_asc"
@@ -729,7 +730,7 @@ export default function Tienda() {
         let todos: Producto[] = []
         let desde = 0
         let usarRpc = true
-        const COLS = "id, nombre, precio_venta, stock, categoria, subcategoria, laboratorio, imagen_url"
+        const COLS = "id, nombre, precio_venta, stock, categoria, subcategoria, laboratorio, imagen_url, oculto_tienda"
         while (true) {
           let data: Producto[] | null
           if (usarRpc) {
@@ -750,7 +751,8 @@ export default function Tienda() {
         }
         if (todos.length === 0) throw new Error("Sin datos")
         // Ocultar productos sin precio (precio_venta = 0): se verían como "$0".
-        todos = todos.filter(p => p.precio_venta > 0)
+        // Y ocultar los marcados como "oculto_tienda" (servicios, saldos viejos, etc.).
+        todos = todos.filter(p => p.precio_venta > 0 && p.oculto_tienda !== true)
         // Deduplicar registros repetidos del mismo producto. La base tiene
         // duplicados (un registro viejo sin stock y uno nuevo con stock, por
         // reimportaciones). Nos quedamos con el que tiene stock / es más nuevo.

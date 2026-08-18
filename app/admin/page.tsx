@@ -52,6 +52,7 @@ type ProductoAdmin = {
   subcategoria: string | null
   laboratorio: string | null
   imagen_url: string | null
+  oculto_tienda?: boolean
 }
 
 type ImagenItem = {
@@ -276,6 +277,17 @@ export default function AdminPanel() {
     setBulkCat("")
     setBulkSubcat("")
     setGuardandoBulk(false)
+  }
+
+  // Mostrar / ocultar un producto de la tienda (servicios, saldos viejos, etc.)
+  async function toggleOculto(id: number, ocultoActual: boolean) {
+    const nuevo = !ocultoActual
+    setProductos(ps => ps.map(p => p.id === id ? { ...p, oculto_tienda: nuevo } : p))
+    const res = await apiFetch(`/api/admin/productos/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ oculto_tienda: nuevo }),
+    })
+    if (!res.ok) setProductos(ps => ps.map(p => p.id === id ? { ...p, oculto_tienda: ocultoActual } : p)) // revertir
   }
 
   async function guardarSubcategoria(id: number, subcat: string) {
@@ -864,7 +876,7 @@ export default function AdminPanel() {
                 <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 700 }}>
                   <thead>
                     <tr style={{ background: "#f8fafc", borderBottom: "2px solid #e2e8f0" }}>
-                      {["", "Producto", "Laboratorio", "Categoría", "Precio", "Stock", ""].map((h, i) => (
+                      {["", "Producto", "Laboratorio", "Categoría", "Precio", "Stock", "Tienda", ""].map((h, i) => (
                         <th key={i} style={{ padding: "11px 16px", textAlign: "left", fontSize: 10.5, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.6, whiteSpace: "nowrap" }}>{h}</th>
                       ))}
                     </tr>
@@ -891,6 +903,19 @@ export default function AdminPanel() {
                         <td style={{ padding: "10px 16px", fontSize: 13, fontWeight: 700, color: "#1a2035", whiteSpace: "nowrap" }}>{fmt(p.precio_venta)}</td>
                         <td style={{ padding: "10px 16px" }}>
                           <span style={{ fontSize: 12, fontWeight: 700, color: p.stock > 0 ? "#16a34a" : "#94a3b8" }}>{p.stock}</span>
+                        </td>
+                        <td style={{ padding: "10px 16px" }}>
+                          <button
+                            onClick={() => toggleOculto(p.id, !!p.oculto_tienda)}
+                            title={p.oculto_tienda ? "Oculto de la tienda — tocá para mostrar" : "Visible en la tienda — tocá para ocultar"}
+                            style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+                            <span style={{ fontSize: 11, fontWeight: 800, color: p.oculto_tienda ? "#dc2626" : "#16a34a", whiteSpace: "nowrap" }}>
+                              {p.oculto_tienda ? "Oculto" : "Visible"}
+                            </span>
+                            <span style={{ display: "inline-block", width: 38, height: 21, borderRadius: 999, background: p.oculto_tienda ? "#e2e8f0" : "#bbf7d0", position: "relative", transition: "background .15s", border: "1px solid #e2e8f0" }}>
+                              <span style={{ position: "absolute", top: 2, left: p.oculto_tienda ? 2 : 19, width: 15, height: 15, borderRadius: 999, background: p.oculto_tienda ? "#94a3b8" : "#16a34a", transition: "left .15s" }} />
+                            </span>
+                          </button>
                         </td>
                         <td style={{ padding: "10px 16px" }}>
                           <button onClick={() => { setEditProducto(p); setEditFields({ nombre: p.nombre, precio_venta: p.precio_venta, categoria: p.categoria ?? "", subcategoria: p.subcategoria ?? "", laboratorio: p.laboratorio ?? "", stock: p.stock }) }}
