@@ -1843,12 +1843,12 @@ export default function Tienda() {
               ))}
             </div>
             {/* Cuerpo del hero */}
-            <div style={{ padding: "52px 24px 56px", textAlign: "center", maxWidth: 680, margin: "0 auto" }}>
+            <div style={{ padding: "40px 24px 20px", textAlign: "center", maxWidth: 680, margin: "0 auto" }}>
               <h1 style={{ margin: "0 0 10px", fontSize: "clamp(14px, 4.3vw, 32px)", fontWeight: 900, color: "white", lineHeight: 1.2, whiteSpace: "nowrap" }}>
                 Tu distribuidora veterinaria <span style={{ color: "#f0c8d8" }}>online</span>
               </h1>
               {/* Buscador hero */}
-              <div style={{ position: "relative", maxWidth: 520, margin: "0 auto 26px" }}>
+              <div style={{ position: "relative", maxWidth: 520, margin: "0 auto" }}>
                 <input
                   value={heroQuery}
                   onChange={e => setHeroQuery(e.target.value)}
@@ -1880,7 +1880,7 @@ export default function Tienda() {
 
 
           {/* ── VER CATÁLOGO ──────────────────────────────────────────────── */}
-          <div style={{ background: "#1a2035", padding: "32px 20px", borderTop: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
+          <div style={{ background: "#1a2035", padding: "20px 20px 26px", borderTop: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
             <button onClick={() => verCatalogo("")}
               style={{ display: "inline-flex", alignItems: "center", gap: 12, padding: "18px 48px", borderRadius: 16, background: "#d4688e", color: "white", border: "none", fontSize: 18, fontWeight: 900, cursor: "pointer", boxShadow: "0 6px 28px rgba(212,104,142,0.5)", transition: "background 0.15s, transform 0.12s, box-shadow 0.15s" }}
               onMouseEnter={e => { e.currentTarget.style.background = "#b05070"; e.currentTarget.style.transform = "scale(1.03)"; e.currentTarget.style.boxShadow = "0 8px 36px rgba(212,104,142,0.6)" }}
@@ -1936,33 +1936,6 @@ export default function Tienda() {
             </div>
           )}
 
-
-          {/* ── CÓMO FUNCIONA ─────────────────────────────────────────────── */}
-          <div style={{ background: "#0f172a", padding: "44px 20px" }}>
-            <div style={{ maxWidth: 1280, margin: "0 auto" }}>
-              <div style={{ textAlign: "center", marginBottom: 32 }}>
-                <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 900, color: "white" }}>¿Cómo hacer un pedido?</h2>
-                <p style={{ margin: 0, fontSize: 14, color: "#64748b" }}>Simple, rápido y sin complicaciones</p>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 20 }}>
-                {[
-                  { n: "1", titulo: "Explorás el catálogo", desc: "Navegá por categorías, buscá por nombre o laboratorio y agregá los productos al carrito." },
-                  { n: "2", titulo: "Confirmás el pedido", desc: "Completás tu nombre y teléfono. Sin registro obligatorio. El pedido llega al instante." },
-                  { n: "3", titulo: "Te contactamos", desc: "Nos comunicamos para coordinar precio final, forma de pago y entrega o retiro." },
-                ].map(step => (
-                  <div key={step.n} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: "26px 22px", display: "flex", flexDirection: "column", gap: 14 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: "50%", background: "#d4688e", color: "white", fontWeight: 900, fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      {step.n}
-                    </div>
-                    <div>
-                      <p style={{ margin: "0 0 6px", fontSize: 15, fontWeight: 800, color: "white" }}>{step.titulo}</p>
-                      <p style={{ margin: 0, fontSize: 13, color: "#64748b", lineHeight: 1.65 }}>{step.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
 
           {/* ── CHIPS DE CATEGORÍAS ───────────────────────────────────────── */}
           {categorias.length > 0 && (
