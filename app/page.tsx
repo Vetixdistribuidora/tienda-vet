@@ -93,12 +93,17 @@ const BANNER_VERSION = "vetix_banner_1"
 // Se muestran en un carrusel en el inicio. Para agregar/quitar una promo,
 // poné el archivo en /public/promos y sumá (o borrá) una línea acá.
 // El orden de esta lista es el orden en que aparecen.
-// Para agregar un video en vez de una imagen, poné el .mp4 en /public/promos
-// y sumá la línea con video: true.
-const PROMOS: { src: string; alt: string; video?: boolean }[] = [
-  { src: "/promos/elmer-perfumes.mp4", alt: "Perfume Chic N°1 para mascotas — Elmer", video: true },
-  { src: "/promos/paul-1.jpeg",  alt: "Vacuna Antirrábica PAULVAC — Promoción 9+1" },
-  { src: "/promos/paul-2.jpeg",  alt: "Vacuna Séxtuple Paul 6 — Promoción 10+4" },
+// - video: true  → para un .mp4 (en vez de imagen)
+// - ratio        → la proporción del archivo (ej. "4 / 5" vertical, "16 / 9"
+//                  horizontal, "9 / 16" video vertical). Todos se muestran con
+//                  la MISMA altura, y el ancho se ajusta según esta proporción.
+const PROMOS: { src: string; alt: string; video?: boolean; ratio: string }[] = [
+  { src: "/promos/chapitas.mp4",       alt: "Chapitas identificatorias para mascotas",                    video: true, ratio: "9 / 16" },
+  { src: "/promos/flia-m.jpeg",        alt: "Familia de Mascotas — figuras 3D y llaveros",                             ratio: "16 / 9" },
+  { src: "/promos/paul-1.jpeg",        alt: "Vacuna Antirrábica PAULVAC — Promoción 9+1",                              ratio: "4 / 5" },
+  { src: "/promos/salchi.jpeg",        alt: "Salchicha 3D Familia de Mascotas — un amigo para siempre",               ratio: "3 / 2" },
+  { src: "/promos/paul-2.jpeg",        alt: "Vacuna Séxtuple Paul 6 — Promoción 10+4",                                 ratio: "4 / 5" },
+  { src: "/promos/elmer-perfumes.mp4", alt: "Perfume Chic N°1 para mascotas — Elmer",                     video: true, ratio: "9 / 16" },
 ]
 
 function fmt(n: number) {
@@ -524,7 +529,7 @@ function PromoFlyers({ onZoom }: { onZoom?: (src: string) => void }) {
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px 18px" }}>
         <span style={{ fontSize: 10, fontWeight: 800, color: "#d4688e", textTransform: "uppercase", letterSpacing: 1.4 }}>Promociones</span>
         <h2 style={{ margin: "4px 0 3px", fontSize: 20, fontWeight: 900, color: "#1a2035" }}>Ofertas destacadas</h2>
-        <p style={{ margin: 0, fontSize: 13, color: "#64748b" }}>Aprovechá las promos vigentes de nuestros laboratorios</p>
+        <p style={{ margin: 0, fontSize: 13, color: "#64748b" }}>Promociones, lanzamientos y novedades para tu negocio</p>
       </div>
 
       <div
@@ -544,13 +549,13 @@ function PromoFlyers({ onZoom }: { onZoom?: (src: string) => void }) {
           {PROMOS.map((promo, i) => (
             <div key={promo.src}
               onClick={() => { if (!promo.video) onZoom?.(promo.src) }}
-              style={{ position: "relative", flexShrink: 0, width: "min(76vw, 300px)", aspectRatio: "4 / 5", borderRadius: 16, overflow: "hidden", scrollSnapAlign: "center", cursor: (!promo.video && onZoom) ? "zoom-in" : "default", background: "#f7f8fb", border: "1.5px solid #e6e2de", boxShadow: "0 6px 20px rgba(0,0,0,0.12)" }}>
+              style={{ position: "relative", flexShrink: 0, height: "clamp(240px, 55vw, 380px)", aspectRatio: promo.ratio, borderRadius: 16, overflow: "hidden", scrollSnapAlign: "center", cursor: (!promo.video && onZoom) ? "zoom-in" : "default", background: "#0f172a", border: "1.5px solid #e6e2de", boxShadow: "0 8px 24px rgba(0,0,0,0.16)" }}>
               {promo.video ? (
                 <video src={promo.src} muted autoPlay loop playsInline controls
                   aria-label={promo.alt}
                   style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
               ) : (
-                <Image src={promo.src} alt={promo.alt} fill sizes="(max-width: 640px) 76vw, 300px" style={{ objectFit: "cover" }} priority={i < 2} />
+                <Image src={promo.src} alt={promo.alt} fill sizes="(max-width: 640px) 90vw, 640px" style={{ objectFit: "cover" }} priority={i < 2} />
               )}
             </div>
           ))}
