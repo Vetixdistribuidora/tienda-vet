@@ -623,7 +623,7 @@ export default function Tienda() {
   const [cargandoPedidos, setCargandoPedidos] = useState(false)
 
   // ── Paginación ────────────────────────────────────────────────────────────
-  const [visibles, setVisibles] = useState(48)
+  const [paginaActual, setPaginaActual] = useState(1)
 
   // ── Favoritos (localStorage) ──────────────────────────────────────────────
   const [favoritos, setFavoritos] = useState<Set<number>>(() => {
@@ -679,7 +679,7 @@ export default function Tienda() {
   const [heroQuery, setHeroQuery] = useState("")
 
   // ── Ref para scroll infinito (sentinel) ───────────────────────────────────
-  const sentinelRef = useRef<HTMLDivElement>(null)
+  const catalogoTopRef = useRef<HTMLDivElement>(null)
 
   // ── Debounce búsqueda (valor filtrado con 300 ms de delay) ───────────────
   const [busquedaDelay, setBusquedaDelay] = useState("")
@@ -1037,20 +1037,8 @@ export default function Tienda() {
     pendingSubcat.current = ""
   }, [categoriaActiva])
 
-  // Reset paginación cuando cambian los filtros
-  useEffect(() => { setVisibles(48) }, [busquedaDelay, categoriaActiva, subcategoriaActiva, precioMin, precioMax, laboratoriosFiltro, orden])
-
-  // Scroll infinito — cuando el sentinel entra en pantalla cargamos más
-  useEffect(() => {
-    const el = sentinelRef.current
-    if (!el) return
-    const obs = new IntersectionObserver(
-      entries => { if (entries[0].isIntersecting) setVisibles(v => v + 48) },
-      { rootMargin: "200px" }
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [secciones])
+  // Reset a la primera página cuando cambian los filtros
+  useEffect(() => { setPaginaActual(1) }, [busquedaDelay, categoriaActiva, subcategoriaActiva, precioMin, precioMax, laboratoriosFiltro, orden])
 
   // Auth session
   useEffect(() => {
@@ -2351,35 +2339,63 @@ export default function Tienda() {
                     onVerPrecio: () => { setLoginModo("login"); setLoginError(""); setAuthModalOpen(true) },
                   })
 
-                  // Sentinel para scroll infinito + botón explícito
-                  const Sentinel = ({ todos, pagina }: { todos: Producto[]; pagina: Producto[] }) =>
-                    todos.length > pagina.length ? (
-                      <div ref={sentinelRef} style={{ padding: "32px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-                        <p style={{ margin: 0, fontSize: 13, color: "#94b8d8" }}>
-                          Mostrando <b style={{ color: "#d4688e" }}>{pagina.length}</b> de <b style={{ color: "#d4688e" }}>{todos.length}</b> productos
+                  const POR_PAGINA = 48
+
+                  // Números de página a mostrar (con "…" cuando hay muchas)
+                  const numerosPagina = (actual: number, total: number): (number | "…")[] => {
+                    const set = new Set<number>([1, total, actual - 1, actual, actual + 1])
+                    const nums = [...set].filter(p => p >= 1 && p <= total).sort((a, b) => a - b)
+                    const out: (number | "…")[] = []
+                    let prev = 0
+                    for (const p of nums) { if (p - prev > 1) out.push("…"); out.push(p); prev = p }
+                    return out
+                  }
+
+                  // Controles de paginación: "Mostrando X–Y de Z" + números de página
+                  const Paginacion = ({ total }: { total: number }) => {
+                    const paginas = Math.max(1, Math.ceil(total / POR_PAGINA))
+                    const pag = Math.min(Math.max(1, paginaActual), paginas)
+                    const desde = total === 0 ? 0 : (pag - 1) * POR_PAGINA + 1
+                    const hasta = Math.min(pag * POR_PAGINA, total)
+                    const ir = (p: number) => {
+                      setPaginaActual(Math.min(Math.max(1, p), paginas))
+                      catalogoTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+                    }
+                    const est = (activo: boolean, deshab = false): React.CSSProperties => ({
+                      minWidth: 40, height: 40, padding: "0 12px", borderRadius: 10,
+                      border: `1.5px solid ${activo ? "#d4688e" : "#e2e8f0"}`,
+                      background: activo ? "#d4688e" : "#e8e8e8", color: activo ? "white" : "#374151",
+                      fontSize: 14, fontWeight: activo ? 800 : 600,
+                      cursor: deshab ? "default" : "pointer", opacity: deshab ? 0.4 : 1,
+                    })
+                    return (
+                      <div style={{ padding: "30px 0 10px", display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+                        <p style={{ margin: 0, fontSize: 13, color: "#64748b" }}>
+                          Mostrando <b style={{ color: "#d4688e" }}>{desde}–{hasta}</b> de <b style={{ color: "#d4688e" }}>{total}</b> productos
                         </p>
-                        <button
-                          onClick={() => setVisibles(v => v + 48)}
-                          style={{ padding: "11px 28px", background: "#d4688e", color: "white", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer", letterSpacing: 0.2 }}
-                          onMouseEnter={e => (e.currentTarget.style.background = "#b05070")}
-                          onMouseLeave={e => (e.currentTarget.style.background = "#d4688e")}
-                        >
-                          Cargar más productos
-                        </button>
-                      </div>
-                    ) : (
-                      <div style={{ padding: "24px 0", textAlign: "center" }}>
-                        <p style={{ margin: 0, fontSize: 12, color: "#94b8d8" }}>
-                          Mostrando todos los <b style={{ color: "#d4688e" }}>{todos.length}</b> productos
-                        </p>
+                        {paginas > 1 && (
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", alignItems: "center", maxWidth: "100%" }}>
+                            <button onClick={() => ir(pag - 1)} disabled={pag <= 1} style={est(false, pag <= 1)}>‹</button>
+                            {numerosPagina(pag, paginas).map((p, i) =>
+                              p === "…"
+                                ? <span key={"e" + i} style={{ padding: "0 4px", color: "#94a3b8", fontWeight: 700 }}>…</span>
+                                : <button key={p} onClick={() => ir(p)} style={est(p === pag)}>{p}</button>
+                            )}
+                            <button onClick={() => ir(pag + 1)} disabled={pag >= paginas} style={est(false, pag >= paginas)}>›</button>
+                          </div>
+                        )}
                       </div>
                     )
+                  }
 
                   if (categoriaActiva === "" || esFiltroFavs) {
                     const todos = secciones.flatMap(({ items }) => items)
-                    const pagina = todos.slice(0, visibles)
+                    const paginas = Math.max(1, Math.ceil(todos.length / POR_PAGINA))
+                    const pag = Math.min(Math.max(1, paginaActual), paginas)
+                    const pagina = todos.slice((pag - 1) * POR_PAGINA, pag * POR_PAGINA)
                     return (
                       <>
+                        <div ref={catalogoTopRef} style={{ scrollMarginTop: 90 }} />
                         {vistaLista ? (
                           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                             {pagina.map(p => <FilaListaProducto key={p.id} {...renderProps(p)} />)}
@@ -2389,13 +2405,18 @@ export default function Tienda() {
                             {pagina.map(p => <TarjetaProducto key={p.id} {...renderProps(p)} />)}
                           </div>
                         )}
-                        <Sentinel todos={todos} pagina={pagina} />
+                        <Paginacion total={todos.length} />
                       </>
                     )
                   }
 
-                  return secciones.map(({ cat, items }) => (
+                  return secciones.map(({ cat, items }) => {
+                    const paginas = Math.max(1, Math.ceil(items.length / POR_PAGINA))
+                    const pag = Math.min(Math.max(1, paginaActual), paginas)
+                    const pagina = items.slice((pag - 1) * POR_PAGINA, pag * POR_PAGINA)
+                    return (
                     <section key={cat} style={{ marginBottom: 48 }}>
+                      <div ref={catalogoTopRef} style={{ scrollMarginTop: 90 }} />
                       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
                         <div style={{ width: 4, height: 22, background: "#d4688e", borderRadius: 4 }}/>
                         <h2 style={{ margin: 0, fontSize: 18, fontWeight: 900, color: "#1a2035" }}>{cat}</h2>
@@ -2406,15 +2427,17 @@ export default function Tienda() {
                       </div>
                       {vistaLista ? (
                         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                          {items.map(p => <FilaListaProducto key={p.id} {...renderProps(p)} />)}
+                          {pagina.map(p => <FilaListaProducto key={p.id} {...renderProps(p)} />)}
                         </div>
                       ) : (
                         <div className="grid-productos" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
-                          {items.map(p => <TarjetaProducto key={p.id} {...renderProps(p)} />)}
+                          {pagina.map(p => <TarjetaProducto key={p.id} {...renderProps(p)} />)}
                         </div>
                       )}
+                      <Paginacion total={items.length} />
                     </section>
-                  ))
+                    )
+                  })
                 })()}
               </>
             )}
