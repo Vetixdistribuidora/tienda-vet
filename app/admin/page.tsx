@@ -65,6 +65,7 @@ type ProductoAdmin = {
   laboratorio: string | null
   imagen_url: string | null
   oculto_tienda?: boolean
+  mostrar_agotado?: boolean
 }
 
 type ImagenItem = {
@@ -100,7 +101,7 @@ const ESTADO_STYLE: Record<string, { bg: string; border: string; color: string }
 
 // ── Componente ────────────────────────────────────────────────────────────────
 export default function AdminPanel() {
-  type Tab = "clientes" | "pedidos" | "categorias" | "productos"
+  type Tab = "clientes" | "pedidos" | "categorias" | "productos" | "agotados"
   const [tab, setTab] = useState<Tab>("clientes")
   const [token, setToken] = useState<string | null>(null)
   const [esAdmin, setEsAdmin] = useState(false)
@@ -119,6 +120,14 @@ export default function AdminPanel() {
   const [resultadosVetix, setResultadosVetix] = useState<VetixCliente[]>([])
   const [buscandoVetix, setBuscandoVetix] = useState(false)
   const [vinculando, setVinculando] = useState(false)
+
+  // Agotados en vitrina (productos que se muestran sin stock)
+  const [agotados, setAgotados] = useState<ProductoAdmin[]>([])
+  const [cargandoAgotados, setCargandoAgotados] = useState(false)
+  const [busqAgotados, setBusqAgotados] = useState("")
+  const [resultadosAgotados, setResultadosAgotados] = useState<ProductoAdmin[]>([])
+  const [buscandoAgotados, setBuscandoAgotados] = useState(false)
+  const [guardandoAgotado, setGuardandoAgotado] = useState<number | null>(null)
 
   // Pedidos
   const [pedidos, setPedidos] = useState<PedidoAdmin[]>([])
@@ -194,6 +203,7 @@ export default function AdminPanel() {
     if (!esAdmin || !token) return
     if (tab === "pedidos" && pedidos.length === 0) cargarPedidos()
     if ((tab === "categorias" || tab === "productos") && productos.length === 0) cargarProductos()
+    if (tab === "agotados") cargarAgotados()
     // reset selección al cambiar de tab
     if (tab !== "categorias") setSelectedIds(new Set())
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -238,6 +248,37 @@ export default function AdminPanel() {
     const res = await apiFetch(`/api/admin/vetix-clientes?q=${encodeURIComponent(q.trim())}`)
     if (res.ok) setResultadosVetix(await res.json())
     setBuscandoVetix(false)
+  }
+
+  // ── Agotados en vitrina ─────────────────────────────────────────────────
+  async function cargarAgotados() {
+    setCargandoAgotados(true); setApiError(null)
+    const res = await apiFetch("/api/admin/productos-agotados")
+    if (res.ok) setAgotados(await res.json())
+    else { const b = await res.text(); setApiError(`Agotados: ${res.status} — ${b}`) }
+    setCargandoAgotados(false)
+  }
+
+  async function buscarAgotados(q: string) {
+    setBusqAgotados(q)
+    if (q.trim().length < 2) { setResultadosAgotados([]); return }
+    setBuscandoAgotados(true)
+    const res = await apiFetch(`/api/admin/productos-agotados?q=${encodeURIComponent(q.trim())}`)
+    if (res.ok) setResultadosAgotados(await res.json())
+    setBuscandoAgotados(false)
+  }
+
+  async function marcarAgotado(id: number, mostrar: boolean) {
+    setGuardandoAgotado(id)
+    const res = await apiFetch(`/api/admin/productos/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ mostrar_agotado: mostrar }),
+    })
+    setGuardandoAgotado(null)
+    if (!res.ok) { const b = await res.text(); setApiError(`Marcar: ${res.status} — ${b}`); return }
+    // Reflejar en ambas listas
+    setResultadosAgotados(rs => rs.map(p => p.id === id ? { ...p, mostrar_agotado: mostrar } : p))
+    cargarAgotados()
   }
 
   async function vincular(email: string, clienteId: number | null) {
@@ -570,12 +611,13 @@ export default function AdminPanel() {
           <Link href="/" style={{ fontSize: 12, color: "#64748b", textDecoration: "none", fontWeight: 600 }}>← Tienda</Link>
         </div>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 20px", display: "flex", overflowX: "auto" }}>
-          {(["clientes", "pedidos", "categorias", "productos"] as Tab[]).map(t => {
+          {(["clientes", "pedidos", "categorias", "productos", "agotados"] as Tab[]).map(t => {
             const labels: Record<Tab, string> = {
               clientes:   clientes.length   ? `Clientes (${clientes.length})`   : "Clientes",
               pedidos:    pedidos.length    ? `Pedidos (${pedidos.length})`    : "Pedidos",
               categorias: "Categorías",
               productos:  productos.length  ? `Productos (${productos.length})` : "Productos",
+              agotados:   "Agotados en vitrina",
             }
             return (
               <button key={t} onClick={() => setTab(t)} style={{
@@ -982,6 +1024,91 @@ export default function AdminPanel() {
                         </tr>
                       )
                     })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ════════ TAB AGOTADOS EN VITRINA ════════ */}
+        {tab === "agotados" && (
+          <div>
+            <div style={{ background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 12, padding: "14px 18px", marginBottom: 18 }}>
+              <p style={{ margin: 0, fontSize: 13, color: "#1e40af", lineHeight: 1.65 }}>
+                <b>Productos en vitrina.</b> Los que agregues acá se muestran en la tienda <b>aunque tengan stock 0</b>, con el cartel “Sin stock” y sin botón de compra. Sirve para productos que querés que la gente sepa que manejás. El resto de la tienda no cambia.
+              </p>
+            </div>
+
+            {/* Buscador para agregar */}
+            <input placeholder="Buscar un producto para agregar a la vitrina..." value={busqAgotados} onChange={e => buscarAgotados(e.target.value)}
+              style={{ width: "100%", padding: "10px 14px", border: "1.5px solid #e2e8f0", borderRadius: 9, fontSize: 13, outline: "none", boxSizing: "border-box", background: "white" }}
+              onFocus={e => (e.target.style.borderColor = "#e8197d")} onBlur={e => (e.target.style.borderColor = "#e2e8f0")} />
+
+            {busqAgotados.trim().length >= 2 && (
+              <div style={{ marginTop: 8, background: "white", border: "1px solid #f1f5f9", borderRadius: 10, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+                {buscandoAgotados ? (
+                  <div style={{ padding: "16px", textAlign: "center", fontSize: 13, color: "#94a3b8" }}>Buscando...</div>
+                ) : resultadosAgotados.length === 0 ? (
+                  <div style={{ padding: "16px", textAlign: "center", fontSize: 13, color: "#94a3b8" }}>Sin coincidencias</div>
+                ) : resultadosAgotados.map((p, i) => (
+                  <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 16px", borderTop: i > 0 ? "1px solid #f1f5f9" : "none" }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "#1a2035" }}>{p.nombre}</div>
+                      <div style={{ fontSize: 12, color: "#64748b" }}>
+                        Stock: <span style={{ color: p.stock > 0 ? "#16a34a" : "#dc2626", fontWeight: 700 }}>{p.stock}</span> · {fmt(p.precio_venta)}{p.oculto_tienda ? " · ⚠ oculto de la tienda" : ""}
+                      </div>
+                    </div>
+                    {p.mostrar_agotado ? (
+                      <span style={{ fontSize: 12, fontWeight: 700, color: "#15803d", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 7, padding: "5px 12px" }}>✓ En vitrina</span>
+                    ) : (
+                      <button onClick={() => marcarAgotado(p.id, true)} disabled={guardandoAgotado === p.id}
+                        style={{ fontSize: 12, fontWeight: 800, color: "white", background: "#e8197d", border: "none", borderRadius: 7, padding: "6px 14px", cursor: "pointer", flexShrink: 0 }}>
+                        + Agregar
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Lista actual en vitrina */}
+            <h3 style={{ margin: "26px 0 12px", fontSize: 14, fontWeight: 800, color: "#1a2035" }}>
+              En vitrina {agotados.length > 0 && <span style={{ color: "#64748b", fontWeight: 600 }}>({agotados.length})</span>}
+            </h3>
+            {cargandoAgotados ? <Spinner /> : agotados.length === 0 ? (
+              <div style={{ background: "white", borderRadius: 12, border: "1px dashed #e2e8f0", padding: "36px 20px", textAlign: "center" }}>
+                <p style={{ margin: 0, fontSize: 13, color: "#94a3b8" }}>Todavía no marcaste ningún producto. Buscá uno arriba y tocá “+ Agregar”.</p>
+              </div>
+            ) : (
+              <div style={{ background: "white", borderRadius: 14, boxShadow: "0 2px 12px rgba(0,0,0,0.07)", overflow: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 520 }}>
+                  <thead>
+                    <tr style={{ background: "#f8fafc", borderBottom: "2px solid #e2e8f0" }}>
+                      {["Producto", "Stock", "Precio", ""].map(h => (
+                        <th key={h} style={{ padding: "11px 16px", textAlign: "left", fontSize: 10.5, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.6 }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {agotados.map((p, i) => (
+                      <tr key={p.id} style={{ borderBottom: "1px solid #f1f5f9", background: i % 2 === 0 ? "white" : "#fafbfc" }}>
+                        <td style={{ padding: "11px 16px", fontSize: 13, fontWeight: 700, color: "#1a2035" }}>
+                          {p.nombre}
+                          {p.oculto_tienda && <span style={{ marginLeft: 8, fontSize: 11, color: "#b45309" }}>⚠ oculto de la tienda</span>}
+                        </td>
+                        <td style={{ padding: "11px 16px" }}>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: p.stock > 0 ? "#16a34a" : "#dc2626" }}>{p.stock}</span>
+                        </td>
+                        <td style={{ padding: "11px 16px", fontSize: 13, fontWeight: 700, color: "#1a2035", whiteSpace: "nowrap" }}>{fmt(p.precio_venta)}</td>
+                        <td style={{ padding: "11px 16px" }}>
+                          <button onClick={() => marcarAgotado(p.id, false)} disabled={guardandoAgotado === p.id}
+                            style={{ fontSize: 12, fontWeight: 700, color: "#dc2626", background: "white", border: "1.5px solid #fecaca", borderRadius: 7, padding: "5px 12px", cursor: "pointer", whiteSpace: "nowrap" }}>
+                            Quitar
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>

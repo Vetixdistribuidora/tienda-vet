@@ -754,6 +754,16 @@ export default function Tienda() {
           desde += 1000
           if (desde >= 20000) break  // seguro anti-bucle
         }
+        // Sumar productos "vitrina": marcados para mostrarse aunque estén sin
+        // stock (aparecen con cartel "Sin stock"). El dedup de abajo evita
+        // repetirlos si ya vinieron del catálogo.
+        try {
+          const rv = await fetch("/api/vitrina")
+          if (rv.ok) {
+            const vit = await rv.json()
+            if (Array.isArray(vit)) todos = [...todos, ...(vit as Producto[])]
+          }
+        } catch { /* si falla, la tienda sigue igual */ }
         if (todos.length === 0) throw new Error("Sin datos")
         // Ocultar productos sin precio (precio_venta = 0): se verían como "$0".
         // Y ocultar los marcados como "oculto_tienda" (servicios, saldos viejos, etc.).

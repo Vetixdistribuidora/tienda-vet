@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { verificarAdmin } from "../_lib"
 import { getSupabaseAdmin } from "@/lib/supabase-admin"
 
-type ProdRow = { id: number; nombre: string; precio_venta: number; stock: number; categoria: string | null; laboratorio: string | null; imagen_url: string | null; oculto_tienda: boolean }
+type ProdRow = { id: number; nombre: string; precio_venta: number; stock: number; categoria: string | null; laboratorio: string | null; imagen_url: string | null; oculto_tienda: boolean; mostrar_agotado: boolean }
 
 export async function GET(req: NextRequest) {
   if (!await verificarAdmin(req)) {
@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   }
 
   const db = getSupabaseAdmin()
-  const SELECT = "id, nombre, precio_venta, stock, categoria, subcategoria, laboratorio, imagen_url, oculto_tienda"
+  const SELECT = "id, nombre, precio_venta, stock, categoria, subcategoria, laboratorio, imagen_url, oculto_tienda, mostrar_agotado"
 
   // ── 1. Traer el MISMO catálogo que ve la tienda (stock > 0 + ventas
   //       recientes), así el panel admin y la tienda coinciden y se puede
