@@ -18,6 +18,18 @@ type ClienteAdmin = {
   created_at: string | null
 }
 
+type VetixCliente = {
+  id: number
+  nombre: string
+  apellido: string | null
+  cuit: string | null
+  localidad: string | null
+  tipo_cliente: string | null
+  email_tienda: string | null
+  saldo?: number
+  facturas_abiertas?: number
+}
+
 type PedidoItemAdmin = {
   nombre_producto: string
   cantidad: number
@@ -100,6 +112,13 @@ export default function AdminPanel() {
   const [busqClientes, setBusqClientes] = useState("")
   const [filtroTipo, setFiltroTipo] = useState("todos")
   const [guardandoTipo, setGuardandoTipo] = useState<string | null>(null)
+  // Vinculación cuenta de tienda ↔ cliente de vetix (para la cuenta corriente)
+  const [vinculaciones, setVinculaciones] = useState<Record<string, VetixCliente>>({})
+  const [modalVincular, setModalVincular] = useState<ClienteAdmin | null>(null)
+  const [busqVetix, setBusqVetix] = useState("")
+  const [resultadosVetix, setResultadosVetix] = useState<VetixCliente[]>([])
+  const [buscandoVetix, setBuscandoVetix] = useState(false)
+  const [vinculando, setVinculando] = useState(false)
 
   // Pedidos
   const [pedidos, setPedidos] = useState<PedidoAdmin[]>([])
@@ -200,6 +219,37 @@ export default function AdminPanel() {
     if (res.ok) { setClientes(await res.json()) }
     else { const body = await res.text(); setApiError(`Clientes: ${res.status} — ${body}`) }
     setCargandoClientes(false)
+    cargarVinculaciones()
+  }
+
+  async function cargarVinculaciones() {
+    const res = await apiFetch("/api/admin/vetix-clientes?linked=1")
+    if (!res.ok) return
+    const rows: VetixCliente[] = await res.json()
+    const map: Record<string, VetixCliente> = {}
+    for (const r of rows) { if (r.email_tienda) map[r.email_tienda.toLowerCase()] = r }
+    setVinculaciones(map)
+  }
+
+  async function buscarVetix(q: string) {
+    setBusqVetix(q)
+    if (q.trim().length < 2) { setResultadosVetix([]); return }
+    setBuscandoVetix(true)
+    const res = await apiFetch(`/api/admin/vetix-clientes?q=${encodeURIComponent(q.trim())}`)
+    if (res.ok) setResultadosVetix(await res.json())
+    setBuscandoVetix(false)
+  }
+
+  async function vincular(email: string, clienteId: number | null) {
+    setVinculando(true)
+    const res = await apiFetch("/api/admin/vincular", {
+      method: "POST",
+      body: JSON.stringify({ email, cliente_id: clienteId }),
+    })
+    setVinculando(false)
+    if (!res.ok) { const b = await res.text(); setApiError(`Vincular: ${res.status} — ${b}`); return }
+    await cargarVinculaciones()
+    setModalVincular(null); setBusqVetix(""); setResultadosVetix([])
   }
 
   async function cargarPedidos() {
@@ -575,14 +625,14 @@ export default function AdminPanel() {
                 <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 600 }}>
                   <thead>
                     <tr style={{ background: "#f8fafc", borderBottom: "2px solid #e2e8f0" }}>
-                      {["Cliente", "Email", "Teléfono", "Tipo"].map(h => (
+                      {["Cliente", "Email", "Teléfono", "Tipo", "Cuenta vetix"].map(h => (
                         <th key={h} style={{ padding: "11px 16px", textAlign: "left", fontSize: 10.5, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.6 }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {clientesFiltrados.length === 0 ? (
-                      <tr><td colSpan={4} style={{ padding: "48px 16px", textAlign: "center", color: "#94a3b8", fontSize: 13 }}>Sin resultados</td></tr>
+                      <tr><td colSpan={5} style={{ padding: "48px 16px", textAlign: "center", color: "#94a3b8", fontSize: 13 }}>Sin resultados</td></tr>
                     ) : clientesFiltrados.map((c, i) => {
                       const ts = TIPO_STYLE[c.tipo_cliente] ?? TIPO_STYLE.pendiente
                       return (
@@ -608,6 +658,22 @@ export default function AdminPanel() {
                               {guardandoTipo === c.id && <span style={{ fontSize: 11, color: "#94a3b8" }}>Guardando...</span>}
                             </div>
                           </td>
+                          <td style={{ padding: "12px 16px" }}>
+                            {(() => {
+                              const link = c.email ? vinculaciones[c.email.toLowerCase()] : undefined
+                              return link ? (
+                                <button onClick={() => { setModalVincular(c); setBusqVetix(""); setResultadosVetix([]) }}
+                                  style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 10px", borderRadius: 7, fontSize: 12, fontWeight: 700, cursor: "pointer", border: "1.5px solid #bbf7d0", background: "#f0fdf4", color: "#15803d" }}>
+                                  ✓ {link.nombre} {link.apellido ?? ""}{link.cuit ? ` · ${link.cuit}` : ""}
+                                </button>
+                              ) : (
+                                <button onClick={() => { setModalVincular(c); setBusqVetix(""); setResultadosVetix([]) }}
+                                  style={{ padding: "5px 12px", borderRadius: 7, fontSize: 12, fontWeight: 700, cursor: "pointer", border: "1.5px solid #e2e8f0", background: "white", color: "#64748b" }}>
+                                  + Vincular
+                                </button>
+                              )
+                            })()}
+                          </td>
                         </tr>
                       )
                     })}
@@ -617,6 +683,78 @@ export default function AdminPanel() {
             )}
           </div>
         )}
+
+        {/* ════════ MODAL VINCULAR TIENDA ↔ VETIX ════════ */}
+        {modalVincular && (() => {
+          const email = modalVincular.email?.toLowerCase() ?? ""
+          const actual = email ? vinculaciones[email] : undefined
+          return (
+            <div onClick={e => { if (e.target === e.currentTarget) setModalVincular(null) }}
+              style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,0.55)", zIndex: 100, display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "60px 16px", overflowY: "auto" }}>
+              <div style={{ background: "white", borderRadius: 16, width: "100%", maxWidth: 520, boxShadow: "0 24px 60px rgba(0,0,0,0.3)", overflow: "hidden" }}>
+                <div style={{ padding: "18px 22px", borderBottom: "1px solid #f1f5f9" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+                    <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#1a2035" }}>Vincular con cliente de vetix</h3>
+                    <button onClick={() => setModalVincular(null)} style={{ width: 30, height: 30, borderRadius: 8, border: "1px solid #e2e8f0", background: "white", cursor: "pointer", color: "#64748b", fontSize: 16 }}>✕</button>
+                  </div>
+                  <p style={{ margin: "6px 0 0", fontSize: 13, color: "#64748b" }}>
+                    Cuenta de tienda: <b style={{ color: "#1a2035" }}>{modalVincular.nombre} {modalVincular.apellido}</b> · {modalVincular.email}
+                  </p>
+                </div>
+
+                <div style={{ padding: "18px 22px" }}>
+                  {actual && (
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: "10px 14px", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 10, marginBottom: 16 }}>
+                      <span style={{ fontSize: 13, color: "#15803d" }}>Vinculado a <b>{actual.nombre} {actual.apellido ?? ""}</b>{actual.cuit ? ` · ${actual.cuit}` : ""}</span>
+                      <button onClick={() => vincular(modalVincular.email!, null)} disabled={vinculando}
+                        style={{ padding: "5px 12px", borderRadius: 7, fontSize: 12, fontWeight: 700, cursor: "pointer", border: "1.5px solid #fecaca", background: "white", color: "#dc2626" }}>
+                        Desvincular
+                      </button>
+                    </div>
+                  )}
+
+                  <input autoFocus placeholder="Buscar cliente por nombre o CUIT..." value={busqVetix} onChange={e => buscarVetix(e.target.value)}
+                    style={{ width: "100%", padding: "10px 14px", border: "1.5px solid #e2e8f0", borderRadius: 9, fontSize: 13, outline: "none", boxSizing: "border-box" }}
+                    onFocus={e => (e.target.style.borderColor = "#e8197d")} onBlur={e => (e.target.style.borderColor = "#e2e8f0")} />
+
+                  <div style={{ marginTop: 12, maxHeight: 340, overflowY: "auto" }}>
+                    {buscandoVetix && <p style={{ fontSize: 13, color: "#94a3b8", textAlign: "center", padding: "16px 0" }}>Buscando...</p>}
+                    {!buscandoVetix && busqVetix.trim().length >= 2 && resultadosVetix.length === 0 && (
+                      <p style={{ fontSize: 13, color: "#94a3b8", textAlign: "center", padding: "16px 0" }}>Sin coincidencias</p>
+                    )}
+                    {resultadosVetix.map(v => {
+                      const yaVinc = v.email_tienda && v.email_tienda.toLowerCase() !== email
+                      return (
+                        <button key={v.id} onClick={() => vincular(modalVincular.email!, v.id)} disabled={vinculando}
+                          style={{ width: "100%", textAlign: "left", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, padding: "11px 14px", borderRadius: 9, border: "1px solid #f1f5f9", background: "white", cursor: "pointer", marginBottom: 6 }}
+                          onMouseEnter={e => (e.currentTarget.style.background = "#f8fafc")} onMouseLeave={e => (e.currentTarget.style.background = "white")}>
+                          <div style={{ minWidth: 0 }}>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: "#1a2035" }}>{v.nombre} {v.apellido ?? ""}</div>
+                            <div style={{ fontSize: 12, color: "#64748b" }}>
+                              {v.cuit ? `CUIT ${v.cuit}` : "sin CUIT"}{v.localidad ? ` · ${v.localidad}` : ""}{v.tipo_cliente ? ` · ${v.tipo_cliente}` : ""}
+                            </div>
+                            {typeof v.saldo === "number" && (
+                              <div style={{ fontSize: 11, marginTop: 3 }}>
+                                {v.saldo > 0
+                                  ? <span style={{ color: "#b91c1c", fontWeight: 700 }}>Cta. corriente: {fmt(v.saldo)} · {v.facturas_abiertas} factura{v.facturas_abiertas === 1 ? "" : "s"} abierta{v.facturas_abiertas === 1 ? "" : "s"}</span>
+                                  : <span style={{ color: "#94a3b8" }}>Sin saldo pendiente en cuenta corriente</span>}
+                              </div>
+                            )}
+                            {yaVinc && <div style={{ fontSize: 11, color: "#b45309", marginTop: 2 }}>⚠ Ya vinculado a otra cuenta ({v.email_tienda})</div>}
+                          </div>
+                          <span style={{ fontSize: 12, fontWeight: 800, color: "#e8197d", flexShrink: 0 }}>Vincular →</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                  <p style={{ margin: "10px 2px 0", fontSize: 11, color: "#94a3b8", lineHeight: 1.5 }}>
+                    Al vincular, el cliente verá su saldo, facturas y pagos de vetix en “Mi cuenta”. Asegurate de elegir el cliente correcto.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )
+        })()}
 
         {/* ════════ TAB PEDIDOS ════════ */}
         {tab === "pedidos" && (

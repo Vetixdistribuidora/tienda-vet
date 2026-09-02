@@ -1513,46 +1513,41 @@ export default function Tienda() {
     const notasItems = carrito.filter(i => i.nota).map(i => `• ${i.producto.nombre}: ${i.nota}`).join("\n")
     const notasFinal = [form.notas.trim(), notasItems ? `Notas por producto:\n${notasItems}` : ""].filter(Boolean).join("\n\n") || null
 
-    const { data: pedido, error } = await supabase
-      .from("pedidos")
-      .insert({
-        cliente_nombre: form.nombre.trim(),
-        cliente_email: form.email.trim() || usuario?.email || null,
-        cliente_telefono: form.telefono.trim(),
-        cliente_direccion: form.direccion.trim() || null,
-        notas: notasFinal,
-        total: totalPrecio,
-        estado: "pendiente",
-        usuario_id: usuario?.id ?? null,
+    // Crear el pedido de forma segura desde el servidor (ver /api/pedidos):
+    // la identidad y los precios se resuelven en el backend, no en el navegador.
+    const { data: { session } } = await supabase.auth.getSession()
+    let nuevoId: number
+    try {
+      const resp = await fetch("/api/pedidos", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({
+          cliente_nombre: form.nombre.trim(),
+          cliente_email: form.email.trim() || usuario?.email || null,
+          cliente_telefono: form.telefono.trim(),
+          cliente_direccion: form.direccion.trim() || null,
+          notas: notasFinal,
+          items: carrito.map(i => ({ producto_id: i.producto.id, cantidad: i.cantidad })),
+        }),
       })
-      .select().single()
-
-    if (error || !pedido) {
-      console.error("Error al insertar pedido:", error)
+      const json = await resp.json()
+      if (!resp.ok || !json?.id) {
+        setEnviando(false)
+        setErrPedido("Error al enviar el pedido: " + (json?.error ?? "sin respuesta del servidor"))
+        return
+      }
+      nuevoId = json.id
+    } catch {
       setEnviando(false)
-      setErrPedido("Error al enviar el pedido: " + (error?.message ?? "sin respuesta del servidor"))
-      return
-    }
-
-    const { error: errItems } = await supabase.from("pedido_items").insert(
-      carrito.map(i => {
-        const pu = precioConTipo(i.producto.precio_venta, tipoCliente) ?? i.producto.precio_venta
-        return {
-          pedido_id: pedido.id, producto_id: i.producto.id,
-          nombre_producto: i.producto.nombre, precio_unitario: pu,
-          cantidad: i.cantidad, subtotal: pu * i.cantidad,
-        }
-      })
-    )
-    if (errItems) {
-      console.error("Error al insertar pedido_items:", errItems)
-      setEnviando(false)
-      setErrPedido("Error al guardar los productos del pedido: " + errItems.message)
+      setErrPedido("Error de conexión al enviar el pedido")
       return
     }
 
     const total = totalPrecio
-    setEnviando(false); setNumeroPedido(pedido.id); setPrecioFinal(total)
+    setEnviando(false); setNumeroPedido(nuevoId); setPrecioFinal(total)
     setPedidoCarrito(carrito); setPedidoOk(true); setCarrito([])
     // Guardar datos del cliente para pre-rellenar la próxima vez
     localStorage.setItem("vetix_cliente", JSON.stringify({
@@ -3057,7 +3052,7 @@ export default function Tienda() {
                     { label: "Inicio", action: () => { irAInicio(); setSidebarOpen(false); setCatPanelOpen(false) } },
                     { label: "Catálogo completo", action: () => { verCatalogo(""); setSidebarOpen(false); setCatPanelOpen(false) } },
                     ...(favoritos.size > 0 ? [{ label: `Mis favoritos (${favoritos.size})`, action: () => { setSidebarOpen(false); setCatPanelOpen(false); setBusqueda(""); setCategoriaActiva("__favs__") } }] : []),
-                    ...(usuario ? [{ label: "Mis pedidos", action: () => { setSidebarOpen(false); setCatPanelOpen(false); window.location.href = "/mis-pedidos" } }] : []),
+                    ...(usuario ? [{ label: "Mi cuenta", action: () => { setSidebarOpen(false); setCatPanelOpen(false); window.location.href = "/mis-pedidos" } }] : []),
                     ...(tienePrecios ? [{ label: "Descargar lista de precios", action: () => { exportarCSV(); setSidebarOpen(false); setCatPanelOpen(false) } }] : []),
                   ].map(item => (
                     <button key={item.label} onClick={item.action}
