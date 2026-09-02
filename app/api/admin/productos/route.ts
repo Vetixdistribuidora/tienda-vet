@@ -69,8 +69,19 @@ export async function GET(req: NextRequest) {
     if (data) sinStockVendidos.push(...data)
   }
 
-  // ── 5. Mergear y ordenar por nombre ─────────────────────────────────────────
-  const todos = [...conStock, ...sinStockVendidos]
+  // ── 5. Sumar los productos "en vitrina" (mostrar_agotado) que no estén ya ────
+  //       Así aparecen en el listado de Productos y se pueden editar (foto, etc.)
+  //       aunque tengan stock 0 y nunca se hayan vendido.
+  const yaIncluidos = new Set([...conStock, ...sinStockVendidos].map(p => p.id))
+  const { data: vitrina } = await db
+    .from("productos")
+    .select(SELECT)
+    .eq("mostrar_agotado", true)
+    .limit(500)
+  const vitrinaExtra = (vitrina ?? []).filter(p => !yaIncluidos.has(p.id))
+
+  // ── 6. Mergear y ordenar por nombre ─────────────────────────────────────────
+  const todos = [...conStock, ...sinStockVendidos, ...vitrinaExtra]
     .sort((a, b) => a.nombre.localeCompare(b.nombre, "es", { sensitivity: "base" }))
 
   return NextResponse.json(todos)
