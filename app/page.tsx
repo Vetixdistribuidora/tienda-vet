@@ -1832,23 +1832,20 @@ export default function Tienda() {
       {vistaHome && (
         <div>
 
+          {/* ── VER CATÁLOGO (arriba) ─────────────────────────────────────── */}
+          <div style={{ background: "#1a2035", padding: "26px 20px 8px", textAlign: "center" }}>
+            <button onClick={() => verCatalogo("")}
+              style={{ display: "inline-flex", alignItems: "center", gap: 12, padding: "18px 48px", borderRadius: 16, background: "#d4688e", color: "white", border: "none", fontSize: 18, fontWeight: 900, cursor: "pointer", boxShadow: "0 6px 28px rgba(212,104,142,0.5)", transition: "background 0.15s, transform 0.12s, box-shadow 0.15s" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#b05070"; e.currentTarget.style.transform = "scale(1.03)"; e.currentTarget.style.boxShadow = "0 8px 36px rgba(212,104,142,0.6)" }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#d4688e"; e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "0 6px 28px rgba(212,104,142,0.5)" }}>
+              Ver catálogo completo — {productos.length.toLocaleString("es-AR")} productos →
+            </button>
+          </div>
+
           {/* ── HERO ─────────────────────────────────────────────────── */}
           <div style={{ background: "#1a2035" }}>
-            {/* Barra de stats */}
-            <div style={{ background: "linear-gradient(90deg, #b05070, #d4688e, #c97b9e, #b05070)", backgroundSize: "200% 100%", padding: "9px 24px", display: "flex", justifyContent: "center", gap: 36, flexWrap: "wrap" }}>
-              {[
-                { n: `+${productos.length}`, label: "productos" },
-                { n: `+${laboratorios.length}`, label: "laboratorios" },
-                { n: categorias.length.toString(), label: "categorías" },
-                { n: "24 hs", label: "atención online" },
-              ].map(st => (
-                <div key={st.label} style={{ display: "flex", alignItems: "center", gap: 6, color: "white", fontSize: 12, fontWeight: 600 }}>
-                  <strong style={{ fontSize: 15, fontWeight: 900 }}>{st.n}</strong>{st.label}
-                </div>
-              ))}
-            </div>
             {/* Cuerpo del hero */}
-            <div style={{ padding: "40px 24px 20px", textAlign: "center", maxWidth: 680, margin: "0 auto" }}>
+            <div style={{ padding: "20px 24px 24px", textAlign: "center", maxWidth: 680, margin: "0 auto" }}>
               <h1 style={{ margin: "0 0 10px", fontSize: "clamp(14px, 4.3vw, 32px)", fontWeight: 900, color: "white", lineHeight: 1.2, whiteSpace: "nowrap" }}>
                 Tu distribuidora veterinaria <span style={{ color: "#f0c8d8" }}>online</span>
               </h1>
@@ -1880,18 +1877,19 @@ export default function Tienda() {
                 </button>
               </div>
             </div>
-          </div>
-
-
-
-          {/* ── VER CATÁLOGO ──────────────────────────────────────────────── */}
-          <div style={{ background: "#1a2035", padding: "20px 20px 26px", borderTop: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
-            <button onClick={() => verCatalogo("")}
-              style={{ display: "inline-flex", alignItems: "center", gap: 12, padding: "18px 48px", borderRadius: 16, background: "#d4688e", color: "white", border: "none", fontSize: 18, fontWeight: 900, cursor: "pointer", boxShadow: "0 6px 28px rgba(212,104,142,0.5)", transition: "background 0.15s, transform 0.12s, box-shadow 0.15s" }}
-              onMouseEnter={e => { e.currentTarget.style.background = "#b05070"; e.currentTarget.style.transform = "scale(1.03)"; e.currentTarget.style.boxShadow = "0 8px 36px rgba(212,104,142,0.6)" }}
-              onMouseLeave={e => { e.currentTarget.style.background = "#d4688e"; e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "0 6px 28px rgba(212,104,142,0.5)" }}>
-              Ver catálogo completo — {productos.length.toLocaleString("es-AR")} productos →
-            </button>
+            {/* Barra de stats (abajo) */}
+            <div style={{ background: "linear-gradient(90deg, #b05070, #d4688e, #c97b9e, #b05070)", backgroundSize: "200% 100%", padding: "10px 24px", display: "flex", justifyContent: "center", gap: 36, flexWrap: "wrap" }}>
+              {[
+                { n: `+${productos.length}`, label: "productos" },
+                { n: `+${laboratorios.length}`, label: "laboratorios" },
+                { n: categorias.length.toString(), label: "categorías" },
+                { n: "24 hs", label: "atención online" },
+              ].map(st => (
+                <div key={st.label} style={{ display: "flex", alignItems: "center", gap: 6, color: "white", fontSize: 12, fontWeight: 600 }}>
+                  <strong style={{ fontSize: 15, fontWeight: 900 }}>{st.n}</strong>{st.label}
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* ── PROMOCIONES (FLYERS) ──────────────────────────────────────── */}
