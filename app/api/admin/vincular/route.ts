@@ -37,14 +37,15 @@ export async function POST(req: NextRequest) {
       .eq("id", cliente_id)
     if (eSet) return NextResponse.json({ error: eSet.message }, { status: 500 })
 
-    // Reflejar el tipo_cliente de vetix en el perfil de la tienda (mismo criterio
-    // que ya usa el login: clientes manda sobre tienda_perfiles).
+    // Reflejar el tipo_cliente de vetix en el perfil SOLO si es una categoría real
+    // (veterinario/productor). Nunca degradar a "pendiente" un tipo ya asignado
+    // por el admin al vincular (ese era el bug de "se vuelve pendiente solo").
     const { data: cli } = await db
       .from("clientes")
       .select("tipo_cliente")
       .eq("id", cliente_id)
       .maybeSingle()
-    if (cli?.tipo_cliente) {
+    if (cli?.tipo_cliente === "veterinario" || cli?.tipo_cliente === "productor") {
       await db.from("tienda_perfiles").update({ tipo_cliente: cli.tipo_cliente }).ilike("email", emailLc)
     }
   }

@@ -1323,10 +1323,20 @@ export default function Tienda() {
       .maybeSingle()
 
     const TIPOS_VALIDOS: TipoCliente[] = ["veterinario", "productor", "pendiente"]
+    const esReal = (t: string | null | undefined) => t === "veterinario" || t === "productor"
     const tipoDeClientes: TipoCliente | null = clienteRow?.tipo_cliente && TIPOS_VALIDOS.includes(clienteRow.tipo_cliente)
       ? clienteRow.tipo_cliente as TipoCliente
       : null
-    const tipoFinal: TipoCliente = tipoDeClientes ?? (TIPOS_VALIDOS.includes(p.tipo_cliente) ? p.tipo_cliente : "pendiente")
+    // clientes (vetix) puede SUBIR de categoría, pero NUNCA degradar a "pendiente"
+    // un veterinario/productor ya asignado por el admin en la tienda.
+    let tipoFinal: TipoCliente
+    if (tipoDeClientes === "pendiente" && esReal(p.tipo_cliente)) {
+      tipoFinal = p.tipo_cliente                       // no degradar lo asignado
+    } else if (tipoDeClientes) {
+      tipoFinal = tipoDeClientes                       // clientes manda (subir / cambiar)
+    } else {
+      tipoFinal = TIPOS_VALIDOS.includes(p.tipo_cliente) ? p.tipo_cliente : "pendiente"
+    }
 
     // Si cambió, actualizar tienda_perfiles para la próxima vez
     if (tipoFinal !== p.tipo_cliente) {
