@@ -741,7 +741,10 @@ export default function Tienda() {
         // calculado en el servidor. Reemplaza por completo al catálogo normal, así
         // no hay riesgo de que se filtre ningún producto de otra categoría.
         if (tipoCliente === "publico") {
-          const r = await fetch("/api/catalogo-publico")
+          const { data: { session } } = await supabase.auth.getSession()
+          const r = await fetch("/api/catalogo-publico", {
+            headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {},
+          })
           if (!r.ok) throw new Error("No se pudo cargar el catálogo")
           const data = await r.json()
           setProductos(Array.isArray(data) ? (data as Producto[]) : [])
@@ -825,8 +828,10 @@ export default function Tienda() {
       }
     }
     cargar()
+  // Solo recargar cuando cambia SI ES público o no (los demás tipos usan la misma
+  // fuente y calculan el precio en el cliente, no hace falta re-fetchear todo).
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reintento, tipoCliente])
+  }, [reintento, tipoCliente === "publico"])
 
   // Scroll tracker
   useEffect(() => {
