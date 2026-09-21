@@ -23,8 +23,10 @@ export async function PATCH(
 
   if (e1) return NextResponse.json({ error: e1.message }, { status: 500 })
 
-  // Also update clientes.tipo_cliente (source of truth used on login)
-  if (email) {
+  // Also update clientes.tipo_cliente (source of truth used on login).
+  // "publico" es un tipo SOLO de la tienda (minorista): no se escribe en la tabla
+  // clientes de vetix para no ensuciarla con un valor que vetix no conoce.
+  if (email && tipo_cliente !== "publico") {
     await db
       .from("clientes")
       .update({ tipo_cliente })

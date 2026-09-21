@@ -6,7 +6,7 @@ import Image from "next/image"
 import Link from "next/link"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
-type TipoCliente = "veterinario" | "productor" | "pendiente"
+type TipoCliente = "veterinario" | "productor" | "pendiente" | "publico"
 
 type ClienteAdmin = {
   id: string
@@ -88,6 +88,7 @@ const TIPO_STYLE: Record<TipoCliente, { bg: string; border: string; color: strin
   veterinario: { bg: "#eff6ff", border: "#bfdbfe", color: "#1d4ed8" },
   productor:   { bg: "#f0fdf4", border: "#bbf7d0", color: "#15803d" },
   pendiente:   { bg: "#fffbeb", border: "#fde68a", color: "#92400e" },
+  publico:     { bg: "#faf5ff", border: "#e9d5ff", color: "#7e22ce" },
 }
 
 const ESTADO_STYLE: Record<string, { bg: string; border: string; color: string }> = {
@@ -657,6 +658,7 @@ export default function AdminPanel() {
                 <option value="todos">Todos los tipos</option>
                 <option value="veterinario">Veterinarios</option>
                 <option value="productor">Productores</option>
+                <option value="publico">Públicos</option>
                 <option value="pendiente">Pendientes</option>
               </select>
               <button onClick={cargarClientes} style={{ padding: "9px 16px", background: "#1a2035", color: "white", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>↺ Actualizar</button>
@@ -695,6 +697,7 @@ export default function AdminPanel() {
                                 style={{ padding: "5px 10px", borderRadius: 7, fontSize: 12, fontWeight: 700, cursor: "pointer", outline: "none", border: `1.5px solid ${ts.border}`, background: ts.bg, color: ts.color }}>
                                 <option value="veterinario">Veterinario</option>
                                 <option value="productor">Productor</option>
+                                <option value="publico">Público (solo Pet Shop)</option>
                                 <option value="pendiente">Pendiente</option>
                               </select>
                               {guardandoTipo === c.id && <span style={{ fontSize: 11, color: "#94a3b8" }}>Guardando...</span>}

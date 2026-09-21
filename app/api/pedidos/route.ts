@@ -14,6 +14,7 @@ import { getSupabaseAdmin } from "@/lib/supabase-admin"
 
 const FACTOR_VET = 1.30
 const FACTOR_PROD = 1.58
+const FACTOR_PUBLICO = 2.0 // "publico": precio = costo × 2 (100% sobre el costo)
 
 function factorPara(tipo: string | null | undefined): number | null {
   if (tipo === "veterinario") return FACTOR_VET
@@ -61,29 +62,33 @@ export async function POST(req: NextRequest) {
   // 3. Determinar el tipo de cliente (autoritativo, del servidor)
   let tipo: string | null = null
   if (emailToken) {
+    const { data: perf } = await db.from("tienda_perfiles").select("tipo_cliente").eq("id", usuarioId).maybeSingle()
     const { data: cli } = await db.from("clientes").select("tipo_cliente").eq("email_tienda", emailToken).maybeSingle()
-    if (cli?.tipo_cliente) tipo = cli.tipo_cliente
-    else {
-      const { data: perf } = await db.from("tienda_perfiles").select("tipo_cliente").eq("id", usuarioId).maybeSingle()
-      tipo = perf?.tipo_cliente ?? null
-    }
+    const perfilTipo = perf?.tipo_cliente ?? null
+    const clientesTipo = cli?.tipo_cliente ?? null
+    // "publico" es de la tienda y manda; si no, gana clientes (vetix) y si no, el perfil.
+    tipo = perfilTipo === "publico" ? "publico" : (clientesTipo ?? perfilTipo)
   }
+  const esPublico = tipo === "publico"
   const factor = factorPara(tipo)
 
-  // 4. Recalcular precios desde la base
+  // 4. Recalcular precios desde la base.
+  //    Público: precio = costo × 2 (el costo NUNCA sale de acá, solo el precio final).
   const ids = [...cantidades.keys()]
   const { data: prods, error: prodErr } = await db
-    .from("productos").select("id, nombre, precio_venta").in("id", ids)
+    .from("productos").select("id, nombre, precio_venta, costo").in("id", ids)
   if (prodErr) return NextResponse.json({ error: prodErr.message }, { status: 500 })
 
   const prodMap = new Map((prods ?? []).map(p => [p.id, p]))
   const itemsRows: { producto_id: number; nombre_producto: string; precio_unitario: number | null; cantidad: number; subtotal: number | null }[] = []
   let total = 0
-  let hayPrecios = factor != null
+  let hayPrecios = esPublico || factor != null
   for (const [pid, cant] of cantidades) {
     const p = prodMap.get(pid)
     if (!p) return NextResponse.json({ error: `Producto ${pid} no existe` }, { status: 400 })
-    const pu = factor != null ? Math.round(Number(p.precio_venta) * factor * 100) / 100 : null
+    const pu = esPublico
+      ? (Number(p.costo) > 0 ? Math.round(Number(p.costo) * FACTOR_PUBLICO * 100) / 100 : null)
+      : (factor != null ? Math.round(Number(p.precio_venta) * factor * 100) / 100 : null)
     const sub = pu != null ? Math.round(pu * cant * 100) / 100 : null
     if (sub != null) total += sub
     itemsRows.push({ producto_id: pid, nombre_producto: p.nombre, precio_unitario: pu, cantidad: cant, subtotal: sub })

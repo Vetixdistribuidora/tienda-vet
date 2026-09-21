@@ -70,7 +70,11 @@ const CAT_DEFAULT = { bg: "#f5f7fb", color: "#374151", border: "#e2e8f0", icon: 
 // ── Precios por rol ───────────────────────────────────────────────────────
 const FACTOR_VET  = 1.30
 const FACTOR_PROD = 1.58
-type TipoCliente = "veterinario" | "productor" | "pendiente"
+// "publico" (minorista, solo Pet Shop): su precio = costo × 2, calculado en el
+// servidor (/api/catalogo-publico) para no exponer el costo. Los productos que
+// recibe el público ya traen ese precio en precio_venta, así que acá no se
+// aplica ningún factor extra.
+type TipoCliente = "veterinario" | "productor" | "pendiente" | "publico"
 type PerfilUsuario = {
   id: string; nombre: string; apellido: string; email: string
   telefono: string; direccion: string; tipo_cliente: TipoCliente
@@ -78,6 +82,7 @@ type PerfilUsuario = {
 function precioConTipo(precioVenta: number, tipo: TipoCliente | null): number | null {
   if (tipo === "veterinario") return Math.round(precioVenta * FACTOR_VET * 100) / 100
   if (tipo === "productor")   return Math.round(precioVenta * FACTOR_PROD * 100) / 100
+  if (tipo === "publico")     return precioVenta  // ya viene calculado (costo × 2)
   return null
 }
 
@@ -732,6 +737,16 @@ export default function Tienda() {
       setCargando(true)
       setErrorCarga(false)
       try {
+        // Cliente "público" (minorista): ve SOLO el Pet Shop, con precio = costo × 2
+        // calculado en el servidor. Reemplaza por completo al catálogo normal, así
+        // no hay riesgo de que se filtre ningún producto de otra categoría.
+        if (tipoCliente === "publico") {
+          const r = await fetch("/api/catalogo-publico")
+          if (!r.ok) throw new Error("No se pudo cargar el catálogo")
+          const data = await r.json()
+          setProductos(Array.isArray(data) ? (data as Producto[]) : [])
+          return
+        }
         let todos: Producto[] = []
         let desde = 0
         let usarRpc = true
@@ -811,7 +826,7 @@ export default function Tienda() {
     }
     cargar()
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reintento])
+  }, [reintento, tipoCliente])
 
   // Scroll tracker
   useEffect(() => {
@@ -981,7 +996,7 @@ export default function Tienda() {
 
   const totalFiltrados = secciones.reduce((s, g) => s + g.items.length, 0)
   const totalItems = carrito.reduce((s, i) => s + i.cantidad, 0)
-  const tienePrecios = tipoCliente === "veterinario" || tipoCliente === "productor"
+  const tienePrecios = tipoCliente === "veterinario" || tipoCliente === "productor" || tipoCliente === "publico"
   const totalPrecio = carrito.reduce((s, i) => {
     const precio = precioConTipo(i.producto.precio_venta, tipoCliente) ?? i.producto.precio_venta
     return s + precio * i.cantidad
@@ -1322,15 +1337,18 @@ export default function Tienda() {
       .eq("email_tienda", p.email.toLowerCase())
       .maybeSingle()
 
-    const TIPOS_VALIDOS: TipoCliente[] = ["veterinario", "productor", "pendiente"]
+    const TIPOS_VALIDOS: TipoCliente[] = ["veterinario", "productor", "pendiente", "publico"]
     const esReal = (t: string | null | undefined) => t === "veterinario" || t === "productor"
     const tipoDeClientes: TipoCliente | null = clienteRow?.tipo_cliente && TIPOS_VALIDOS.includes(clienteRow.tipo_cliente)
       ? clienteRow.tipo_cliente as TipoCliente
       : null
-    // clientes (vetix) puede SUBIR de categoría, pero NUNCA degradar a "pendiente"
-    // un veterinario/productor ya asignado por el admin en la tienda.
+    // "publico" es un tipo propio de la tienda (minorista): vetix nunca lo tiene,
+    // así que se respeta siempre. Fuera de eso, clientes puede SUBIR de categoría
+    // pero NUNCA degradar a "pendiente" un veterinario/productor ya asignado.
     let tipoFinal: TipoCliente
-    if (tipoDeClientes === "pendiente" && esReal(p.tipo_cliente)) {
+    if (p.tipo_cliente === "publico") {
+      tipoFinal = "publico"
+    } else if (tipoDeClientes === "pendiente" && esReal(p.tipo_cliente)) {
       tipoFinal = p.tipo_cliente                       // no degradar lo asignado
     } else if (tipoDeClientes) {
       tipoFinal = tipoDeClientes                       // clientes manda (subir / cambiar)
@@ -1412,7 +1430,7 @@ export default function Tienda() {
       .eq("email_tienda", loginEmail.trim().toLowerCase())
       .maybeSingle()
     const tipoRaw = clienteData?.tipo_cliente ?? "pendiente"
-    const tipo: TipoCliente = (["veterinario", "productor", "pendiente"] as TipoCliente[]).includes(tipoRaw)
+    const tipo: TipoCliente = (["veterinario", "productor", "pendiente", "publico"] as TipoCliente[]).includes(tipoRaw)
       ? tipoRaw as TipoCliente : "pendiente"
 
     // 3. Insertar perfil
