@@ -70,7 +70,31 @@ export async function POST(req: NextRequest) {
     tipo = perfilTipo === "publico" ? "publico" : (clientesTipo ?? perfilTipo)
   }
   const esPublico = tipo === "publico"
-  const factor = factorPara(tipo)
+  let factor = factorPara(tipo)
+
+  // Fortificación (NO cambia el candado): si el tipo quedó sin resolver — p.ej. el
+  // cliente pidió sin loguearse, o el email del token no coincide con el que tenés
+  // cargado — buscamos al cliente por EMAIL o TELÉFONO en la tabla clientes y usamos
+  // SOLO su tipo_cliente (el rubro que VOS asignaste en admin). Si el cliente no
+  // tiene rubro asignado, factor sigue null → precios "a confirmar", igual que hoy.
+  if (!esPublico && factor == null) {
+    let tipoResuelto: string | null = null
+    const emailBusq = (emailToken ?? body.cliente_email?.trim()?.toLowerCase()) || null
+    if (emailBusq) {
+      const { data } = await db.from("clientes").select("tipo_cliente").eq("email_tienda", emailBusq).maybeSingle()
+      tipoResuelto = data?.tipo_cliente ?? null
+    }
+    if (!tipoResuelto) {
+      const telDig = telefono.replace(/\D/g, "")
+      if (telDig.length >= 6) {
+        const last8 = telDig.slice(-8)
+        const { data } = await db.from("clientes").select("tipo_cliente, telefono").ilike("telefono", "%" + last8 + "%").limit(10)
+        const cli = (data ?? []).find((c: { telefono?: string | null }) => (c.telefono ?? "").replace(/\D/g, "").slice(-8) === last8)
+        tipoResuelto = cli?.tipo_cliente ?? null
+      }
+    }
+    if (tipoResuelto) factor = factorPara(tipoResuelto)
+  }
 
   // 4. Recalcular precios desde la base.
   //    Público: precio = costo × 2 (el costo NUNCA sale de acá, solo el precio final).
