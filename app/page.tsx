@@ -2904,12 +2904,12 @@ export default function Tienda() {
 
               {/* Cuerpo */}
               <div style={{ overflowY: "auto", flex: 1 }}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0 }}>
+                <div className="detalle-2col" style={{ gap: 0 }}>
 
                   {/* Imagen */}
                   <div
                     onClick={() => p.imagen_url && setImagenZoom(p.imagen_url)}
-                    style={{ background: "#f7f8fb", display: "flex", alignItems: "center", justifyContent: "center", minHeight: 260, position: "relative", borderRight: "1px solid #f1f5f9", cursor: p.imagen_url ? "zoom-in" : "default", overflow: "hidden" }}>
+                    style={{ background: "#f7f8fb", display: "flex", alignItems: "center", justifyContent: "center", minHeight: 260, position: "relative", cursor: p.imagen_url ? "zoom-in" : "default", overflow: "hidden" }}>
                     {p.imagen_url
                       ? <Image src={p.imagen_url} alt={p.nombre} fill sizes="(max-width: 640px) 90vw, 310px" style={{ objectFit: "contain", padding: 16, transition: "transform 0.2s", pointerEvents: "none" }} />
                       : <div style={{ opacity: 0.3 }}><IcoBox /></div>
@@ -2928,7 +2928,7 @@ export default function Tienda() {
 
                   {/* Info */}
                   <div style={{ padding: "24px 22px", display: "flex", flexDirection: "column", gap: 16 }}>
-                    <h2 style={{ margin: 0, fontSize: 17, fontWeight: 900, color: "#1a2035", lineHeight: 1.4 }}>{p.nombre}</h2>
+                    <h2 style={{ margin: 0, fontSize: 17, fontWeight: 900, color: "#1a2035", lineHeight: 1.4, overflowWrap: "break-word" }}>{p.nombre}</h2>
 
                     <div>
                       {tipoCliente === null ? (

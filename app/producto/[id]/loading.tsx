@@ -16,7 +16,7 @@ export default function LoadingProducto() {
 
       {/* Card skeleton */}
       <main style={{ maxWidth: 900, margin: "0 auto", padding: "20px 20px 60px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", background: "white", borderRadius: 22, border: "1px solid #eaecf2", overflow: "hidden", boxShadow: "0 4px 24px rgba(0,0,0,0.06)" }}>
+        <div className="detalle-2col" style={{ background: "white", borderRadius: 22, border: "1px solid #eaecf2", overflow: "hidden", boxShadow: "0 4px 24px rgba(0,0,0,0.06)" }}>
 
           {/* Imagen */}
           <div style={{ background: "#f7f8fb", minHeight: 340, display: "flex", alignItems: "center", justifyContent: "center" }}>

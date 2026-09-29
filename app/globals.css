@@ -9,6 +9,10 @@ input, textarea, select, button { font-family: inherit; }
   overflow: hidden;
 }
 
+/* Detalle de producto (página y modal): 2 columnas en desktop, apilado en celular.
+   minmax(0,1fr) evita que el contenido (nombres largos) desborde horizontalmente. */
+.detalle-2col { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
+
 /* ── Skeleton ── */
 @keyframes shimmer {
   0%   { background-position: -600px 0; }
@@ -58,6 +62,8 @@ input, textarea, select, button { font-family: inherit; }
 /* ── Responsive ── */
 @media (max-width: 640px) {
   .grid-productos        { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+  .producto-nombre       { -webkit-line-clamp: 3; }
+  .detalle-2col          { grid-template-columns: minmax(0,1fr) !important; }
   .header-search         { display: none !important; }
   .header-search-mobile  { display: block !important; }
   .cart-text             { display: none !important; }

@@ -122,7 +122,7 @@ export default async function ProductoPage(
 
       {/* Contenido principal */}
       <main style={{ maxWidth: 900, margin: "0 auto", padding: "20px 20px 60px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)", gap: 32, background: "white", borderRadius: 22, border: "1px solid #eaecf2", overflow: "hidden", boxShadow: "0 4px 24px rgba(0,0,0,0.06)" }}>
+        <div className="detalle-2col" style={{ gap: 32, background: "white", borderRadius: 22, border: "1px solid #eaecf2", overflow: "hidden", boxShadow: "0 4px 24px rgba(0,0,0,0.06)" }}>
 
           {/* Imagen */}
           <div style={{ background: "#f7f8fb", display: "flex", alignItems: "center", justifyContent: "center", minHeight: 340, position: "relative" }}>
@@ -158,7 +158,7 @@ export default async function ProductoPage(
             </div>
 
             {/* Nombre */}
-            <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: "#1a2035", lineHeight: 1.35 }}>
+            <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: "#1a2035", lineHeight: 1.35, overflowWrap: "break-word" }}>
               {producto.nombre}
             </h1>
 
