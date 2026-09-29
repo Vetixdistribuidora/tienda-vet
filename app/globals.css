@@ -62,7 +62,7 @@ input, textarea, select, button { font-family: inherit; }
 /* ── Responsive ── */
 @media (max-width: 640px) {
   .grid-productos        { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
-  .producto-nombre       { -webkit-line-clamp: 3; }
+  .producto-nombre       { -webkit-line-clamp: 4; }
   .detalle-2col          { grid-template-columns: minmax(0,1fr) !important; }
   .header-search         { display: none !important; }
   .header-search-mobile  { display: block !important; }

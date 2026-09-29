@@ -417,29 +417,33 @@ function TarjetaProducto({ p, enCarrito, onAgregar, onCambiar, onDetalle, esFav,
         <p onClick={onDetalle} className="producto-nombre" style={{ margin: "0 0 auto", fontSize: 13, fontWeight: 700, color: "#1a2035", lineHeight: 1.45, paddingBottom: 12, cursor: "pointer" }}>
           {p.nombre}
         </p>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
-          {tipoCliente === undefined || tipoCliente === null ? (
-            <button onClick={e => { e.stopPropagation(); onVerPrecio?.() }}
-              style={{ fontSize: 11, fontWeight: 700, color: "#d4688e", background: "#fdf0f5", border: "1px solid #f0c8d8", borderRadius: 7, padding: "5px 10px", cursor: "pointer", whiteSpace: "nowrap" }}>
-              Ver precio
-            </button>
-          ) : tipoCliente === "pendiente" ? (
-            <span style={{ fontSize: 12, fontWeight: 700, color: "#92400e" }}>A consultar</span>
-          ) : (
-            <span style={{ fontSize: 17, fontWeight: 900, color: "#d4688e", letterSpacing: -0.3 }}>{fmt(precioConTipo(p.precio_venta, tipoCliente)!)}</span>
-          )}
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {/* Precio */}
+          <div style={{ minHeight: 22, display: "flex", alignItems: "center" }}>
+            {tipoCliente === undefined || tipoCliente === null ? (
+              <button onClick={e => { e.stopPropagation(); onVerPrecio?.() }}
+                style={{ fontSize: 11, fontWeight: 700, color: "#d4688e", background: "#fdf0f5", border: "1px solid #f0c8d8", borderRadius: 7, padding: "5px 10px", cursor: "pointer", whiteSpace: "nowrap" }}>
+                Ver precio
+              </button>
+            ) : tipoCliente === "pendiente" ? (
+              <span style={{ fontSize: 13, fontWeight: 700, color: "#92400e" }}>A consultar</span>
+            ) : (
+              <span style={{ fontSize: 18, fontWeight: 900, color: "#d4688e", letterSpacing: -0.3 }}>{fmt(precioConTipo(p.precio_venta, tipoCliente)!)}</span>
+            )}
+          </div>
+          {/* Acción — a lo ancho, debajo del precio (no se corta) */}
           {p.stock <= 0 ? (
-            <span style={{ fontSize: 12, fontWeight: 800, color: "#6b7280", background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: 9, padding: "8px 13px", whiteSpace: "nowrap" }}>Sin stock</span>
+            <span style={{ display: "block", textAlign: "center", fontSize: 12, fontWeight: 800, color: "#6b7280", background: "#f3f4f6", border: "1px solid #e5e7eb", borderRadius: 9, padding: "9px 12px" }}>Sin stock</span>
           ) : enCarrito > 0 ? (
-            <div style={{ display: "flex", alignItems: "center", gap: 2, background: "#fdf0f5", border: "2px solid #d4688e", borderRadius: 10, padding: "2px 4px" }}>
-              <button onClick={e => { e.stopPropagation(); onCambiar(-1) }} style={{ width: 26, height: 26, border: "none", borderRadius: 7, background: "#fdf0f5", color: "#be185d", fontWeight: 900, cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1 }}>−</button>
-              <span style={{ fontSize: 13, fontWeight: 900, color: "#be185d", minWidth: 22, textAlign: "center" }}>{enCarrito}</span>
-              <button onClick={e => { e.stopPropagation(); onCambiar(1) }} style={{ width: 26, height: 26, border: "none", borderRadius: 7, background: "#d4688e", color: "white", fontWeight: 900, cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1 }}>+</button>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2, background: "#fdf0f5", border: "2px solid #d4688e", borderRadius: 10, padding: "3px 6px" }}>
+              <button onClick={e => { e.stopPropagation(); onCambiar(-1) }} style={{ width: 34, height: 28, border: "none", borderRadius: 7, background: "#fdf0f5", color: "#be185d", fontWeight: 900, cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1 }}>−</button>
+              <span style={{ fontSize: 14, fontWeight: 900, color: "#be185d", minWidth: 22, textAlign: "center" }}>{enCarrito}</span>
+              <button onClick={e => { e.stopPropagation(); onCambiar(1) }} style={{ width: 34, height: 28, border: "none", borderRadius: 7, background: "#d4688e", color: "white", fontWeight: 900, cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1 }}>+</button>
             </div>
           ) : (
-            <button onClick={e => { e.stopPropagation(); onAgregar() }} style={{ background: "#d4688e", color: "white", border: "none", borderRadius: 9, padding: "8px 13px", fontSize: 12, fontWeight: 800, cursor: "pointer", transition: "background 0.15s, transform 0.12s", whiteSpace: "nowrap" }}
-              onMouseEnter={e => { e.currentTarget.style.background = "#b05070"; e.currentTarget.style.transform = "scale(1.06)" }}
-              onMouseLeave={e => { e.currentTarget.style.background = "#d4688e"; e.currentTarget.style.transform = "scale(1)" }}>
+            <button onClick={e => { e.stopPropagation(); onAgregar() }} style={{ width: "100%", background: "#d4688e", color: "white", border: "none", borderRadius: 9, padding: "10px 13px", fontSize: 13, fontWeight: 800, cursor: "pointer", transition: "background 0.15s", whiteSpace: "nowrap" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#b05070" }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#d4688e" }}>
               + Agregar
             </button>
           )}
