@@ -490,16 +490,20 @@ function PromoFlyers({ onZoom }: { onZoom?: (src: string) => void }) {
   const scrollerRef = useRef<HTMLDivElement>(null)
   const [activo, setActivo] = useState(0)
   const [pausado, setPausado] = useState(false)
+  const indiceRef = useRef(0)   // índice lógico actual (lo manejan los botones, siempre avanza y da la vuelta)
+  const lockRef = useRef(0)     // ignora la detección por scroll mientras dura un scroll programático
 
   const irA = useCallback((i: number) => {
     const el = scrollerRef.current
     if (!el) return
     const n = PROMOS.length
     const idx = ((i % n) + n) % n
+    indiceRef.current = idx
+    setActivo(idx)
+    lockRef.current = Date.now() + 700
     const card = el.children[idx] as HTMLElement | undefined
     if (!card) return
-    // Centrar la tarjeta (coincide con scrollSnapAlign: center), así los
-    // botones ‹ › y los puntos avanzan de a una de forma confiable.
+    // Centrar la tarjeta (coincide con scrollSnapAlign: center).
     const cardLeft = card.getBoundingClientRect().left - el.getBoundingClientRect().left + el.scrollLeft
     const left = cardLeft - (el.clientWidth - card.clientWidth) / 2
     el.scrollTo({ left: Math.max(0, left), behavior: "smooth" })
@@ -508,16 +512,17 @@ function PromoFlyers({ onZoom }: { onZoom?: (src: string) => void }) {
   // Avance automático (pausado al pasar el mouse por encima)
   useEffect(() => {
     if (pausado) return
-    const t = setInterval(() => irA(activo + 1), 4500)
+    const t = setInterval(() => irA(indiceRef.current + 1), 4500)
     return () => clearInterval(t)
-  }, [activo, pausado, irA])
+  }, [pausado, irA])
 
-  // Detecta cuál flyer está centrado para marcar el punto activo
+  // Detecta cuál flyer está centrado para marcar el punto activo (solo en scroll manual)
   useEffect(() => {
     const el = scrollerRef.current
     if (!el) return
     let raf = 0
     const onScroll = () => {
+      if (Date.now() < lockRef.current) return   // durante el scroll de los botones no pisamos el índice
       cancelAnimationFrame(raf)
       raf = requestAnimationFrame(() => {
         const centro = el.scrollLeft + el.clientWidth / 2
@@ -528,6 +533,7 @@ function PromoFlyers({ onZoom }: { onZoom?: (src: string) => void }) {
           const d = Math.abs(cc - centro)
           if (d < bestDist) { bestDist = d; best = i }
         })
+        indiceRef.current = best
         setActivo(best)
       })
     }
@@ -551,7 +557,7 @@ function PromoFlyers({ onZoom }: { onZoom?: (src: string) => void }) {
         onMouseLeave={() => setPausado(false)}
       >
         {/* Flecha anterior */}
-        <button aria-label="Anterior" onClick={() => irA(activo - 1)} className="hide-sm"
+        <button aria-label="Anterior" onClick={() => irA(indiceRef.current - 1)} className="hide-sm"
           style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", zIndex: 3, width: 42, height: 42, borderRadius: "50%", background: "rgba(255,255,255,0.95)", border: "1px solid #e6e2de", boxShadow: "0 3px 12px rgba(0,0,0,0.15)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#1a2035", fontSize: 20, lineHeight: 1 }}>
           ‹
         </button>
@@ -575,7 +581,7 @@ function PromoFlyers({ onZoom }: { onZoom?: (src: string) => void }) {
         </div>
 
         {/* Flecha siguiente */}
-        <button aria-label="Siguiente" onClick={() => irA(activo + 1)} className="hide-sm"
+        <button aria-label="Siguiente" onClick={() => irA(indiceRef.current + 1)} className="hide-sm"
           style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", zIndex: 3, width: 42, height: 42, borderRadius: "50%", background: "rgba(255,255,255,0.95)", border: "1px solid #e6e2de", boxShadow: "0 3px 12px rgba(0,0,0,0.15)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#1a2035", fontSize: 20, lineHeight: 1 }}>
           ›
         </button>
