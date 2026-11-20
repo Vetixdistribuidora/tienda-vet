@@ -103,6 +103,7 @@ const BANNER_VERSION = "vetix_banner_1"
 //                  horizontal, "9 / 16" video vertical). Todos se muestran con
 //                  la MISMA altura, y el ancho se ajusta según esta proporción.
 const PROMOS: { src: string; alt: string; video?: boolean; ratio: string }[] = [
+  { src: "/promos/beautipet-colageno.jpeg", alt: "BeautiPet Colágeno para mascotas — Promo 3+1 (llevás 4, pagás 3)", ratio: "1 / 1" },
   { src: "/promos/chapitas.mp4",       alt: "Chapitas identificatorias para mascotas",                    video: true, ratio: "9 / 16" },
   { src: "/promos/flia-m.jpeg",        alt: "Familia de Mascotas — figuras 3D y llaveros",                             ratio: "16 / 9" },
   { src: "/promos/paul-1.jpeg",        alt: "Vacuna Antirrábica PAULVAC — Promoción 9+1",                              ratio: "4 / 5" },
@@ -497,8 +498,11 @@ function PromoFlyers({ onZoom }: { onZoom?: (src: string) => void }) {
     const idx = ((i % n) + n) % n
     const card = el.children[idx] as HTMLElement | undefined
     if (!card) return
-    const left = card.getBoundingClientRect().left - el.getBoundingClientRect().left + el.scrollLeft
-    el.scrollTo({ left, behavior: "smooth" })
+    // Centrar la tarjeta (coincide con scrollSnapAlign: center), así los
+    // botones ‹ › y los puntos avanzan de a una de forma confiable.
+    const cardLeft = card.getBoundingClientRect().left - el.getBoundingClientRect().left + el.scrollLeft
+    const left = cardLeft - (el.clientWidth - card.clientWidth) / 2
+    el.scrollTo({ left: Math.max(0, left), behavior: "smooth" })
   }, [])
 
   // Avance automático (pausado al pasar el mouse por encima)
